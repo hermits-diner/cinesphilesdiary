@@ -174,6 +174,76 @@ app.get('/api/boxoffice', checkAuth, async (req, res) => {
   }
 });
 
+// 1.5. GET /api/upcoming — Fetch upcoming releases using TMDB South Korea region
+app.get('/api/upcoming', checkAuth, async (req, res) => {
+  const startTime = Date.now();
+  const cacheKey = 'upcoming_movies';
+  const cachedData = apiCache.get(cacheKey);
+
+  if (cachedData) {
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: true,
+      latency: `${latency}ms`,
+      data: cachedData,
+    });
+  }
+
+  try {
+    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+    // Fetch South Korea upcoming movies from TMDB
+    const url = `https://api.themoviedb.org/3/movie/upcoming?api_key=${tmdbKey}&language=ko-KR&region=KR`;
+    const response = await axios.get(url, { timeout: 4500 });
+    const rawList = response.data?.results || [];
+
+    // Filter out movies without posters or release dates
+    // Sort movies by release date ascending (soonest release first)
+    const formattedList = rawList
+      .filter(movie => movie.release_date && movie.poster_path)
+      .map(movie => {
+        // Map primary genre ID to string
+        const genreMap = {
+          28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
+          99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
+          36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
+          10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
+          10752: '전쟁', 37: '서부'
+        };
+        const primaryGenreId = movie.genre_ids?.[0];
+        const genre = genreMap[primaryGenreId] || '영화';
+
+        return {
+          movieCd: `TMDB_${movie.id}`, // synthetic code prefix
+          movieNm: movie.title,
+          openDt: movie.release_date,
+          poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : null,
+          rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
+          genre: genre,
+          overview: movie.overview || null
+        };
+      })
+      .sort((a, b) => new Date(a.openDt) - new Date(b.openDt)); // sort by release date ascending
+
+    // Cache upcoming list for 12 hours (43200 seconds)
+    apiCache.set(cacheKey, formattedList, 43200);
+
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: false,
+      latency: `${latency}ms`,
+      data: formattedList,
+    });
+  } catch (error) {
+    console.error('TMDB Upcoming API Error:', error.message);
+    return res.status(500).json({
+      error: '개봉 예정작 정보를 가져오는 중 서버 에러가 발생했습니다.',
+    });
+  }
+});
+
 // Helper function to search TMDB for posters, backdrops, and descriptions
 async function getTmdbAssets(movieNm, openDt) {
   // Use user's TMDB API key if set, or fall back to a public key to ensure instant premium workability!
@@ -273,6 +343,76 @@ app.get('/api/movie', checkAuth, async (req, res) => {
       latency: `${latency}ms`,
       data: cachedData,
     });
+  }
+
+  if (movieCd.startsWith('TMDB_')) {
+    const tmdbId = movieCd.substring('TMDB_'.length);
+    try {
+      const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+      const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${tmdbKey}&language=ko-KR&append_to_response=videos,credits`;
+      const response = await axios.get(url, { timeout: 4000 });
+      const movie = response.data;
+      
+      if (!movie) {
+        return res.status(404).json({ error: 'TMDB movie details not found.' });
+      }
+
+      // Map genres
+      const genres = movie.genres?.map(g => g.name).join(', ') || '정보 없음';
+
+      // Map directors (crew where job === 'Director')
+      const directors = movie.credits?.crew?.filter(c => c.job === 'Director').map(d => d.name).join(', ') || '정보 없음';
+
+      // Map top 10 actors
+      const actors = movie.credits?.cast?.slice(0, 10).map(a => a.name).join(', ') || '정보 없음';
+
+      // Map production nations
+      const nations = movie.production_countries?.map(n => n.name).join(', ') || '정보 없음';
+
+      // Map production companies (limit to 2)
+      const companys = movie.production_companies?.slice(0, 2).map(c => c.name).join(', ') || '정보 없음';
+
+      // Find trailer key
+      let trailerKey = null;
+      const videos = movie.videos?.results || [];
+      const trailer = videos.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')) || videos.find(v => v.site === 'YouTube');
+      if (trailer) {
+        trailerKey = trailer.key;
+      }
+
+      const formattedDetail = {
+        movieCd: movieCd,
+        movieNm: movie.title,
+        movieNmEn: movie.original_title || 'Movie Details',
+        showTm: movie.runtime || null,
+        genres: genres,
+        directors: directors,
+        actors: actors,
+        nations: nations,
+        companys: companys,
+        poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+        backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : null,
+        rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
+        overview: movie.overview || null,
+        trailerKey: trailerKey
+      };
+
+      // Cache movie detail indefinitely (24 hours = 86400 seconds)
+      apiCache.set(cacheKey, formattedDetail, 86400);
+
+      const latency = Date.now() - startTime;
+      return res.json({
+        success: true,
+        fromCache: false,
+        latency: `${latency}ms`,
+        data: formattedDetail,
+      });
+    } catch (error) {
+      console.error('TMDB Movie Detail API Error:', error.message);
+      return res.status(500).json({
+        error: 'TMDB 상세 정보를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.',
+      });
+    }
   }
 
   try {

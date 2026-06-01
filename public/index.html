@@ -1846,13 +1846,25 @@
 
     <!-- Main Content Section -->
     <main>
-      <h2 class="section-title">
-        <i class="fa-solid fa-chart-line"></i>
-        일별 박스오피스 <span id="currentDateTitle" style="color: var(--color-secondary); margin-left: 4px;"></span>
+      <!-- Main Content Mode Tabs -->
+      <div class="boxoffice-tabs-container" style="margin-bottom: 1.5rem;">
+        <div class="boxoffice-tabs" style="background: rgba(255, 255, 255, 0.01); border-color: rgba(255,255,255,0.06);">
+          <button id="tabBoxOfficeBtn" class="boxoffice-filter-btn active" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="실시간 박스오피스 순위 보기">
+            <i class="fa-solid fa-chart-line"></i> 실시간 박스오피스
+          </button>
+          <button id="tabUpcomingBtn" class="boxoffice-filter-btn" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="곧 개봉할 상영 예정작 보기">
+            <i class="fa-solid fa-calendar-days"></i> 상영 예정작
+          </button>
+        </div>
+      </div>
+
+      <h2 class="section-title" id="mainSectionTitle">
+        <i class="fa-solid fa-chart-line" id="mainSectionIcon"></i>
+        <span id="mainSectionText">일별 박스오피스</span> <span id="currentDateTitle" style="color: var(--color-secondary); margin-left: 4px;"></span>
       </h2>
 
       <!-- Movie Nationality Filter Tabs -->
-      <div class="boxoffice-tabs-container">
+      <div class="boxoffice-tabs-container" id="nationTabsContainer">
         <div class="boxoffice-tabs">
           <button class="boxoffice-filter-btn active" data-nation="ALL" title="전체 영화 박스오피스">
             <i class="fa-solid fa-globe"></i> 전체 영화

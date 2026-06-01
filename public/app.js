@@ -107,6 +107,7 @@ function getGenrePlaceholder(genre, movieNm) {
 let activeMovieInfo = null;
 let activeRating = 0; // Selected rating state (1-5 stars)
 let currentNation = 'ALL'; // Nationality filter state ('ALL', 'K', 'F')
+let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'UPCOMING')
 
 // Premium Presets Default Config (Option 1)
 const DEFAULT_PRESETS = [
@@ -246,7 +247,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Box Office Nationality Filter Tabs Click Event Listeners
-  const filterBtns = document.querySelectorAll('.boxoffice-filter-btn');
+  const filterBtns = document.querySelectorAll('#nationTabsContainer .boxoffice-filter-btn');
   filterBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const selectedNation = btn.getAttribute('data-nation') || 'ALL';
@@ -264,6 +265,53 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     });
   });
+
+  // Main Content View Mode Switcher
+  const tabBoxOfficeBtn = document.getElementById('tabBoxOfficeBtn');
+  const tabUpcomingBtn = document.getElementById('tabUpcomingBtn');
+  const mainSectionIcon = document.getElementById('mainSectionIcon');
+  const mainSectionText = document.getElementById('mainSectionText');
+  const nationTabsContainer = document.getElementById('nationTabsContainer');
+
+  if (tabBoxOfficeBtn && tabUpcomingBtn) {
+    tabBoxOfficeBtn.addEventListener('click', () => {
+      if (currentViewMode === 'BOXOFFICE') return;
+      currentViewMode = 'BOXOFFICE';
+
+      tabBoxOfficeBtn.classList.add('active');
+      tabUpcomingBtn.classList.remove('active');
+
+      if (nationTabsContainer) nationTabsContainer.style.display = '';
+      if (currentDateTitle) currentDateTitle.style.display = '';
+      if (mainSectionIcon) {
+        mainSectionIcon.className = 'fa-solid fa-chart-line';
+      }
+      if (mainSectionText) {
+        mainSectionText.textContent = '일별 박스오피스';
+      }
+
+      loadBoxOfficeData(dateInput.value, currentNation);
+    });
+
+    tabUpcomingBtn.addEventListener('click', () => {
+      if (currentViewMode === 'UPCOMING') return;
+      currentViewMode = 'UPCOMING';
+
+      tabUpcomingBtn.classList.add('active');
+      tabBoxOfficeBtn.classList.remove('active');
+
+      if (nationTabsContainer) nationTabsContainer.style.display = 'none';
+      if (currentDateTitle) currentDateTitle.style.display = 'none';
+      if (mainSectionIcon) {
+        mainSectionIcon.className = 'fa-solid fa-calendar-days';
+      }
+      if (mainSectionText) {
+        mainSectionText.textContent = '곧 개봉할 상영 예정작';
+      }
+
+      loadUpcomingMovies();
+    });
+  }
   
   if (modalCloseBtn) {
     modalCloseBtn.addEventListener('click', closeModal);
@@ -795,6 +843,136 @@ function renderBoxOfficeList(moviesList) {
           <a href="${bookingUrl}" target="_blank" class="unified-booking-btn" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
             <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
           </a>
+        </div>
+      </div>
+    `;
+    
+    movieCard.addEventListener('click', () => openMovieDetails(movie.movieCd, movie.movieNm));
+    movieGrid.appendChild(movieCard);
+  });
+}
+
+// 2.5. Fetch and Render Upcoming Movies (개봉예정작)
+async function loadUpcomingMovies() {
+  renderSkeletons();
+  
+  try {
+    const response = await fetch(`${BACKEND_BASE}/api/upcoming`, {
+      method: 'GET',
+      headers: API_HEADERS
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to fetch upcoming movies');
+    }
+    
+    renderUpcomingList(result.data);
+  } catch (error) {
+    console.error('Error loading upcoming movies:', error);
+    showToast('데이터 조회 실패', error.message, 'error');
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--color-accent); margin-bottom: 1rem;"></i>
+        <p>${error.message}</p>
+        <button onclick="loadUpcomingMovies()" style="margin-top: 1.5rem; background: var(--gradient-primary); border: none; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          다시 시도하기
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Render actual Upcoming Releases Card List
+function renderUpcomingList(moviesList) {
+  if (!moviesList || moviesList.length === 0) {
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>조회된 개봉 예정작 데이터가 존재하지 않습니다.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  movieGrid.innerHTML = '';
+  
+  moviesList.forEach((movie, index) => {
+    // Calculate D-Day
+    const releaseDate = new Date(movie.openDt);
+    const today = new Date();
+    releaseDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    
+    const diffTime = releaseDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    let dDayText = '';
+    let dDayClass = '';
+    if (diffDays === 0) {
+      dDayText = 'D-Day';
+      dDayClass = 'rank-1';
+    } else if (diffDays > 0) {
+      dDayText = `D-${diffDays}`;
+      dDayClass = diffDays <= 7 ? 'rank-2' : (diffDays <= 21 ? 'rank-3' : 'rank-other');
+    } else {
+      dDayText = '개봉완료';
+      dDayClass = 'rank-other';
+    }
+    
+    // Check if poster exists
+    let posterHtml = '';
+    if (movie.poster) {
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+    } else {
+      const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
+      posterHtml = `
+        <div class="poster-placeholder" style="background: ${spec.gradientStr}; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; text-align: center; gap: 0.85rem; position: relative; height: 100%;">
+          <div class="genre-tag-badge" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 0.25rem 0.65rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">${escapeHtml(spec.genreName)}</div>
+          <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
+          <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
+          <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineSpark Archive</div>
+        </div>
+      `;
+    }
+
+    // Rating badge (if available)
+    const ratingHtml = movie.rating && parseFloat(movie.rating) > 0
+      ? `<div class="rating-badge"><i class="fa-solid fa-star"></i> ${movie.rating}</div>`
+      : '';
+
+    const movieCard = document.createElement('div');
+    movieCard.className = 'movie-card';
+    movieCard.style.animationDelay = `${index * 0.05}s`;
+    
+    movieCard.innerHTML = `
+      <div class="rank-badge ${dDayClass}" style="font-size: 0.72rem; padding: 0.25rem 0.65rem; min-width: 50px; font-weight: 800; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-transform: uppercase; font-family: var(--font-outfit);">${dDayText}</div>
+      <div class="poster-container">
+        ${posterHtml}
+        ${ratingHtml}
+      </div>
+      <div class="movie-header-info" style="justify-content: flex-start; height: auto;">
+        <h3 class="movie-title" style="margin-bottom: 0.5rem;">${movie.movieNm}</h3>
+        <div class="movie-meta-list" style="margin-bottom: 0.5rem;">
+          <div class="movie-meta-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>개봉일: ${formatOpenDate(movie.openDt)}</span>
+          </div>
+          <div class="movie-meta-item">
+            <i class="fa-solid fa-hourglass-half" style="color: var(--color-secondary);"></i>
+            <span>개봉 대기: ${diffDays > 0 ? diffDays + '일 남음' : '오늘 개봉!'}</span>
+          </div>
+          <div class="movie-meta-item" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.45; margin-top: 0.6rem; height: 2.9em;">
+            <span style="font-style: italic; color: rgba(255,255,255,0.15); font-family: Georgia, serif; font-size: 1.1rem; line-height: 0; vertical-align: bottom; margin-right: 2px;">“</span>
+            <span>${movie.overview || '이 영화에 대한 설레는 줄거리 정보가 아직 등록되지 않았습니다.'}</span>
+          </div>
+        </div>
+        <div class="unified-booking-container" style="margin-top: auto; padding-top: 0.5rem; width: 100%;">
+          <button class="unified-booking-btn" style="background: var(--gradient-primary); border-color: var(--color-primary); width: 100%; cursor: pointer;" title="상영 예정작 상세 정보 보기">
+            <i class="fa-solid fa-circle-info"></i> 기대작 상세 정보
+          </button>
         </div>
       </div>
     `;
