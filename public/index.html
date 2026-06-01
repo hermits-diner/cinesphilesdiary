@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineSpark - 스마트 박스오피스 & 나만의 시네마 다이어리</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Inline modal interaction fallbacks for instant responsiveness and caching survival -->
+  <script>
+    function openCinesparkSpace() {
+      console.log('[CineSpark] 🚀 Inline openCinesparkSpace() fallback triggered!');
+      const modal = document.getElementById('cinesparkSpaceModal');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } else {
+        alert('모달 요소를 찾을 수 없습니다.');
+      }
+    }
+    function closeCinesparkSpace() {
+      console.log('[CineSpark] 🚀 Inline closeCinesparkSpace() fallback triggered!');
+      const modal = document.getElementById('cinesparkSpaceModal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+  </script>
+  
+  <style>
+    /* Design Tokens & Variables */
+    :root {
+      --bg-dark: #090a0f;
+      --bg-card: rgba(18, 20, 32, 0.6);
+      --bg-modal: rgba(14, 16, 28, 0.85);
+      --border-glow: rgba(99, 102, 241, 0.15);
+      --border-glow-hover: rgba(99, 102, 241, 0.35);
+      
+      --color-primary: #6366f1; /* Indigo */
+      --color-secondary: #10b981; /* Emerald */
+      --color-accent: #f43f5e; /* Rose */
+      --color-text-main: #f3f4f6;
+      --color-text-muted: #9ca3af;
+      
+      --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --gradient-silver: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+      --gradient-bronze: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --gradient-neon: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+      --gradient-dark: linear-gradient(180deg, #11131e 0%, #090a0f 100%);
+      
+      --font-outfit: 'Outfit', 'Noto Sans KR', sans-serif;
+      --font-inter: 'Inter', 'Noto Sans KR', sans-serif;
+      
+      --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+      --shadow-neon: 0 0 20px rgba(99, 102, 241, 0.25);
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Core Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: var(--font-inter);
+      color: var(--color-text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.5);
+    }
+
+    /* Layout & Header */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 5rem 1.5rem;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+      text-align: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      font-size: 2.5rem;
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+    }
+
+    .brand-title {
+      font-family: var(--font-outfit);
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      background: linear-gradient(to right, #ffffff, #9ca3af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title span {
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      max-width: 600px;
+      margin-top: 0.25rem;
+    }
+
+    /* Date Controller */
+    .controls-wrapper {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glow);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+    }
+
+    .controls-wrapper:focus-within, .controls-wrapper:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.15);
+    }
+
+    .date-label {
+      font-family: var(--font-outfit);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .date-picker-input {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-family: var(--font-outfit);
+      font-size: 1rem;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Datepicker styling for modern browsers */
+    .date-picker-input::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+      opacity: 0.8;
+      transition: var(--transition-smooth);
+    }
+    .date-picker-input::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* Main Section: Box Office Grid */
+    .section-title {
+      font-family: var(--font-outfit);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title i {
+      color: var(--color-primary);
+    }
+
+    .boxoffice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      opacity: 1;
+      transition: var(--transition-smooth);
+    }
+
+    /* Movie Cards */
+    .movie-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+      animation: fadeInUp 0.5s ease backwards;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--color-primary);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Card Poster Image Container */
+    .poster-container {
+      width: 100%;
+      height: 380px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .movie-poster {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: rgba(9, 10, 15, 0.95); /* Deep black background to blend with the card and dark theme */
+      transition: var(--transition-smooth);
+    }
+
+    .movie-card:hover .movie-poster {
+      transform: scale(1.05);
+    }
+
+    .poster-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .placeholder-icon {
+      font-size: 3rem;
+      color: rgba(255,255,255,0.4);
+      animation: pulse 3s infinite;
+    }
+
+    .placeholder-title {
+      font-family: var(--font-outfit);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Rating Badge on Card */
+    .rating-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(9, 10, 15, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #f59e0b;
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-family: var(--font-outfit);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      box-shadow: var(--shadow-premium);
+    }
+
+    /* Rank Badges */
+    .rank-badge {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-outfit);
+      font-size: 1.35rem;
+      font-weight: 900;
+      border-bottom-right-radius: 24px;
+      box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.4);
+      z-index: 5;
+    }
+
+    .rank-badge.rank-1 { background: var(--gradient-gold); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+    .rank-badge.rank-2 { background: var(--gradient-silver); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+    .rank-badge.rank-3 { background: var(--gradient-bronze); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+    .rank-badge.rank-other { background: rgba(9, 10, 15, 0.75); backdrop-filter: blur(6px); border-right: 1px solid var(--border-glow); border-bottom: 1px solid var(--border-glow); color: var(--color-text-main); }
+
+    /* Card Details */
+    .movie-header-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .movie-title {
+      font-family: var(--font-outfit);
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 0.75rem;
+      color: #ffffff;
+      transition: var(--transition-smooth);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .movie-card:hover .movie-title {
+      color: var(--color-secondary);
+    }
+
+    .movie-meta-list {
+      margin-bottom: 0.75rem;
+    }
+
+    .movie-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .movie-meta-item i {
+      width: 14px;
+      color: var(--color-primary);
+    }
+
+    .rank-change {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      width: fit-content;
+    }
+
+    .rank-up { color: #f43f5e; }
+    .rank-down { color: #3b82f6; }
+    .rank-same { color: var(--color-text-muted); }
+    .rank-new { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; font-size: 0.75rem; border-radius: 8px; text-transform: uppercase; }
+
+    /* Skeletons */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: loading-shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    .skeleton-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      height: 520px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .skeleton-badge { width: 54px; height: 54px; border-bottom-right-radius: 24px; position: absolute; top:0; left:0; }
+    .skeleton-poster { width: 100%; height: 380px; }
+    .skeleton-title { width: 75%; height: 24px; margin: 1.25rem 1.25rem 0.5rem 1.25rem; }
+    .skeleton-text { width: 50%; height: 16px; margin: 0 1.25rem 0.5rem 1.25rem; }
+
+    @keyframes loading-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 6, 12, 0.7);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Modal Card */
+    .modal-card {
+      background: var(--bg-modal);
+      border: 1px solid var(--border-glow-hover);
+      border-radius: 32px;
+      width: 90%;
+      max-width: 720px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), var(--shadow-neon);
+      overflow: hidden;
+      position: relative;
+      transform: translateY(40px) scale(0.95);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Modal Backdrop Header image */
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 240px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(10px) brightness(0.45);
+      transform: scale(1.05);
+      z-index: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+    }
+
+    /* Modal Header */
+    .modal-header {
+      padding: 3rem 2rem 1.5rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-end;
+      background: linear-gradient(to bottom, rgba(14, 16, 28, 0) 0%, rgba(14, 16, 28, 0.95) 100%);
+      min-height: 240px;
+    }
+
+    /* Floating poster in Modal Header */
+    .modal-poster-wrap {
+      width: 110px;
+      height: 160px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .modal-poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-poster-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+    }
+
+    .modal-poster-placeholder i {
+      font-size: 2rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-glow);
+      color: var(--color-text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close-btn:hover {
+      background: var(--color-accent);
+      color: #ffffff;
+      border-color: var(--color-accent);
+      transform: rotate(90deg);
+    }
+
+    .modal-title-wrap {
+      padding-right: 2.5rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-outfit);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .modal-subtitle {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Modal Body */
+    .modal-body {
+      padding: 1.5rem 2rem 2rem 2rem;
+      overflow-y: auto;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Movie Spec Table Layout */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 1.25rem;
+      border-radius: 20px;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .spec-item.full-width {
+      grid-column: span 2;
+    }
+
+    .spec-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-secondary);
+      font-weight: 600;
+    }
+
+    .spec-value {
+      font-size: 0.9rem;
+      color: var(--color-text-main);
+      font-weight: 500;
+    }
+
+    /* Synopsis / Overview Container */
+    .overview-container {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 1.25rem;
+      border-radius: 20px;
+    }
+
+    .overview-text {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+    }
+
+    /* Youtube Trailer Container with 16:9 responsive aspect ratio */
+    .trailer-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .iframe-ratio {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #000;
+    }
+
+    .iframe-ratio iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* AI Review Section */
+    .ai-review-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-outfit);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .ai-header i {
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulse 2s infinite;
+    }
+
+    .review-textarea-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .review-textarea {
+      width: 100%;
+      min-height: 80px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 1rem;
+      font-family: var(--font-inter);
+      font-size: 0.9rem;
+      color: #ffffff;
+      outline: none;
+      resize: none;
+      transition: var(--transition-smooth);
+    }
+
+    .review-textarea:focus {
+      border-color: var(--color-primary);
+      background: rgba(99, 102, 241, 0.03);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+    }
+
+    .textarea-counter {
+      position: absolute;
+      bottom: 0.75rem;
+      right: 1rem;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .review-btn-wrap {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .ai-btn {
+      background: var(--gradient-neon);
+      border: none;
+      color: #ffffff;
+      padding: 0.75rem 1.75rem;
+      border-radius: 12px;
+      font-family: var(--font-outfit);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      transition: var(--transition-smooth);
+    }
+
+    .ai-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5), 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    .ai-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .ai-btn:disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* AI Expanded Review Result area */
+    .ai-result-panel {
+      background: rgba(16, 185, 129, 0.03);
+      border: 1px dashed rgba(10, 185, 129, 0.25);
+      border-radius: 20px;
+      padding: 1.25rem;
+      margin-top: 0.5rem;
+      display: none;
+      position: relative;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .ai-result-panel.active {
+      display: block;
+    }
+
+    .ai-result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-outfit);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-secondary);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 50px;
+      margin-bottom: 0.75rem;
+    }
+
+    .ai-result-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e5e7eb;
+      font-weight: 400;
+      white-space: pre-line;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: var(--transition-smooth);
+    }
+
+    .copy-btn:hover {
+      color: var(--color-secondary);
+      transform: scale(1.1);
+    }
+
+    /* AI Loading States */
+    .ai-loading-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.5rem 0;
+    }
+
+    .ai-loading-container.active {
+      display: flex;
+    }
+
+    .spinner-ring {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(99, 102, 241, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--color-primary);
+      border-right-color: var(--color-secondary);
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-status-text {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .loading-dots::after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(14, 16, 28, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      width: 320px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      font-size: 1.1rem;
+      margin-top: 0.1rem;
+    }
+
+    .toast-success .toast-icon { color: var(--color-secondary); }
+    .toast-error .toast-icon { color: var(--color-accent); }
+    .toast-info .toast-icon { color: var(--color-primary); }
+
+    .toast-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      flex: 1;
+    }
+
+    .toast-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .toast-desc {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+    }
+
+    /* Keyframes Animations */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
+    /* Unified Booking Button styling */
+    .unified-booking-container {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .unified-booking-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      text-align: center;
+      padding: 0.65rem 1rem;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      font-family: var(--font-outfit);
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      background: var(--gradient-neon);
+      color: #ffffff;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .unified-booking-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4), var(--shadow-neon);
+      background: linear-gradient(135deg, #8b5cf6 0%, #10b981 100%);
+      border-color: var(--color-secondary);
+    }
+
+    .unified-booking-btn i {
+      font-size: 1rem;
+      animation: pulse 2s infinite;
+    }
+
+    /* Modal Booking Section styling */
+    .modal-booking-section {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .modal-booking-title {
+      font-family: var(--font-outfit);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-booking-btn-wrap {
+      width: 100%;
+    }
+
+    /* Star Rating styling */
+    .star-rating-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.01);
+      padding: 0.5rem 0;
+      border-radius: 12px;
+    }
+
+    .rating-stars {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 1.65rem;
+      color: var(--color-text-muted);
+    }
+
+    .rating-stars i {
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .rating-stars i:hover {
+      transform: scale(1.25);
+    }
+
+    .rating-stars i.active {
+      color: #f59e0b;
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+
+    .rating-score-text {
+      font-family: var(--font-outfit);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-left: 0.25rem;
+    }
+
+    /* CineSpark Space Modal Specifics */
+    .cinespark-space-card {
+      max-width: 920px;
+      width: 95%;
+      height: 88vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .space-tabs-header {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0 1.5rem 0.75rem 1.5rem;
+      margin-top: 0.5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+    
+    .space-tabs-header::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome/Safari */
+    }
+
+    .space-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-outfit);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .space-tab-btn:hover {
+      color: #ffffff;
+    }
+
+    .space-tab-btn.active {
+      color: var(--color-secondary);
+    }
+
+    .space-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -0.85rem;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--gradient-neon);
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    .space-tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+    }
+
+    .space-tab-content.active {
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+
+    /* Column Split Layout */
+    .space-split-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.75rem;
+      height: 100%;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .space-split-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* Ticket Stub CSS (Aesthetic masterpiece) */
+    .ticket-stub-preview-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      position: sticky;
+      top: 0;
+    }
+
+    .ticket-stub {
+      width: 320px;
+      background: rgba(18, 20, 32, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      box-shadow: var(--shadow-premium), 0 0 20px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .ticket-poster {
+      height: 185px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    
+    .ticket-poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .ticket-poster:hover .ticket-poster-img {
+      transform: scale(1.05);
+    }
+    
+    .ticket-poster-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(to top, rgba(9, 10, 15, 0.95) 0%, rgba(9, 10, 15, 0) 100%);
+      pointer-events: none;
+    }
+    
+    .ticket-poster-placeholder-icon {
+      font-size: 3.5rem;
+      color: rgba(255, 255, 255, 0.05);
+      position: absolute;
+    }
+
+    .ticket-header {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(16, 185, 129, 0.2) 100%);
+      padding: 1rem 1.25rem;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Punched Stub Circles on the sides */
+    .ticket-header::before, .ticket-header::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background-color: rgba(14, 16, 28, 0.95); /* matches modal card background */
+      border-radius: 50%;
+      bottom: -7px;
+      z-index: 10;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .ticket-header::before { left: -8px; }
+    .ticket-header::after { right: -8px; }
+
+    .ticket-logo {
+      font-family: var(--font-outfit);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--color-text-main);
+    }
+
+    .ticket-logo span {
+      color: var(--color-secondary);
+    }
+
+    .ticket-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .ticket-title {
+      font-family: var(--font-outfit);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .ticket-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .ticket-meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ticket-meta-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .ticket-meta-val {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Barcode generated with CSS */
+    .ticket-barcode-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 0.75rem;
+    }
+
+    .ticket-barcode {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 36px;
+      width: 100%;
+      gap: 1.5px;
+    }
+
+    .barcode-line {
+      background-color: var(--color-text-main);
+      height: 100%;
+      width: 1px;
+    }
+    .barcode-line.thick-1 { width: 3px; }
+    .barcode-line.thick-2 { width: 4px; }
+    .barcode-line.thin { width: 1px; opacity: 0.7; }
+    .barcode-line.space-thin { margin-right: 2px; }
+    .barcode-line.space-thick { margin-right: 4px; }
+
+    .ticket-serial {
+      font-family: monospace;
+      font-size: 0.62rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.2em;
+    }
+
+    /* Form Card Styling inside Space Split Layout */
+    .space-form-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 1.5rem;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .space-form-title {
+      font-family: var(--font-outfit);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .space-form-title i {
+      color: var(--color-primary);
+    }
+
+    .space-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .space-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-family: var(--font-inter);
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .space-input:focus {
+      border-color: var(--color-primary);
+      background: rgba(99, 102, 241, 0.03);
+    }
+
+    .template-guide-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 0.5rem 0.65rem;
+      color: #ffffff;
+      font-family: var(--font-outfit);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      transition: var(--transition-smooth);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .template-guide-btn:hover {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    .template-guide-btn:active {
+      transform: translateY(0);
+    }
+
+    /* List Display styling for tickets / diaries */
+    .space-list-title {
+      font-family: var(--font-outfit);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .space-ticket-carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 0.5rem 0 1rem 0;
+      width: 100%;
+      scroll-snap-type: x mandatory;
+    }
+
+    .space-ticket-carousel::-webkit-scrollbar {
+      height: 6px;
+    }
+    .space-ticket-carousel::-webkit-scrollbar-thumb {
+      background: rgba(16, 185, 129, 0.2);
+      border-radius: 3px;
+    }
+
+    .carousel-stub-item {
+      scroll-snap-align: start;
+      transform: scale(0.95);
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+    .carousel-stub-item:hover {
+      transform: scale(1.0);
+    }
+
+    .stub-delete-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: rgba(244, 63, 94, 0.9);
+      color: white;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      font-size: 0.75rem;
+      opacity: 0;
+      transition: var(--transition-smooth);
+    }
+
+    .carousel-stub-item:hover .stub-delete-btn {
+      opacity: 1;
+    }
+
+    /* Diary Emotion Selector styling */
+    .emotion-row {
+      display: flex;
+      gap: 0.35rem;
+      width: 100%;
+    }
+
+    .emotion-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      font-size: 1rem;
+      transition: var(--transition-smooth);
+    }
+
+    .emotion-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .emotion-btn.active {
+      border-color: var(--color-secondary);
+      background: rgba(16, 185, 129, 0.05);
+      transform: scale(1.05);
+    }
+
+    .emotion-btn-desc {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+    .emotion-btn.active .emotion-btn-desc {
+      color: var(--color-secondary);
+    }
+
+    /* Diary Feed List */
+    .diary-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      overflow-y: auto;
+      max-height: 70vh;
+      width: 100%;
+      padding-right: 0.5rem;
+    }
+
+    .diary-feed-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 1.25rem;
+      border-radius: 18px;
+      position: relative;
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .diary-feed-card:hover {
+      border-color: var(--color-primary);
+      background: rgba(99, 102, 241, 0.01);
+    }
+
+    .diary-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .diary-card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .diary-card-emoji {
+      font-size: 1.45rem;
+    }
+
+    .diary-card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .diary-card-date {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-outfit);
+    }
+
+    .diary-card-tag {
+      font-size: 0.65rem;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--color-primary);
+      padding: 0.15rem 0.5rem;
+      border-radius: 50px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .diary-card-text {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .diary-delete-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      opacity: 0.4;
+      transition: var(--transition-smooth);
+    }
+    .diary-feed-card:hover .diary-delete-btn {
+      opacity: 1;
+    }
+    .diary-delete-btn:hover {
+      color: var(--color-accent);
+    }
+
+    /* Bucket List Styles */
+    .bucket-lists-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      width: 100%;
+    }
+
+    .bucket-card {
+      background: rgba(18, 20, 32, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 22px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .bucket-card:hover {
+      border-color: var(--color-secondary);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.8), 0 0 15px rgba(16, 185, 129, 0.1);
+    }
+
+    .bucket-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    .bucket-card-title {
+      font-family: var(--font-outfit);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .bucket-card-title i {
+      color: var(--color-secondary);
+    }
+
+    .bucket-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      flex: 1;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .bucket-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: var(--color-text-main);
+      cursor: pointer;
+    }
+
+    .bucket-item input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: var(--color-secondary);
+    }
+
+    .bucket-item.checked span {
+      text-decoration: line-through;
+      color: var(--color-text-muted);
+      opacity: 0.7;
+    }
+
+    /* Progress bar gauge styling */
+    .bucket-progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-top: 0.25rem;
+    }
+
+    .bucket-progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+      font-weight: 700;
+    }
+
+    .bucket-progress-bar-bg {
+      background: rgba(255, 255, 255, 0.05);
+      height: 6px;
+      border-radius: 10px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .bucket-progress-bar-fg {
+      background: var(--gradient-neon);
+      height: 100%;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.4s ease-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem 1rem 3rem 1rem;
+      }
+      header {
+        margin-bottom: 2.5rem;
+      }
+      .brand-title {
+        font-size: 1.75rem;
+      }
+      .controls-wrapper {
+        padding: 0.6rem 1.25rem;
+      }
+      .boxoffice-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-card {
+        width: 95%;
+        border-radius: 20px;
+      }
+      .modal-body {
+        padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+      }
+      .spec-grid {
+        grid-template-columns: 1fr;
+      }
+      .spec-item.full-width {
+        grid-column: span 1;
+      }
+      .toast-container {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        width: calc(100% - 2rem);
+      }
+      .toast {
+        width: 100%;
+      }
+    }
+
+    /* Box Office Nationality Tabs */
+    .boxoffice-tabs-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+
+    .boxoffice-tabs {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glow);
+      padding: 0.35rem;
+      border-radius: 50px;
+      display: flex;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-premium);
+      transition: var(--transition-smooth);
+    }
+
+    .boxoffice-filter-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-outfit);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.6rem 1.25rem;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition-smooth);
+    }
+
+    .boxoffice-filter-btn i {
+      font-size: 0.95rem;
+      transition: var(--transition-smooth);
+    }
+
+    .boxoffice-filter-btn:hover {
+      color: #ffffff;
+    }
+
+    .boxoffice-filter-btn.active {
+      background: var(--gradient-neon);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+    }
+    
+    .boxoffice-filter-btn.active i {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Area -->
+    <header>
+      <div class="brand">
+        <i class="fa-solid fa-wand-magic-sparkles brand-logo"></i>
+        <h1 class="brand-title">CineSpark <span>Portal</span></h1>
+      </div>
+      <p class="brand-subtitle">스크린의 모든 여운을 기록하고 탐색하는 나만의 시네마 아카이브.</p>
+      
+      <!-- Date Selection Controller & Settings -->
+      <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <div class="controls-wrapper">
+          <span class="date-label">
+            <i class="fa-regular fa-calendar-days"></i> Boxoffice Date
+          </span>
+          <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
+        </div>
+        
+        <button id="cinesparkSpaceBtn" onclick="openCinesparkSpace()" class="controls-wrapper" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); padding: 0.75rem 1.25rem; border-radius: 50px; cursor: pointer; color: var(--color-text-main); font-weight: 600; font-family: var(--font-inter); display: flex; align-items: center; gap: 0.5rem; transition: var(--transition-smooth); background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border-color: var(--color-primary);" title="나만의 시네마 아지트">
+          <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i>
+          <span>나의 아지트</span>
+        </button>
+
+        <button id="settingsBtn" class="controls-wrapper" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); padding: 0.75rem 1.25rem; border-radius: 50px; cursor: pointer; color: var(--color-text-main); font-weight: 500; font-family: var(--font-inter); display: flex; align-items: center; gap: 0.5rem; transition: var(--transition-smooth);" title="API 서버 주소 설정">
+          <i class="fa-solid fa-gear" style="color: var(--color-primary);"></i>
+          <span>서버 설정</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+      <h2 class="section-title">
+        <i class="fa-solid fa-chart-line"></i>
+        일별 박스오피스 <span id="currentDateTitle" style="color: var(--color-secondary); margin-left: 4px;"></span>
+      </h2>
+
+      <!-- Movie Nationality Filter Tabs -->
+      <div class="boxoffice-tabs-container">
+        <div class="boxoffice-tabs">
+          <button class="boxoffice-filter-btn active" data-nation="ALL" title="전체 영화 박스오피스">
+            <i class="fa-solid fa-globe"></i> 전체 영화
+          </button>
+          <button class="boxoffice-filter-btn" data-nation="K" title="한국 영화 박스오피스">
+            <i class="fa-solid fa-film"></i> 국내 영화
+          </button>
+          <button class="boxoffice-filter-btn" data-nation="F" title="해외 영화 박스오피스">
+            <i class="fa-solid fa-earth-americas"></i> 해외 영화
+          </button>
+        </div>
+      </div>
+
+      <!-- Movie Card Grid (Skeleton UI loaded by default) -->
+      <div id="movieGrid" class="boxoffice-grid">
+        <!-- Default Skeletons -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-poster"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-poster"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-poster"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-poster"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Movie Details & AI Review Modal -->
+  <div id="movieModal" class="modal-overlay">
+    <div class="modal-card">
+      <!-- Blur Backdrop Image -->
+      <div class="modal-backdrop" id="modalBackdrop"></div>
+      
+      <div class="modal-header">
+        <button class="modal-close-btn" id="modalCloseBtn" aria-label="모달 닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <!-- Floating Movie Poster -->
+        <div class="modal-poster-wrap" id="modalPosterWrap">
+          <img id="modalPoster" class="modal-poster-img" style="display: none;" alt="영화 포스터">
+          <div id="modalPosterPlaceholder" class="modal-poster-placeholder">
+            <i class="fa-solid fa-film"></i>
+          </div>
+        </div>
+
+        <div class="modal-title-wrap">
+          <h3 class="modal-title" id="modalMovieTitle">영화 상세 정보</h3>
+          <p class="modal-subtitle" id="modalMovieSubTitle">Movie Details</p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <!-- Synopsis / Overview (TMDB) -->
+        <div class="overview-container" id="modalOverview" style="display: none;">
+          <span class="spec-label" style="display: block; margin-bottom: 0.5rem;">줄거리</span>
+          <p class="overview-text" id="modalOverviewText">영화 소개가 준비 중입니다.</p>
+        </div>
+
+        <!-- Detailed Movie Specs -->
+        <div class="spec-grid">
+          <div class="spec-item">
+            <span class="spec-label">장르</span>
+            <span class="spec-value" id="specGenre">정보 없음</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">상영 시간</span>
+            <span class="spec-value" id="specShowtime">정보 없음</span>
+          </div>
+          <div class="spec-item full-width">
+            <span class="spec-label">감독</span>
+            <span class="spec-value" id="specDirectors">정보 없음</span>
+          </div>
+          <div class="spec-item full-width">
+            <span class="spec-label">출연</span>
+            <span class="spec-value" id="specActors">정보 없음</span>
+          </div>
+        </div>
+
+        <!-- Fast Ticket Booking Section -->
+        <div class="modal-booking-section" id="modalBookingSection">
+          <span class="modal-booking-title">
+            <i class="fa-solid fa-ticket"></i> 원클릭 빠른 예매 (Quick Booking)
+          </span>
+          <div class="modal-booking-btn-wrap" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="#" target="_blank" id="modalUnifiedBookingBtn" class="unified-booking-btn" style="flex: 1; min-width: 200px;" title="실시간 영화 예매 및 시간표 보기">
+              <i class="fa-solid fa-bolt"></i> 실시간 예매 및 시간표 조회
+            </a>
+            <button id="modalIssueTicketBtn" class="unified-booking-btn" style="flex: 1; min-width: 200px; background: var(--gradient-neon); border-color: var(--color-secondary); cursor: pointer;" title="나만의 영화 아지트에 디지털 티켓 발행하기">
+              <i class="fa-solid fa-ticket"></i> 아지트에 티켓 저장
+            </button>
+          </div>
+        </div>
+
+        <!-- Youtube Official Trailer (16:9 Aspect Ratio) -->
+        <div class="trailer-container" id="modalTrailerContainer" style="display: none;">
+          <span class="spec-label">공식 예고편 (Official Trailer)</span>
+          <div class="iframe-ratio" id="modalTrailerFrameWrap" style="display: none;">
+            <iframe id="modalTrailerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <!-- Premium Fallback CTA Card if trailer is unavailable -->
+          <div id="modalTrailerFallback" style="display: none; background: rgba(255,255,255,0.015); border: 1px solid var(--border-glow); border-radius: 20px; padding: 2.25rem 1.5rem; text-align: center; flex-direction: column; align-items: center; justify-content: center; gap: 0.85rem; box-shadow: var(--shadow-premium);">
+            <div style="background: rgba(239, 68, 68, 0.1); width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);">
+              <i class="fa-brands fa-youtube" style="font-size: 1.75rem; color: #ef4444; animation: pulse 2.5s infinite;"></i>
+            </div>
+            <div style="font-family: var(--font-outfit); font-size: 0.95rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">공식 예고편 외부 관람</div>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted); max-width: 320px; line-height: 1.5;">본 기기에서는 인라인 임베드 재생이 제한된 동영상입니다. 유튜브 공식 앱/웹사이트에서 편안하게 예고편을 감상해 보세요.</p>
+            <a href="#" target="_blank" id="modalTrailerYoutubeBtn" class="unified-booking-btn" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-color: #dc2626; color: #ffffff; padding: 0.6rem 1.5rem; border-radius: 12px; font-size: 0.85rem; width: auto; margin-top: 0.5rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);" title="유튜브에서 예고편 보기">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i> YouTube에서 바로보기
+            </a>
+          </div>
+        </div>
+
+        <!-- My Cinema Log Section (Phase 1 Star Rating & Review Log) -->
+        <div class="ai-review-section">
+          <h4 class="ai-header" style="color: var(--color-text-main);">
+            <i class="fa-solid fa-star"></i> 나의 시네마 로그 (My Cinema Log)
+          </h4>
+          <p class="brand-subtitle" style="font-size: 0.85rem; margin-top: 0.25rem;">나의 소중한 영화 관람 소감과 별점을 직접 기록하고 영구적으로 보존할 수 있습니다.</p>
+          
+          <!-- Interactive Star Rating Container -->
+          <div class="star-rating-container">
+            <span class="spec-label" style="text-transform: none; margin-bottom: 0;">나의 별점:</span>
+            <div id="ratingStars" class="rating-stars">
+              <i class="fa-regular fa-star" data-rating="1"></i>
+              <i class="fa-regular fa-star" data-rating="2"></i>
+              <i class="fa-regular fa-star" data-rating="3"></i>
+              <i class="fa-regular fa-star" data-rating="4"></i>
+              <i class="fa-regular fa-star" data-rating="5"></i>
+            </div>
+            <span id="ratingScoreText" class="rating-score-text">0.0 / 5.0</span>
+          </div>
+
+          <div class="review-textarea-wrapper">
+            <textarea id="userReviewInput" class="review-textarea" placeholder="이 영화에 대한 나만의 소감이나 한 줄 평을 적어보세요. (최대 150자)" maxlength="150" aria-label="나만의 감상평 입력"></textarea>
+            <span class="textarea-counter" id="charCounter">0 / 150</span>
+          </div>
+          
+          <div class="review-btn-wrap" style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%;">
+            <button id="deleteReviewBtn" class="ai-btn" style="background: var(--gradient-bronze); box-shadow: none; display: none;" title="관람 로그 삭제">
+              <i class="fa-solid fa-trash"></i> 기록 삭제
+            </button>
+            <button id="saveReviewBtn" class="ai-btn" style="background: var(--gradient-neon);" title="관람 로그 저장">
+              <i class="fa-solid fa-floppy-disk"></i> 관람 기록 저장
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CineSpark Space Modal -->
+  <div id="cinesparkSpaceModal" class="modal-overlay">
+    <div class="modal-card cinespark-space-card">
+      <div class="modal-header" style="min-height: auto; padding: 2rem 2rem 0.5rem 2rem; background: transparent; border-bottom: none; display: flex; align-items: center; justify-content: space-between; z-index: 5;">
+        <div class="modal-title-wrap" style="padding: 0;">
+          <h3 class="modal-title" style="font-size: 1.65rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i> 나의 시네마 아지트
+          </h3>
+          <p class="modal-subtitle" style="font-size: 0.8rem;">티켓북, 다이어리, 버킷리스트로 소중한 영화적 일상을 기록해 보세요.</p>
+        </div>
+        <button class="modal-close-btn" id="spaceCloseBtn" onclick="closeCinesparkSpace()" style="position: static; transform: none; width: 34px; height: 34px;" aria-label="아지트 닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Tabs Header Navigation -->
+      <div class="space-tabs-header">
+        <button class="space-tab-btn active" data-tab="tabTicket">
+          <i class="fa-solid fa-ticket"></i> 디지털 티켓북
+        </button>
+        <button class="space-tab-btn" data-tab="tabDiary">
+          <i class="fa-solid fa-pen-nib"></i> 시네필 다이어리
+        </button>
+        <button class="space-tab-btn" data-tab="tabBucket">
+          <i class="fa-solid fa-circle-check"></i> 버킷 리스트
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="modal-body" style="padding: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        
+        <!-- Tab 1: Ticket Stub Collector -->
+        <div id="tabTicket" class="space-tab-content active">
+          <div class="space-split-layout">
+            <!-- Left Side Form -->
+            <div class="space-form-card">
+              <span class="space-form-title">
+                <i class="fa-solid fa-ticket-simple"></i> 새로운 티켓 발급
+              </span>
+              <div class="space-input-group">
+                <label for="ticketMovieNm" class="spec-label">영화 제목</label>
+                <input type="text" id="ticketMovieNm" class="space-input" placeholder="예: 범죄도시4" required>
+              </div>
+              <div class="space-input-group">
+                <label for="ticketPresetSelect" class="spec-label">
+                  <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--color-secondary);"></i> 초고속 관람 프리셋 템플릿
+                </label>
+                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                  <select id="ticketPresetSelect" class="space-input" style="flex: 1; background-color: #121420;">
+                    <!-- JavaScript에서 동적으로 로드 -->
+                  </select>
+                  <button type="button" id="savePresetBtn" class="ai-btn" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; background: var(--gradient-neon); flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.25rem;" title="현재 입력값을 새 프리셋으로 저장">
+                    <i class="fa-solid fa-floppy-disk"></i> 프리셋 저장
+                  </button>
+                </div>
+              </div>
+              <div class="ticket-meta-grid">
+                <div class="space-input-group">
+                  <label for="ticketWatchDate" class="spec-label">관람 일자</label>
+                  <input type="date" id="ticketWatchDate" class="space-input" required>
+                </div>
+                <div class="space-input-group">
+                  <label for="ticketTheater" class="spec-label">관람 극장</label>
+                  <select id="ticketTheater" class="space-input" style="background-color: #121420;">
+                    <option value="CGV">CGV</option>
+                    <option value="롯데시네마">롯데시네마</option>
+                    <option value="메가박스">메가박스</option>
+                    <option value="집 / OTT">집 / OTT</option>
+                    <option value="기타 극장">기타 극장</option>
+                  </select>
+                </div>
+              </div>
+              <div class="ticket-meta-grid">
+                <div class="space-input-group">
+                  <label for="ticketSeat" class="spec-label">상영관 및 좌석</label>
+                  <input type="text" id="ticketSeat" class="space-input" placeholder="예: 7관 H열 12번">
+                </div>
+                <div class="space-input-group">
+                  <label for="ticketCompanions" class="spec-label">동반자</label>
+                  <input type="text" id="ticketCompanions" class="space-input" placeholder="예: 혼자서, 연인과">
+                </div>
+              </div>
+              <div class="space-input-group">
+                <label for="ticketSnacks" class="spec-label">먹은 간식</label>
+                <input type="text" id="ticketSnacks" class="space-input" placeholder="예: 카라멜 팝콘 & 콜라">
+              </div>
+              <div class="space-input-group">
+                <label for="ticketReview" class="spec-label">나만의 한 줄 평</label>
+                <input type="text" id="ticketReview" class="space-input" placeholder="영화에 대한 짤막한 감상을 남겨보세요.">
+              </div>
+              <button id="saveTicketBtn" class="ai-btn" style="justify-content: center; background: var(--gradient-neon); padding: 0.7rem;">
+                <i class="fa-solid fa-ticket"></i> 티켓 발행 및 아카이브 저장
+              </button>
+            </div>
+
+            <!-- Right Side Preview & Saved List -->
+            <div class="ticket-stub-preview-wrap">
+              <span class="spec-label">실시간 티켓 미리보기</span>
+              <!-- Premium Ticket Stub Markup -->
+              <div class="ticket-stub" id="liveTicketPreview">
+                <div class="ticket-header" id="ticketHeaderBg">
+                  <span class="ticket-logo">CINE<span>SPARK</span> TICKET</span>
+                  <span class="spec-label" id="previewTheaterLabel" style="margin-bottom:0; color: #fff;">CGV</span>
+                </div>
+                <!-- Premium Film Poster Hybrid Area -->
+                <div class="ticket-poster" id="previewPosterSection">
+                  <!-- Ambient Blurred Backdrop -->
+                  <div id="previewPosterBlur" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.35); transform: scale(1.1); pointer-events: none; display: none;"></div>
+                  <i class="fa-solid fa-film ticket-poster-placeholder-icon"></i>
+                  <img id="previewPosterImg" class="ticket-poster-img" style="display: none;" alt="티켓 영화 포스터">
+                  <div class="ticket-poster-overlay"></div>
+                </div>
+                <div class="ticket-body">
+                  <span class="ticket-meta-label">MOVIE TITLE</span>
+                  <h4 class="ticket-title" id="previewTitle">영화를 입력해 주세요</h4>
+                  
+                  <div class="ticket-meta-grid" style="margin-top: 0.5rem;">
+                    <div class="ticket-meta-item">
+                      <span class="ticket-meta-label">DATE</span>
+                      <span class="ticket-meta-val" id="previewDate">2026.06.01</span>
+                    </div>
+                    <div class="ticket-meta-item">
+                      <span class="ticket-meta-label">COMPANION</span>
+                      <span class="ticket-meta-val" id="previewCompanion">혼자서</span>
+                    </div>
+                  </div>
+                  <div class="ticket-meta-grid">
+                    <div class="ticket-meta-item">
+                      <span class="ticket-meta-label">SEAT</span>
+                      <span class="ticket-meta-val" id="previewSeat">일반석</span>
+                    </div>
+                    <div class="ticket-meta-item">
+                      <span class="ticket-meta-label">SNACKS</span>
+                      <span class="ticket-meta-val" id="previewSnack">선택 안 함</span>
+                    </div>
+                  </div>
+                  <div class="ticket-meta-item" style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.25rem;">
+                    <span class="ticket-meta-label">REVIEW MEMO</span>
+                    <span class="ticket-meta-val" id="previewMemo" style="font-weight: 500; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">나만의 특별한 관람 한 줄 평 메모 영역입니다.</span>
+                  </div>
+
+                  <!-- Custom Barcode CSS -->
+                  <div class="ticket-barcode-wrap">
+                    <div class="ticket-barcode">
+                      <div class="barcode-line thick-1"></div>
+                      <div class="barcode-line thin space-thin"></div>
+                      <div class="barcode-line thick-2 space-thin"></div>
+                      <div class="barcode-line thin"></div>
+                      <div class="barcode-line thick-1 space-thick"></div>
+                      <div class="barcode-line thin"></div>
+                      <div class="barcode-line thick-2"></div>
+                      <div class="barcode-line thin space-thin"></div>
+                      <div class="barcode-line thick-1"></div>
+                    </div>
+                    <span class="ticket-serial" id="previewSerial">CS-20260601-9999</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom: Saved Tickets Carousel List -->
+          <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; width: 100%;">
+            <span class="space-list-title">
+              <i class="fa-solid fa-box-open"></i> 나의 티켓북 보관함 (<span id="savedTicketCount">0</span>)
+            </span>
+            <div class="space-ticket-carousel" id="savedTicketsCarousel">
+              <!-- Dynamically populated ticket stubs -->
+              <div style="text-align: center; padding: 2rem; color: var(--color-text-muted); width: 100%;">
+                아직 보관된 티켓이 없습니다. 첫 영화 티켓을 발행해 보세요!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Cinephile's Daily Journal -->
+        <div id="tabDiary" class="space-tab-content">
+          <div class="space-split-layout">
+            <!-- Left Side Form -->
+            <div class="space-form-card">
+              <span class="space-form-title">
+                <i class="fa-solid fa-pen-nib"></i> 오늘의 영화 생각 기록
+              </span>
+              <div class="space-input-group">
+                <label for="diaryTitle" class="spec-label">일기 제목</label>
+                <input type="text" id="diaryTitle" class="space-input" placeholder="예: 새벽에 넷플릭스로 명작 발견!" required>
+              </div>
+              <div class="ticket-meta-grid">
+                <div class="space-input-group">
+                  <label for="diaryDate" class="spec-label">작성 날짜</label>
+                  <input type="date" id="diaryDate" class="space-input" required>
+                </div>
+                <div class="space-input-group">
+                  <label for="diaryContext" class="spec-label">관람 환경</label>
+                  <select id="diaryContext" class="space-input" style="background-color: #121420;">
+                    <option value="집에서 이불 덮고 혼자">집에서 이불 덮고 혼자</option>
+                    <option value="밤늦게 극장에서 심야로">밤늦게 극장에서 심야로</option>
+                    <option value="주말 극장 만석 소란 속에">주말 극장 만석 소란 속에</option>
+                    <option value="비 오는 날 카페에서">비 오는 날 카페에서</option>
+                    <option value="대중교통 이동 중 가볍게">대중교통 이동 중 가볍게</option>
+                    <option value="기타 일상">기타 일상</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Interactive Emoji/Emotion Selector -->
+              <div class="space-input-group">
+                <label class="spec-label">오늘 영화의 감정 날씨</label>
+                <div class="emotion-row" id="diaryEmotionRow">
+                  <button type="button" class="emotion-btn active" data-emoji="🍿">
+                    <span>🍿</span>
+                    <span class="emotion-btn-desc">통쾌함</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emoji="😭">
+                    <span>😭</span>
+                    <span class="emotion-btn-desc">눈물펑펑</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emoji="😱">
+                    <span>😱</span>
+                    <span class="emotion-btn-desc">숨멎긴장</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emoji="🧠">
+                    <span>🧠</span>
+                    <span class="emotion-btn-desc">심오함</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emoji="❤️">
+                    <span>❤️</span>
+                    <span class="emotion-btn-desc">낭만설렘</span>
+                  </button>
+                  <button type="button" class="emotion-btn" data-emoji="😴">
+                    <span>😴</span>
+                    <span class="emotion-btn-desc">지루함</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-input-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                  <label for="diaryContent" class="spec-label">일기장 글쓰기</label>
+                  <span class="spec-label" style="text-transform: none; color: var(--color-secondary); font-size: 0.7rem; margin-bottom: 0;">
+                    <i class="fa-regular fa-lightbulb"></i> 글쓰기가 막막할 땐 가이드를 탭해 보세요!
+                  </span>
+                </div>
+                <div class="diary-template-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; width: 100%;">
+                  <button type="button" class="template-guide-btn" data-template="best-minute">
+                    <i class="fa-solid fa-video" style="color: var(--color-primary);"></i> 🎬 최고의 1분
+                  </button>
+                  <button type="button" class="template-guide-btn" data-template="quote-message">
+                    <i class="fa-solid fa-quote-left" style="color: var(--color-secondary);"></i> 💬 명대사 & 메시지
+                  </button>
+                  <button type="button" class="template-guide-btn" data-template="recommend-love">
+                    <i class="fa-solid fa-heart" style="color: var(--color-accent);"></i> ❤️ 소중한 이에게
+                  </button>
+                </div>
+                <textarea id="diaryContent" class="review-textarea" placeholder="영화를 보며 느꼈던 감정이나 OST, 명대사, 그날의 감상을 솔직하게 일기처럼 적어보세요..." style="min-height: 140px;"></textarea>
+              </div>
+
+              <button id="saveDiaryBtn" class="ai-btn" style="justify-content: center; background: var(--gradient-neon); padding: 0.7rem;">
+                <i class="fa-solid fa-floppy-disk"></i> 다이어리 저장하기
+              </button>
+            </div>
+
+            <!-- Right Side Diary Feed list -->
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+              <span class="space-list-title" style="margin-bottom: 0.75rem;">
+                <i class="fa-solid fa-book-open"></i> 나의 영화 일기 목록 (<span id="savedDiaryCount">0</span>)
+              </span>
+              <div class="diary-feed-list" id="diaryFeedList">
+                <!-- Dynamically populated diary entries -->
+                <div style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+                  아직 기록된 일기가 없습니다. 영화 일상의 소중한 한 컷을 적어보세요!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Bucket List Planner -->
+        <div id="tabBucket" class="space-tab-content">
+          <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); padding: 1.5rem; border-radius: 20px; display: flex; flex-direction: column; gap: 1rem; width: 100%; margin-bottom: 2rem;">
+            <span class="space-form-title">
+              <i class="fa-solid fa-circle-plus" style="color: var(--color-secondary);"></i> 새로운 영화 챌린지 생성
+            </span>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
+              <input type="text" id="bucketListTitle" class="space-input" placeholder="예: '방학 동안 격파할 거장 감독 컬렉션', '죽기 전에 소장할 명작들'" style="flex: 1; min-width: 250px;">
+              <button id="createBucketBtn" class="ai-btn" style="background: var(--gradient-neon); padding: 0.7rem 1.5rem; height: 100%;">
+                <i class="fa-solid fa-plus"></i> 리스트 보드 생성
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom: Grid of Saved Bucket Lists -->
+          <span class="space-list-title" style="margin-bottom: 1.25rem;">
+            <i class="fa-solid fa-circle-check"></i> 나의 영화 정복 맵 (<span id="savedBucketCount">0</span>)
+          </span>
+          <div class="bucket-lists-container" id="bucketListsGrid">
+            <!-- Dynamically populated bucket lists -->
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
+              <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: rgba(255,255,255,0.15);"></i>
+              <p>아직 생성된 챌린지 맵이 존재하지 않습니다. 나만의 버킷 리스트를 생성해 보세요!</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px; border-radius: 24px;">
+      <div class="modal-header" style="min-height: auto; padding: 2rem 2rem 1rem 2rem; background: transparent; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-title-wrap" style="padding: 0;">
+          <h3 class="modal-title" style="font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-sliders" style="color: var(--color-primary);"></i> 서버 설정
+          </h3>
+          <p class="modal-subtitle" style="font-size: 0.8rem;">API 서버 주소를 수동으로 등록합니다.</p>
+        </div>
+        <button class="modal-close-btn" id="settingsCloseBtn" style="position: static; transform: none; width: 32px; height: 32px;" aria-label="설정 닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem 2rem 2rem 2rem; gap: 1.25rem;">
+        <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5;">
+          GitHub Pages와 같은 정적 호스팅 환경에서 구동 중일 때, 배포하신 Node.js 백엔드 서버(Express)의 주소를 설정해 주세요.
+        </p>
+        
+        <div class="spec-item full-width" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label for="backendUrlInput" class="spec-label" style="font-size: 0.8rem; color: var(--color-secondary);">Express API 서버 URL</label>
+          <input type="url" id="backendUrlInput" placeholder="예: https://cinesparks-backend.onrender.com" style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); border-radius: 12px; padding: 0.75rem 1rem; color: #fff; font-family: var(--font-inter); font-size: 0.9rem; outline: none; transition: var(--transition-smooth);" />
+        </div>
+        
+        <button id="saveSettingsBtn" class="ai-btn" style="width: 100%; justify-content: center; background: var(--gradient-neon); padding: 0.75rem;">
+          <i class="fa-solid fa-floppy-disk"></i> 설정 저장 및 리로드
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic JavaScript -->
+  <script src="app.js?v=20260601_2"></script>
+</body>
+</html>

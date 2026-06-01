@@ -1,0 +1,14 @@
+# docs/_config.yml
+
+title: "CineSparks AI Documentation"
+description: "실시간 KOBIS 박스오피스, TMDB 미디어, 그리고 Google Gemini AI 평론 비서를 결합한 고품격 영화 포털 공식 문서"
+baseurl: "/cinesparks-ai"
+url: "https://hermits-diner.github.io"
+
+theme: minima
+
+# GitHub Pages 화이트리스트 공식 플러그인 3대장 탑재
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
