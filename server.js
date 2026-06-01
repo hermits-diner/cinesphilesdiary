@@ -174,6 +174,96 @@ app.get('/api/boxoffice', checkAuth, async (req, res) => {
   }
 });
 
+// 1.2. GET /api/weeklyboxoffice?targetDt=YYYYMMDD&repNationCd=K|F&weekGb=0|1|2
+app.get('/api/weeklyboxoffice', checkAuth, async (req, res) => {
+  const startTime = Date.now();
+  const { targetDt, repNationCd, weekGb } = req.query;
+
+  if (!targetDt || !/^\d{8}$/.test(targetDt)) {
+    return res.status(400).json({ error: 'Invalid Date: targetDt parameter must be YYYYMMDD.' });
+  }
+
+  const nationKey = (repNationCd === 'K' || repNationCd === 'F') ? repNationCd : 'ALL';
+  const weekGbKey = (weekGb === '0' || weekGb === '1' || weekGb === '2') ? weekGb : '0'; // Default is '0' (Weekly, Mon~Sun)
+  const cacheKey = `weeklyboxoffice_${targetDt}_${nationKey}_${weekGbKey}`;
+  const cachedData = apiCache.get(cacheKey);
+
+  if (cachedData) {
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: true,
+      latency: `${latency}ms`,
+      data: cachedData,
+    });
+  }
+
+  try {
+    let url = `http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key=${KOBIS_API_KEY}&targetDt=${targetDt}&weekGb=${weekGbKey}`;
+    if (nationKey !== 'ALL') {
+      url += `&repNationCd=${nationKey}`;
+    }
+    const response = await axios.get(url);
+
+    const boxOfficeResult = response.data?.boxOfficeResult;
+    if (!boxOfficeResult || boxOfficeResult.error) {
+      const errMsg = boxOfficeResult?.error?.message || 'Failed to fetch weekly box office from KOBIS';
+      return res.status(502).json({ error: errMsg });
+    }
+
+    const rawList = boxOfficeResult.weeklyBoxOfficeList || [];
+    
+    // TMDB Integration to fetch Poster, Backdrop and Ratings
+    const formattedList = await Promise.all(rawList.map(async (movie) => {
+      const tmdb = await getTmdbAssets(movie.movieNm, movie.openDt);
+      
+      // Calculate formatted values
+      const salesAmt = parseInt(movie.salesAmt, 10) || 0;
+      const audiCnt = parseInt(movie.audiCnt, 10) || 0;
+      
+      const eok = salesAmt / 100000000;
+      const formattedSales = eok >= 1 ? `${Math.round(eok)}억 원` : `${Math.round(salesAmt / 10000).toLocaleString('ko-KR')}만 원`;
+      
+      const man = audiCnt / 10000;
+      const formattedAudi = man >= 1 ? `${Math.round(man)}만 명` : `${audiCnt.toLocaleString('ko-KR')}명`;
+
+      return {
+        rank: movie.rank,
+        rankInten: movie.rankInten,
+        rankOldAndNew: movie.rankOldAndNew,
+        movieCd: movie.movieCd,
+        movieNm: movie.movieNm,
+        openDt: movie.openDt,
+        salesAmt: salesAmt.toLocaleString('ko-KR'),
+        audiCnt: audiCnt.toLocaleString('ko-KR'),
+        audiAcc: parseInt(movie.audiAcc, 10).toLocaleString('ko-KR'),
+        formattedSales,
+        formattedAudi,
+        poster: tmdb.poster,
+        backdrop: tmdb.backdrop,
+        rating: tmdb.rating,
+        genre: tmdb.genre
+      };
+    }));
+
+    // Cache box office data for 6 hours (21600 seconds)
+    apiCache.set(cacheKey, formattedList, 21600);
+
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: false,
+      latency: `${latency}ms`,
+      data: formattedList,
+    });
+  } catch (error) {
+    console.error('KOBIS Weekly BoxOffice API Error:', error.message);
+    return res.status(500).json({
+      error: '서비스 제공업체의 일시적 지연이 발생했습니다. 잠시 후 다시 시도해 주세요',
+    });
+  }
+});
+
 // 1.5. GET /api/upcoming — Fetch upcoming releases using TMDB South Korea region
 app.get('/api/upcoming', checkAuth, async (req, res) => {
   const startTime = Date.now();

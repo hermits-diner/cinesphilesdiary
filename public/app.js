@@ -107,7 +107,27 @@ function getGenrePlaceholder(genre, movieNm) {
 let activeMovieInfo = null;
 let activeRating = 0; // Selected rating state (1-5 stars)
 let currentNation = 'ALL'; // Nationality filter state ('ALL', 'K', 'F')
-let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'UPCOMING')
+let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'WEEKLYBOXOFFICE', 'UPCOMING')
+
+// Calculate which week of the month a date belongs to
+function getWeekOfMonth(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // 1-indexed
+  
+  // Find the first day of the month
+  const firstDay = new Date(year, date.getMonth(), 1);
+  const firstDayOfWeek = firstDay.getDay(); // 0 (Sunday) to 6 (Saturday)
+  
+  // Calculate day of the month
+  const day = date.getDate();
+  
+  // Week number calculation
+  const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+  
+  return `${month}월 ${weekNum}주차`;
+}
 
 // Premium Presets Default Config (Option 1)
 const DEFAULT_PRESETS = [
@@ -242,7 +262,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Attach events
   if (dateInput) {
     dateInput.addEventListener('change', (e) => {
-      loadBoxOfficeData(e.target.value, currentNation);
+      if (currentViewMode === 'BOXOFFICE') {
+        loadBoxOfficeData(e.target.value, currentNation);
+      } else if (currentViewMode === 'WEEKLYBOXOFFICE') {
+        loadWeeklyBoxOfficeData(e.target.value, currentNation);
+      }
     });
   }
 
@@ -261,24 +285,30 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // Reload box office data with selected nationality filter
       if (dateInput) {
-        loadBoxOfficeData(dateInput.value, currentNation);
+        if (currentViewMode === 'BOXOFFICE') {
+          loadBoxOfficeData(dateInput.value, currentNation);
+        } else if (currentViewMode === 'WEEKLYBOXOFFICE') {
+          loadWeeklyBoxOfficeData(dateInput.value, currentNation);
+        }
       }
     });
   });
 
   // Main Content View Mode Switcher
   const tabBoxOfficeBtn = document.getElementById('tabBoxOfficeBtn');
+  const tabWeeklyBoxOfficeBtn = document.getElementById('tabWeeklyBoxOfficeBtn');
   const tabUpcomingBtn = document.getElementById('tabUpcomingBtn');
   const mainSectionIcon = document.getElementById('mainSectionIcon');
   const mainSectionText = document.getElementById('mainSectionText');
   const nationTabsContainer = document.getElementById('nationTabsContainer');
 
-  if (tabBoxOfficeBtn && tabUpcomingBtn) {
+  if (tabBoxOfficeBtn && tabWeeklyBoxOfficeBtn && tabUpcomingBtn) {
     tabBoxOfficeBtn.addEventListener('click', () => {
       if (currentViewMode === 'BOXOFFICE') return;
       currentViewMode = 'BOXOFFICE';
 
       tabBoxOfficeBtn.classList.add('active');
+      tabWeeklyBoxOfficeBtn.classList.remove('active');
       tabUpcomingBtn.classList.remove('active');
 
       if (nationTabsContainer) nationTabsContainer.style.display = '';
@@ -290,7 +320,36 @@ window.addEventListener('DOMContentLoaded', async () => {
         mainSectionText.textContent = '일별 박스오피스';
       }
 
-      loadBoxOfficeData(dateInput.value, currentNation);
+      // Reset to yesterday for daily box office
+      const yesterday = getYesterdayDateString();
+      dateInput.value = yesterday;
+      loadBoxOfficeData(yesterday, currentNation);
+    });
+
+    tabWeeklyBoxOfficeBtn.addEventListener('click', () => {
+      if (currentViewMode === 'WEEKLYBOXOFFICE') return;
+      currentViewMode = 'WEEKLYBOXOFFICE';
+
+      tabWeeklyBoxOfficeBtn.classList.add('active');
+      tabBoxOfficeBtn.classList.remove('active');
+      tabUpcomingBtn.classList.remove('active');
+
+      if (nationTabsContainer) nationTabsContainer.style.display = '';
+      if (currentDateTitle) currentDateTitle.style.display = '';
+      if (mainSectionIcon) {
+        mainSectionIcon.className = 'fa-solid fa-calendar-days';
+      }
+      if (mainSectionText) {
+        mainSectionText.textContent = '주별 박스오피스';
+      }
+
+      // Default to the previous week (selected date minus 7 days)
+      const currentDate = new Date(dateInput.value);
+      currentDate.setDate(currentDate.getDate() - 7);
+      const prevWeekDateStr = currentDate.toISOString().split('T')[0];
+
+      dateInput.value = prevWeekDateStr;
+      loadWeeklyBoxOfficeData(prevWeekDateStr, currentNation);
     });
 
     tabUpcomingBtn.addEventListener('click', () => {
@@ -299,11 +358,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       tabUpcomingBtn.classList.add('active');
       tabBoxOfficeBtn.classList.remove('active');
+      tabWeeklyBoxOfficeBtn.classList.remove('active');
 
       if (nationTabsContainer) nationTabsContainer.style.display = 'none';
       if (currentDateTitle) currentDateTitle.style.display = 'none';
       if (mainSectionIcon) {
-        mainSectionIcon.className = 'fa-solid fa-calendar-days';
+        mainSectionIcon.className = 'fa-solid fa-hourglass-half';
       }
       if (mainSectionText) {
         mainSectionText.textContent = '곧 개봉할 상영 예정작';
@@ -729,6 +789,52 @@ async function loadBoxOfficeData(dateStr, nation = currentNation) {
   }
 }
 
+// 2.2. Fetch and Render Weekly Box Office Top 10
+async function loadWeeklyBoxOfficeData(dateStr, nation = currentNation) {
+  if (!dateStr) return;
+  
+  const weekLabel = getWeekOfMonth(dateStr);
+  const [yyyy] = dateStr.split('-');
+  currentDateTitle.textContent = `${yyyy}년 ${weekLabel}`;
+  
+  // Show Skeletons during fetch
+  renderSkeletons();
+  
+  const targetDt = dateStr.replace(/-/g, ''); // Convert YYYY-MM-DD to YYYYMMDD
+  
+  let url = `${BACKEND_BASE}/api/weeklyboxoffice?targetDt=${targetDt}&weekGb=0`;
+  if (nation === 'K' || nation === 'F') {
+    url += `&repNationCd=${nation}`;
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: API_HEADERS
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to fetch weekly box office list');
+    }
+    
+    renderWeeklyBoxOfficeList(result.data);
+  } catch (error) {
+    console.error('Error loading weekly box office:', error);
+    showToast('데이터 조회 실패', error.message, 'error');
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--color-accent); margin-bottom: 1rem;"></i>
+        <p>${error.message}</p>
+        <button onclick="loadWeeklyBoxOfficeData(dateInput.value)" style="margin-top: 1.5rem; background: var(--gradient-primary); border: none; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          다시 시도하기
+        </button>
+      </div>
+    `;
+  }
+}
+
 // Render Shimmer Skeletons
 function renderSkeletons() {
   let skeletonsHtml = '';
@@ -836,6 +942,103 @@ function renderBoxOfficeList(moviesList) {
           <div class="movie-meta-item">
             <i class="fa-solid fa-chart-simple"></i>
             <span>누적: ${movie.audiAcc} 명</span>
+          </div>
+        </div>
+        ${rankChangeHtml}
+        <div class="unified-booking-container">
+          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
+          </a>
+        </div>
+      </div>
+    `;
+    
+    movieCard.addEventListener('click', () => openMovieDetails(movie.movieCd, movie.movieNm));
+    movieGrid.appendChild(movieCard);
+  });
+}
+
+// Render actual Weekly Box Office Card List
+function renderWeeklyBoxOfficeList(moviesList) {
+  if (!moviesList || moviesList.length === 0) {
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>선택하신 주간에 조회된 주별 박스오피스 데이터가 존재하지 않습니다.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  movieGrid.innerHTML = '';
+  
+  moviesList.forEach((movie, index) => {
+    const rank = parseInt(movie.rank, 10);
+    const isTopThree = rank <= 3;
+    const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
+    
+    // Determine rank movement styling
+    let rankChangeHtml = '';
+    const rankInten = parseInt(movie.rankInten, 10);
+    
+    if (movie.rankOldAndNew === 'NEW') {
+      rankChangeHtml = `<span class="rank-change rank-new">NEW</span>`;
+    } else if (rankInten > 0) {
+      rankChangeHtml = `<span class="rank-change rank-up"><i class="fa-solid fa-caret-up"></i> ${rankInten}</span>`;
+    } else if (rankInten < 0) {
+      rankChangeHtml = `<span class="rank-change rank-down"><i class="fa-solid fa-caret-down"></i> ${Math.abs(rankInten)}</span>`;
+    } else {
+      rankChangeHtml = `<span class="rank-change rank-same"><i class="fa-solid fa-minus"></i></span>`;
+    }
+    
+    const movieCard = document.createElement('div');
+    movieCard.className = 'movie-card';
+    movieCard.style.animationDelay = `${index * 0.05}s`;
+    
+    // Check if poster exists
+    let posterHtml = '';
+    if (movie.poster) {
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+    } else {
+      const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
+      posterHtml = `
+        <div class="poster-placeholder" style="background: ${spec.gradientStr}; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; text-align: center; gap: 0.85rem; position: relative; height: 100%;">
+          <div class="genre-tag-badge" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 0.25rem 0.65rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">${escapeHtml(spec.genreName)}</div>
+          <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
+          <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
+          <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineSpark Archive</div>
+        </div>
+      `;
+    }
+
+    // Rating star badge
+    const ratingHtml = movie.rating 
+      ? `<div class="rating-badge"><i class="fa-solid fa-star"></i> ${movie.rating}</div>`
+      : '';
+    
+    const bookingUrl = getBookingUrl(movie.movieNm);
+
+    movieCard.innerHTML = `
+      <div class="rank-badge ${badgeClass}">${movie.rank}</div>
+      <div class="poster-container">
+        ${posterHtml}
+        ${ratingHtml}
+      </div>
+      <div class="movie-header-info">
+        <h3 class="movie-title">${movie.movieNm}</h3>
+        <div class="movie-meta-list">
+          <div class="movie-meta-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>개봉일: ${formatOpenDate(movie.openDt)}</span>
+          </div>
+          <div class="movie-meta-item">
+            <i class="fa-solid fa-coins" style="color: #f59e0b;"></i>
+            <span>매출액: ${movie.formattedSales || movie.salesAmt}</span>
+          </div>
+          <div class="movie-meta-item">
+            <i class="fa-solid fa-users" style="color: var(--color-secondary);"></i>
+            <span>관객수: ${movie.formattedAudi || movie.audiCnt}</span>
           </div>
         </div>
         ${rankChangeHtml}
