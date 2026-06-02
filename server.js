@@ -4,6 +4,7 @@ const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
 app.set('trust proxy', 1); // Trust Render's reverse proxy for correct rate-limiting and health checks
@@ -48,15 +49,47 @@ class MemoryCache {
 
 const apiCache = new MemoryCache();
 
-app.use(cors());
+// Enable helmet for robust HTTP security headers
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP to allow seamless FontAwesome and Google Fonts CDNs
+  crossOriginEmbedderPolicy: false
+}));
+
+// CORS options formulation for secure production environment
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:5000', 'http://localhost:5001', 'http://127.0.0.1:5000', 'http://127.0.0.1:5001'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or local file systems)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Serve static assets with no-cache headers to prevent browser from caching older HTML/JS code!
+// Serve static assets with intelligent cache control based on production/development modes
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: (res, path) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+  setHeaders: (res, filePath) => {
+    // In production, cache-control static assets like CSS, JS, fonts, and images for 1 year (31536000 seconds)
+    if (isProduction && (filePath.endsWith('.js') || filePath.endsWith('.css') || filePath.endsWith('.woff2') || filePath.endsWith('.png') || filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.svg') || filePath.endsWith('.ico'))) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      // In development or for HTML files, enforce no-cache to guarantee instant code hot-reloading!
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
   }
 }));
 
