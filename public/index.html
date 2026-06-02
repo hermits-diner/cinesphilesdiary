@@ -130,27 +130,30 @@
       overflow: hidden;
     }
 
-    /* Projector beam: narrow cone from top-center */
-    .cinema-beam {
+    /* Cinema hall SVG scene */
+    .cinema-scene {
       position: absolute;
       inset: 0;
-      background: radial-gradient(
-        ellipse 50% 72% at 50% -2%,
-        rgba(229, 169, 169, 0.18) 0%,
-        rgba(212, 175, 55,  0.09) 38%,
-        transparent 62%
-      );
-      clip-path: polygon(47% 0%, 53% 0%, 80% 100%, 20% 100%);
+    }
+
+    .cinema-scene svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Projector beam polygon inside SVG */
+    .cinema-beam-poly {
       animation: beamFlicker 14s ease-in-out infinite;
     }
 
     @keyframes beamFlicker {
       0%, 100% { opacity: 1;    }
-      18%      { opacity: 0.72; }
+      18%      { opacity: 0.65; }
       34%      { opacity: 1;    }
-      58%      { opacity: 0.83; }
+      58%      { opacity: 0.75; }
       74%      { opacity: 1;    }
-      88%      { opacity: 0.91; }
+      88%      { opacity: 0.85; }
     }
 
     /* Floating dust particles */
@@ -179,49 +182,8 @@
       100% { transform: translateY(-100vh) translateX(var(--dx)); opacity: 0;         }
     }
 
-    /* Cinema seat silhouettes */
-    .cinema-seats {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 200px;
-    }
-
-    .cinema-seats::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom,
-        var(--bg-dark) 0%,
-        transparent 40%,
-        transparent 60%,
-        var(--bg-dark) 100%
-      );
-      z-index: 1;
-    }
-
-    .cinema-seats::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right,
-        var(--bg-dark) 0%,
-        transparent 12%,
-        transparent 88%,
-        var(--bg-dark) 100%
-      );
-      z-index: 1;
-    }
-
-    .cinema-seats svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .cinema-beam              { animation: none !important; opacity: 0.55; }
+      .cinema-beam-poly         { animation: none !important; opacity: 0.6; }
       .cinema-particles span    { display: none !important; }
     }
 
@@ -2666,10 +2628,180 @@
 </head>
 <body>
 
-  <!-- Cinema atmosphere: projector beam + particles + seat silhouettes -->
+  <!-- Cinema atmosphere: full hall SVG scene + floating particles -->
   <div class="cinema-atmosphere" aria-hidden="true">
 
-    <div class="cinema-beam"></div>
+    <!-- Full cinema hall illustration (screen + walls + seats) -->
+    <div class="cinema-scene">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g-scrn" cx="50%" cy="45%" r="55%">
+            <stop offset="0%"   stop-color="#f4e9c4"/>
+            <stop offset="35%"  stop-color="#e6d088"/>
+            <stop offset="70%"  stop-color="#c4a050"/>
+            <stop offset="100%" stop-color="#927028"/>
+          </radialGradient>
+          <radialGradient id="g-amb" cx="50%" cy="0%" r="75%" gradientUnits="userSpaceOnUse" fx="720" fy="44">
+            <stop offset="0%"   stop-color="#c8a040" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#c8a040" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="g-beam" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"   stop-color="#d4b860" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#d4b860" stop-opacity="0.18"/>
+          </linearGradient>
+          <linearGradient id="g-sF" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#e02424"/>
+            <stop offset="45%"  stop-color="#bb1414"/>
+            <stop offset="100%" stop-color="#780808"/>
+          </linearGradient>
+          <linearGradient id="g-sB" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#c01212"/>
+            <stop offset="50%"  stop-color="#960c0c"/>
+            <stop offset="100%" stop-color="
+#600606"/>
+          </linearGradient>
+          <linearGradient id="g-over" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#07050b" stop-opacity="0.90"/>
+            <stop offset="18%"  stop-color="#07050b" stop-opacity="0.62"/>
+            <stop offset="42%"  stop-color="#07050b" stop-opacity="0.40"/>
+            <stop offset="68%"  stop-color="#07050b" stop-opacity="0.20"/>
+            <stop offset="100%" stop-color="#07050b" stop-opacity="0.55"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 1. Base dark background -->
+        <rect width="1440" height="900" fill="#08060d"/>
+
+        <!-- 2. Ceiling glow from screen -->
+        <rect width="1440" height="520" fill="url(#g-amb)"/>
+
+        <!-- 3. Dark side walls (perspective trapezoids flanking screen) -->
+        <polygon points="0,0 268,44 268,396 0,900"      fill="#0b0910"/>
+        <polygon points="1440,0 1172,44 1172,396 1440,900" fill="#0b0910"/>
+
+        <!-- 4. Screen frame -->
+        <rect x="268" y="44" width="904" height="352" fill="#18121e" rx="3"/>
+
+        <!-- 5. Screen (warm glow) -->
+        <rect x="280" y="55" width="880" height="328" fill="url(#g-scrn)" rx="2"/>
+
+        <!-- 6. Projector beam: source behind audience (bottom) → screen (top) -->
+        <polygon class="cinema-beam-poly" points="720,920 360,55 1080,55" fill="url(#g-beam)"/>
+
+        <!-- 7. Floor between screen and first seats -->
+        <rect x="0" y="396" width="1440" height="115" fill="#09070e"/>
+
+        <!-- 8. Screen light warm wash on front rows -->
+        <rect x="0" y="750" width="1440" height="140" fill="#d4a840" fill-opacity="0.07"/>
+
+        <!-- 9. SEAT ROWS — Row 1 (front/largest, y=785) -->
+        <g fill="url(#g-sF)">
+          <rect x="90"   y="785" width="70" height="52" rx="16"/>
+          <rect x="174"  y="785" width="70" height="52" rx="16"/>
+          <rect x="258"  y="785" width="70" height="52" rx="16"/>
+          <rect x="342"  y="785" width="70" height="52" rx="16"/>
+          <rect x="426"  y="785" width="70" height="52" rx="16"/>
+          <rect x="510"  y="785" width="70" height="52" rx="16"/>
+          <rect x="594"  y="785" width="70" height="52" rx="16"/>
+          <rect x="678"  y="785" width="70" height="52" rx="16"/>
+          <rect x="762"  y="785" width="70" height="52" rx="16"/>
+          <rect x="846"  y="785" width="70" height="52" rx="16"/>
+          <rect x="930"  y="785" width="70" height="52" rx="16"/>
+          <rect x="1014" y="785" width="70" height="52" rx="16"/>
+          <rect x="1098" y="785" width="70" height="52" rx="16"/>
+          <rect x="1182" y="785" width="70" height="52" rx="16"/>
+          <rect x="1266" y="785" width="70" height="52" rx="16"/>
+        </g>
+
+        <!-- Row 2 (y=714) -->
+        <g fill="url(#g-sF)">
+          <rect x="192"  y="714" width="59" height="44" rx="14"/>
+          <rect x="263"  y="714" width="59" height="44" rx="14"/>
+          <rect x="334"  y="714" width="59" height="44" rx="14"/>
+          <rect x="405"  y="714" width="59" height="44" rx="14"/>
+          <rect x="476"  y="714" width="59" height="44" rx="14"/>
+          <rect x="547"  y="714" width="59" height="44" rx="14"/>
+          <rect x="618"  y="714" width="59" height="44" rx="14"/>
+          <rect x="689"  y="714" width="59" height="44" rx="14"/>
+          <rect x="760"  y="714" width="59" height="44" rx="14"/>
+          <rect x="831"  y="714" width="59" height="44" rx="14"/>
+          <rect x="902"  y="714" width="59" height="44" rx="14"/>
+          <rect x="973"  y="714" width="59" height="44" rx="14"/>
+          <rect x="1044" y="714" width="59" height="44" rx="14"/>
+          <rect x="1115" y="714" width="59" height="44" rx="14"/>
+          <rect x="1186" y="714" width="59" height="44" rx="14"/>
+        </g>
+
+        <!-- Row 3 (y=651) -->
+        <g fill="url(#g-sB)">
+          <rect x="300"  y="651" width="50" height="36" rx="12"/>
+          <rect x="360"  y="651" width="50" height="36" rx="12"/>
+          <rect x="420"  y="651" width="50" height="36" rx="12"/>
+          <rect x="480"  y="651" width="50" height="36" rx="12"/>
+          <rect x="540"  y="651" width="50" height="36" rx="12"/>
+          <rect x="600"  y="651" width="50" height="36" rx="12"/>
+          <rect x="660"  y="651" width="50" height="36" rx="12"/>
+          <rect x="720"  y="651" width="50" height="36" rx="12"/>
+          <rect x="780"  y="651" width="50" height="36" rx="12"/>
+          <rect x="840"  y="651" width="50" height="36" rx="12"/>
+          <rect x="900"  y="651" width="50" height="36" rx="12"/>
+          <rect x="960"  y="651" width="50" height="36" rx="12"/>
+          <rect x="1020" y="651" width="50" height="36" rx="12"/>
+          <rect x="1080" y="651" width="50" height="36" rx="12"/>
+        </g>
+
+        <!-- Row 4 (y=597) -->
+        <g fill="url(#g-sB)">
+          <rect x="389"  y="597" width="43" height="29" rx="10"/>
+          <rect x="440"  y="597" width="43" height="29" rx="10"/>
+          <rect x="491"  y="597" width="43" height="29" rx="10"/>
+          <rect x="542"  y="597" width="43" height="29" rx="10"/>
+          <rect x="593"  y="597" width="43" height="29" rx="10"/>
+          <rect x="644"  y="597" width="43" height="29" rx="10"/>
+          <rect x="695"  y="597" width="43" height="29" rx="10"/>
+          <rect x="746"  y="597" width="43" height="29" rx="10"/>
+          <rect x="797"  y="597" width="43" height="29" rx="10"/>
+          <rect x="848"  y="597" width="43" height="29" rx="10"/>
+          <rect x="899"  y="597" width="43" height="29" rx="10"/>
+          <rect x="950"  y="597" width="43" height="29" rx="10"/>
+          <rect x="1001" y="597" width="43" height="29" rx="10"/>
+        </g>
+
+        <!-- Row 5 (y=551) -->
+        <g fill="url(#g-sB)">
+          <rect x="462"  y="551" width="36" height="23" rx="8"/>
+          <rect x="505"  y="551" width="36" height="23" rx="8"/>
+          <rect x="548"  y="551" width="36" height="23" rx="8"/>
+          <rect x="591"  y="551" width="36" height="23" rx="8"/>
+          <rect x="634"  y="551" width="36" height="23" rx="8"/>
+          <rect x="677"  y="551" width="36" height="23" rx="8"/>
+          <rect x="720"  y="551" width="36" height="23" rx="8"/>
+          <rect x="763"  y="551" width="36" height="23" rx="8"/>
+          <rect x="806"  y="551" width="36" height="23" rx="8"/>
+          <rect x="849"  y="551" width="36" height="23" rx="8"/>
+          <rect x="892"  y="551" width="36" height="23" rx="8"/>
+          <rect x="935"  y="551" width="36" height="23" rx="8"/>
+        </g>
+
+        <!-- Row 6 (back/smallest, y=511) -->
+        <g fill="url(#g-sB)" opacity="0.80">
+          <rect x="521"  y="511" width="29" height="17" rx="6"/>
+          <rect x="557"  y="511" width="29" height="17" rx="6"/>
+          <rect x="593"  y="511" width="29" height="17" rx="6"/>
+          <rect x="629"  y="511" width="29" height="17" rx="6"/>
+          <rect x="665"  y="511" width="29" height="17" rx="6"/>
+          <rect x="701"  y="511" width="29" height="17" rx="6"/>
+          <rect x="737"  y="511" width="29" height="17" rx="6"/>
+          <rect x="773"  y="511" width="29" height="17" rx="6"/>
+          <rect x="809"  y="511" width="29" height="17" rx="6"/>
+          <rect x="845"  y="511" width="29" height="17" rx="6"/>
+          <rect x="881"  y="511" width="29" height="17" rx="6"/>
+        </g>
+
+        <!-- 10. Readability overlay (dark top & bottom, transparent middle) -->
+        <rect width="1440" height="900" fill="url(#g-over)"/>
+      </svg>
+    </div>
 
     <div class="cinema-particles">
       <span style="--x:47.5%;--dur:14s;--del:0s;  --dx:-18px;--op:.65"></span>
@@ -2684,10 +2816,9 @@
       <span style="--x:48.0%;--dur:11s;--del:0.8s;--dx:11px; --op:.45"></span>
     </div>
 
-    <div class="cinema-seats">
+    <div class="cinema-seats-legacy" style="display:none">
       <svg viewBox="0 0 1440 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- Back row: 14 seats, pitch=103, startX=18 -->
-        <g fill="#3a2f50" opacity="0.85">
+        <g fill="#3a2f50" opacity="0">
           <rect x="18"   y="96" width="65" height="24" rx="5"/>
           <rect x="121"  y="96" width="65" height="24" rx="5"/>
           <rect x="224"  y="96" width="65" height="24" rx="5"/>
