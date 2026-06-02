@@ -946,5 +946,5 @@ app.get('*', (req, res) => {
 
 // Start Express server
 app.listen(PORT, () => {
-  console.log(`CineDiary AI server running on port ${PORT}`);
+  console.log(`Cinephile's Diary server running on port ${PORT}`);
 });
