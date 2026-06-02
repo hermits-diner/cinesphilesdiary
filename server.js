@@ -52,7 +52,10 @@ const apiCache = new MemoryCache();
 // Enable helmet for robust HTTP security headers
 app.use(helmet({
   contentSecurityPolicy: false, // Disable CSP to allow seamless FontAwesome and Google Fonts CDNs
-  crossOriginEmbedderPolicy: false
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
 // CORS options formulation for secure production environment
