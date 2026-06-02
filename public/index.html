@@ -200,9 +200,60 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.1rem;
       margin-bottom: 3.5rem;
       text-align: center;
+    }
+
+    /* ── Screen Stage: brand lives ON the cinema screen ── */
+    .screen-stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      padding: 3rem 4.5rem 2.6rem;
+      width: min(800px, 88vw);
+      /* Cinema screen frame — subtle amber border */
+      border: 1px solid rgba(210, 175, 60, 0.20);
+      border-top-color: rgba(230, 200, 90, 0.35);
+      border-radius: 3px;
+      /* Inner screen glow + outer depth shadow */
+      box-shadow:
+        0 0 80px rgba(180, 140, 50, 0.10),
+        inset 0 0 70px rgba(180, 140, 50, 0.05),
+        0 0 0 6px rgba(5, 3, 8, 0.55);
+      /* Slight warm tint to reinforce "on screen" feel */
+      background: rgba(15, 10, 5, 0.12);
+      margin-bottom: 0.4rem;
+    }
+
+    /* Top-left bracket */
+    .screen-stage::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px;
+      width: 18px; height: 18px;
+      border-top: 2px solid rgba(215, 180, 65, 0.55);
+      border-left: 2px solid rgba(215, 180, 65, 0.55);
+      border-radius: 3px 0 0 0;
+    }
+
+    /* Bottom-right bracket */
+    .screen-stage::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; right: -2px;
+      width: 18px; height: 18px;
+      border-bottom: 2px solid rgba(215, 180, 65, 0.55);
+      border-right: 2px solid rgba(215, 180, 65, 0.55);
+      border-radius: 0 0 3px 0;
+    }
+
+    /* Subtitle tone inside screen-stage: slightly warmer */
+    .screen-stage .brand-subtitle {
+      color: rgba(235, 222, 195, 0.60);
     }
 
     .brand {
@@ -1982,6 +2033,10 @@
       header {
         margin-bottom: 2.5rem;
       }
+      .screen-stage {
+        padding: 2.2rem 2rem 1.8rem;
+        width: 92vw;
+      }
       .brand-cinephile {
         font-size: 1.1rem;
       }
@@ -2881,14 +2936,17 @@
   <div class="container">
     <!-- Header Area -->
     <header>
-      <div class="brand">
-        <h1 class="brand-title">
-          <span class="brand-clip"><em class="brand-cinephile">Cinephile's</em></span>
-          <span class="brand-clip"><strong class="brand-diary">Diary</strong></span>
-        </h1>
+      <!-- Brand on screen -->
+      <div class="screen-stage">
+        <div class="brand">
+          <h1 class="brand-title">
+            <span class="brand-clip"><em class="brand-cinephile">Cinephile's</em></span>
+            <span class="brand-clip"><strong class="brand-diary">Diary</strong></span>
+          </h1>
+        </div>
+        <p class="brand-subtitle">스크린의 모든 여운을 기록하고 탐색하는 시네필 다이어리.</p>
       </div>
-      <p class="brand-subtitle">스크린의 모든 여운을 기록하고 탐색하는 시네필 다이어리.</p>
-      
+
       <!-- Spotlight Search Trigger -->
       <button class="spotlight-trigger" onclick="openSpotlight()" title="영화 검색">
         <i class="fa-solid fa-magnifying-glass"></i>
