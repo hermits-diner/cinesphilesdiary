@@ -1899,7 +1899,7 @@ function showToast(title, desc, type = 'info') {
 }
 
 // ==========================================
-// CineDiary (나의 시네마 다이어리) Core Logic
+// 시네필 다이어리 Core Logic
 // ==========================================
 
 let activeDiaryEmotion = '🍿';
