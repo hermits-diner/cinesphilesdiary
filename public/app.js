@@ -689,90 +689,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   // --- Global Movie Search Bar Bindings & Debouncing ---
-  const globalSearchEl = document.getElementById('globalMovieSearch');
-  const searchClearBtn = document.getElementById('searchClearBtn');
-  const searchDropdown = document.getElementById('searchDropdown');
-
-  if (globalSearchEl && searchDropdown) {
-    let searchTimeout = null;
-
-    globalSearchEl.addEventListener('input', () => {
-      const query = globalSearchEl.value.trim();
-      
-      // Toggle clear button
-      if (searchClearBtn) {
-        searchClearBtn.style.display = query.length > 0 ? 'block' : 'none';
-      }
-
-      clearTimeout(searchTimeout);
-      if (query.length === 0) {
-        searchDropdown.innerHTML = '';
-        searchDropdown.style.display = 'none';
-        return;
-      }
-
-      // Debounce: Wait 300ms before firing search request to optimize cost & API load!
-      searchTimeout = setTimeout(async () => {
-        searchDropdown.innerHTML = `
-          <div style="padding: 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.85rem;">
-            <i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.5rem; color: var(--color-primary);"></i> 검색 중...
-          </div>
-        `;
-        searchDropdown.style.display = 'block';
-
-        try {
-          const res = await fetch(`${BACKEND_BASE}/api/search?query=${encodeURIComponent(query)}`, {
-            method: 'GET',
-            headers: API_HEADERS
-          });
-          const result = await res.json();
-
-          if (!res.ok || !result.success) throw new Error(result.error || '검색 실패');
-
-          const movies = result.data || [];
-          if (movies.length === 0) {
-            searchDropdown.innerHTML = `<div class="search-no-results">"${escapeHtml(query)}"에 매칭되는 영화 검색 결과가 없습니다.</div>`;
-            return;
-          }
-
-          let dropdownHtml = '';
-          movies.forEach(movie => {
-            dropdownHtml += `
-              <div class="search-item" onclick="selectMovieFromSearch('${movie.movieCd}', '${escapeHtml(movie.movieNm)}')">
-                <img src="${escapeHtml(movie.poster || '')}" class="search-poster-thumb" alt="${escapeHtml(movie.movieNm)}">
-                <div class="search-info">
-                  <div class="search-title">${escapeHtml(movie.movieNm)}</div>
-                  <div class="search-meta">${escapeHtml(movie.genre || '장르 정보 없음')} • ${escapeHtml(movie.openDt ? movie.openDt.slice(0, 4) : '개봉연도 미정')}년 개봉 • ⭐ ${escapeHtml(movie.rating || '0.0')}</div>
-                </div>
-              </div>
-            `;
-          });
-          searchDropdown.innerHTML = dropdownHtml;
-
-        } catch (err) {
-          console.error(err);
-          searchDropdown.innerHTML = `<div class="search-no-results" style="color: var(--color-accent);"><i class="fa-solid fa-circle-exclamation"></i> 검색 지연이 발생했습니다.</div>`;
-        }
-      }, 300);
-    });
-
-    if (searchClearBtn) {
-      searchClearBtn.addEventListener('click', () => {
-        globalSearchEl.value = '';
-        searchClearBtn.style.display = 'none';
-        searchDropdown.innerHTML = '';
-        searchDropdown.style.display = 'none';
-        globalSearchEl.focus();
-      });
-    }
-
-    // Close dropdown on clicking outside
-    document.addEventListener('click', (e) => {
-      if (e.target !== globalSearchEl && e.target !== searchDropdown && !searchDropdown.contains(e.target)) {
-        searchDropdown.style.display = 'none';
-      }
-    });
-  }
+  // Spotlight search input wiring (runs once on DOMContentLoaded)
+  initSpotlightSearch();
 
   // --- AI Movie Review Coaching Click Handler ---
   const coachReviewBtn = document.getElementById('coachReviewBtn');
@@ -785,18 +703,121 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // Global Movie Search: Select movie item and open its detail modal
 async function selectMovieFromSearch(movieCd, movieNm) {
-  const dropdown = document.getElementById('searchDropdown');
-  if (dropdown) dropdown.style.display = 'none';
-  
-  const searchInput = document.getElementById('globalMovieSearch');
-  if (searchInput) searchInput.value = '';
-  
-  const clearBtn = document.getElementById('searchClearBtn');
-  if (clearBtn) clearBtn.style.display = 'none';
-
-  console.log(`[CineDiary] Movie selected from search: ${movieNm} (${movieCd})`);
+  closeSpotlight();
   openMovieDetails(movieCd, movieNm);
 }
+
+// ── Spotlight Search ──────────────────────────────────────────────
+
+function openSpotlight() {
+  const overlay = document.getElementById('spotlightOverlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    const input = document.getElementById('spotlightInput');
+    if (input) input.focus();
+  }, 30);
+}
+
+function closeSpotlight() {
+  const overlay = document.getElementById('spotlightOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  const input = document.getElementById('spotlightInput');
+  if (input) input.value = '';
+  const results = document.getElementById('spotlightResults');
+  if (results) results.innerHTML = '';
+  const clearBtn = document.getElementById('spotlightClearBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+}
+
+function handleSpotlightBackdrop(e) {
+  if (e.target === document.getElementById('spotlightOverlay')) closeSpotlight();
+}
+
+function initSpotlightSearch() {
+  const input   = document.getElementById('spotlightInput');
+  const results = document.getElementById('spotlightResults');
+  const clearBtn = document.getElementById('spotlightClearBtn');
+  if (!input || !results) return;
+
+  let searchTimeout = null;
+
+  input.addEventListener('input', () => {
+    const query = input.value.trim();
+    if (clearBtn) clearBtn.style.display = query.length > 0 ? 'flex' : 'none';
+
+    clearTimeout(searchTimeout);
+    if (query.length === 0) { results.innerHTML = ''; return; }
+
+    searchTimeout = setTimeout(async () => {
+      results.innerHTML = `
+        <div style="padding:1.5rem;text-align:center;color:var(--color-text-muted);font-size:0.85rem;">
+          <i class="fa-solid fa-spinner fa-spin" style="margin-right:0.5rem;color:var(--color-primary);"></i> 검색 중...
+        </div>`;
+
+      try {
+        const res = await fetch(`${BACKEND_BASE}/api/search?query=${encodeURIComponent(query)}`, {
+          method: 'GET', headers: API_HEADERS
+        });
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.error || '검색 실패');
+
+        const movies = result.data || [];
+        if (movies.length === 0) {
+          results.innerHTML = `<div class="search-no-results">"${escapeHtml(query)}"에 매칭되는 영화가 없습니다.</div>`;
+          return;
+        }
+
+        results.innerHTML = movies.map(movie => `
+          <div class="search-item" onclick="selectMovieFromSearch('${movie.movieCd}', '${escapeHtml(movie.movieNm)}')">
+            <img src="${escapeHtml(movie.poster || '')}" class="search-poster-thumb" alt="${escapeHtml(movie.movieNm)}">
+            <div class="search-info">
+              <div class="search-title">${escapeHtml(movie.movieNm)}</div>
+              <div class="search-meta">${escapeHtml(movie.genre || '장르 정보 없음')} • ${escapeHtml(movie.openDt ? movie.openDt.slice(0, 4) : '개봉연도 미정')}년 개봉 • ⭐ ${escapeHtml(movie.rating || '0.0')}</div>
+            </div>
+          </div>`).join('');
+
+      } catch (err) {
+        console.error(err);
+        results.innerHTML = `<div class="search-no-results" style="color:var(--color-accent);"><i class="fa-solid fa-circle-exclamation"></i> 검색 지연이 발생했습니다.</div>`;
+      }
+    }, 300);
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      clearBtn.style.display = 'none';
+      results.innerHTML = '';
+      input.focus();
+    });
+  }
+
+  // Keyboard: / or Ctrl+K / Cmd+K to open, Esc to close
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement?.tagName;
+    const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable;
+    const overlay = document.getElementById('spotlightOverlay');
+    const isOpen = overlay?.classList.contains('active');
+
+    if (e.key === 'Escape' && isOpen) {
+      e.preventDefault();
+      closeSpotlight();
+      return;
+    }
+    if ((e.key === '/' && !inInput) || ((e.metaKey || e.ctrlKey) && e.key === 'k')) {
+      e.preventDefault();
+      if (isOpen) closeSpotlight(); else openSpotlight();
+    }
+  });
+}
+
+window.openSpotlight  = openSpotlight;
+window.closeSpotlight = closeSpotlight;
+window.handleSpotlightBackdrop = handleSpotlightBackdrop;
 
 // AI Writer Review Coaching Trigger Logic (1day 3 times limit, LocalStorage cached)
 async function coachUserReview() {
