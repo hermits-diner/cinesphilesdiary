@@ -136,8 +136,8 @@
       inset: 0;
       background: radial-gradient(
         ellipse 50% 72% at 50% -2%,
-        rgba(229, 169, 169, 0.07) 0%,
-        rgba(212, 175, 55,  0.03) 38%,
+        rgba(229, 169, 169, 0.18) 0%,
+        rgba(212, 175, 55,  0.09) 38%,
         transparent 62%
       );
       clip-path: polygon(47% 0%, 53% 0%, 80% 100%, 20% 100%);
@@ -161,10 +161,11 @@
 
     .cinema-particles span {
       position: absolute;
-      width: 2px;
-      height: 2px;
+      width: 3px;
+      height: 3px;
       border-radius: 50%;
-      background: rgba(229, 169, 169, 0.9);
+      background: rgba(245, 220, 180, 1);
+      box-shadow: 0 0 4px rgba(229, 169, 169, 0.8);
       left: var(--x);
       bottom: 0;
       will-change: transform, opacity;
@@ -193,8 +194,8 @@
       inset: 0;
       background: linear-gradient(to bottom,
         var(--bg-dark) 0%,
-        transparent 28%,
-        transparent 55%,
+        transparent 40%,
+        transparent 60%,
         var(--bg-dark) 100%
       );
       z-index: 1;
@@ -206,8 +207,8 @@
       inset: 0;
       background: linear-gradient(to right,
         var(--bg-dark) 0%,
-        transparent 7%,
-        transparent 93%,
+        transparent 12%,
+        transparent 88%,
         var(--bg-dark) 100%
       );
       z-index: 1;
@@ -2671,22 +2672,22 @@
     <div class="cinema-beam"></div>
 
     <div class="cinema-particles">
-      <span style="--x:47.5%;--dur:14s;--del:0s;  --dx:-18px;--op:.32"></span>
-      <span style="--x:50.5%;--dur:10s;--del:2.5s;--dx:12px; --op:.20"></span>
-      <span style="--x:49.0%;--dur:17s;--del:5.2s;--dx:-9px; --op:.28"></span>
-      <span style="--x:51.5%;--dur:11s;--del:1.2s;--dx:20px; --op:.22"></span>
-      <span style="--x:48.5%;--dur:13s;--del:4.0s;--dx:-14px;--op:.38"></span>
-      <span style="--x:52.0%;--dur: 9s;--del:7.5s;--dx:8px;  --op:.18"></span>
-      <span style="--x:46.5%;--dur:16s;--del:3.0s;--dx:-22px;--op:.26"></span>
-      <span style="--x:53.5%;--dur:12s;--del:6.1s;--dx:16px; --op:.24"></span>
-      <span style="--x:50.0%;--dur:15s;--del:8.8s;--dx:-6px; --op:.30"></span>
-      <span style="--x:48.0%;--dur:11s;--del:0.8s;--dx:11px; --op:.20"></span>
+      <span style="--x:47.5%;--dur:14s;--del:0s;  --dx:-18px;--op:.65"></span>
+      <span style="--x:50.5%;--dur:10s;--del:2.5s;--dx:12px; --op:.50"></span>
+      <span style="--x:49.0%;--dur:17s;--del:5.2s;--dx:-9px; --op:.58"></span>
+      <span style="--x:51.5%;--dur:11s;--del:1.2s;--dx:20px; --op:.45"></span>
+      <span style="--x:48.5%;--dur:13s;--del:4.0s;--dx:-14px;--op:.70"></span>
+      <span style="--x:52.0%;--dur: 9s;--del:7.5s;--dx:8px;  --op:.42"></span>
+      <span style="--x:46.5%;--dur:16s;--del:3.0s;--dx:-22px;--op:.55"></span>
+      <span style="--x:53.5%;--dur:12s;--del:6.1s;--dx:16px; --op:.48"></span>
+      <span style="--x:50.0%;--dur:15s;--del:8.8s;--dx:-6px; --op:.60"></span>
+      <span style="--x:48.0%;--dur:11s;--del:0.8s;--dx:11px; --op:.45"></span>
     </div>
 
     <div class="cinema-seats">
       <svg viewBox="0 0 1440 200" xmlns="http://www.w3.org/2000/svg">
         <!-- Back row: 14 seats, pitch=103, startX=18 -->
-        <g fill="#211b2e" opacity="0.72">
+        <g fill="#3a2f50" opacity="0.85">
           <rect x="18"   y="96" width="65" height="24" rx="5"/>
           <rect x="121"  y="96" width="65" height="24" rx="5"/>
           <rect x="224"  y="96" width="65" height="24" rx="5"/>
@@ -2718,7 +2719,7 @@
           <rect x="1370" y="80" width="39" height="18" rx="6"/>
         </g>
         <!-- Front row: 10 seats, pitch=143, startX=29 -->
-        <g fill="#1b1426" opacity="0.90">
+        <g fill="#2e2442" opacity="0.95">
           <rect x="29"   y="140" width="95" height="38" rx="6"/>
           <rect x="172"  y="140" width="95" height="38" rx="6"/>
           <rect x="315"  y="140" width="95" height="38" rx="6"/>
