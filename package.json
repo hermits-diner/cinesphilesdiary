@@ -1,7 +1,7 @@
 {
-  "name": "cinediary-app",
+  "name": "cinephiles-diary",
   "version": "1.0.0",
-  "description": "CineDiary AI movie portal with Gemini review expander",
+  "description": "Cinephile's Diary — AI movie portal with Gemini review coach",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
