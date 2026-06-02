@@ -2763,6 +2763,93 @@ window.addMovieToBucket = addMovieToBucket;
 window.toggleBucketItem = toggleBucketItem;
 window.deleteBucketItem = deleteBucketItem;
 
+// ── Bucket List Excel 양식 다운로드 ──────────────────────────────
+function downloadBucketTemplate() {
+  if (!window.XLSX) {
+    showToast('오류', '엑셀 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'error');
+    return;
+  }
+  const wb = XLSX.utils.book_new();
+  const wsData = [
+    ['리스트 제목', '영화 제목', '완료 여부(Y/N)'],
+    ['거장 감독 컬렉션', '기생충', 'N'],
+    ['거장 감독 컬렉션', '올드보이', 'N'],
+    ['거장 감독 컬렉션', '아가씨', 'Y'],
+    ['죽기 전에 봐야 할 명작', '시민 케인', 'N'],
+    ['죽기 전에 봐야 할 명작', '2001 스페이스 오디세이', 'N'],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  // 열 너비 지정
+  ws['!cols'] = [{ wch: 28 }, { wch: 28 }, { wch: 16 }];
+  XLSX.utils.book_append_sheet(wb, ws, '버킷리스트');
+  XLSX.writeFile(wb, '버킷리스트_양식.xlsx');
+  showToast('다운로드 완료', '양식 파일을 열어 리스트 제목·영화 제목·완료 여부를 채운 후 업로드하세요.', 'success');
+}
+
+// ── Bucket List Excel 업로드 ─────────────────────────────────────
+function uploadBucketExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!window.XLSX) {
+    showToast('오류', '엑셀 라이브러리가 로드되지 않았습니다.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+      // 헤더 행 제외, 빈 행 제거
+      const dataRows = rows.slice(1).filter(r => String(r[0] || '').trim() && String(r[1] || '').trim());
+      if (dataRows.length === 0) {
+        showToast('가져오기 실패', '데이터 행이 없습니다. 양식을 확인해 주세요.', 'error');
+        event.target.value = '';
+        return;
+      }
+
+      // 리스트 제목별로 그룹핑
+      const groups = {};
+      dataRows.forEach(r => {
+        const title  = String(r[0] || '').trim();
+        const movie  = String(r[1] || '').trim();
+        const done   = String(r[2] || '').trim().toUpperCase() === 'Y';
+        if (!title || !movie) return;
+        if (!groups[title]) groups[title] = [];
+        groups[title].push({ id: `${Date.now()}_${Math.random()}`, text: movie, checked: done });
+      });
+
+      let boards = [];
+      try { boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]'); } catch (_) {}
+      if (!Array.isArray(boards)) boards = [];
+
+      Object.entries(groups).forEach(([title, items]) => {
+        boards.push({ id: `${Date.now()}_${Math.random()}`, title, items });
+      });
+
+      localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+      loadSavedBuckets();
+
+      const totalMovies = Object.values(groups).reduce((s, a) => s + a.length, 0);
+      showToast(
+        '가져오기 완료',
+        `${Object.keys(groups).length}개 보드, 총 ${totalMovies}편의 영화를 불러왔습니다.`,
+        'success'
+      );
+    } catch (err) {
+      console.error(err);
+      showToast('파일 오류', '파일을 읽는 중 오류가 발생했습니다. 올바른 엑셀 양식인지 확인해 주세요.', 'error');
+    }
+    event.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+window.downloadBucketTemplate = downloadBucketTemplate;
+window.uploadBucketExcel      = uploadBucketExcel;
+
 // ---- Modal accessibility: focus trap, ESC-to-close, and focus restoration ----
 (function initModalA11y() {
   const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';

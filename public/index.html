@@ -3514,6 +3514,17 @@
             </div>
           </div>
 
+          <!-- Excel import/export toolbar -->
+          <div style="display:flex;gap:0.6rem;align-items:center;justify-content:flex-end;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <button onclick="downloadBucketTemplate()" class="diary-launch-btn" style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;" title="엑셀 양식 파일 다운로드">
+              <i class="fa-solid fa-file-arrow-down"></i> 양식 다운로드
+            </button>
+            <label class="diary-launch-btn" style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;cursor:pointer;" title="엑셀 파일로 버킷 리스트 가져오기">
+              <i class="fa-solid fa-file-arrow-up"></i> 엑셀 업로드
+              <input type="file" id="bucketExcelInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="uploadBucketExcel(event)">
+            </label>
+          </div>
+
           <!-- Bottom: Grid of Saved Bucket Lists -->
           <span class="space-list-title" style="margin-bottom: 1.25rem;">
             <i class="fa-solid fa-circle-check"></i> 나의 영화 정복 맵 (<span id="savedBucketCount">0</span>)
@@ -3586,6 +3597,7 @@
   </div>
 
   <!-- Application Logic JavaScript -->
-  <script src="app.js?v=20260601_3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="app.js?v=20260601_4"></script>
 </body>
 </html>
