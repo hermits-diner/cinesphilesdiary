@@ -1,7 +1,7 @@
 {
-  "name": "cinesparks-app",
+  "name": "cinediary-app",
   "version": "1.0.0",
-  "description": "CineSparks AI movie portal with Gemini review expander",
+  "description": "CineDiary AI movie portal with Gemini review expander",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 app.set('trust proxy', 1); // Trust Render's reverse proxy for correct rate-limiting and health checks
 const PORT = process.env.PORT || 5000;
-const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN || 'DEFAULT_CINESPARKS_AUTH_TOKEN';
+const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN || 'DEFAULT_CINEDIARY_AUTH_TOKEN';
 const KOBIS_API_KEY = process.env.KOBIS_API_KEY || '5a852c691ced334dd9ffadc9ac8637c5';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -701,6 +701,244 @@ app.post('/api/review', checkAuth, reviewLimiter, async (req, res) => {
   }
 });
 
+// 4. GET /api/search — Global movie search using TMDB
+app.get('/api/search', checkAuth, async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ error: '검색어를 입력해주세요.' });
+  }
+
+  const cleanQuery = query.trim();
+  const cacheKey = `search_${cleanQuery}`;
+  const cachedData = apiCache.get(cacheKey);
+
+  if (cachedData) {
+    return res.json({
+      success: true,
+      fromCache: true,
+      data: cachedData,
+    });
+  }
+
+  try {
+    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${encodeURIComponent(cleanQuery)}&language=ko-KR&page=1`;
+    const response = await axios.get(url, { timeout: 4500 });
+    const rawList = response.data?.results || [];
+
+    // Map necessary fields and filter movies with poster paths
+    const formattedList = rawList
+      .filter(movie => movie.title && movie.poster_path)
+      .map(movie => {
+        // Map first genre ID to string representation
+        const genreMap = {
+          28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
+          99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
+          36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
+          10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
+          10752: '전쟁', 37: '서부'
+        };
+        const primaryGenreId = movie.genre_ids?.[0];
+        const genre = genreMap[primaryGenreId] || '영화';
+
+        return {
+          movieCd: `TMDB_${movie.id}`,
+          movieNm: movie.title,
+          openDt: movie.release_date || '개봉연도 불명',
+          poster: `https://image.tmdb.org/t/p/w300${movie.poster_path}`,
+          backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : null,
+          rating: movie.vote_average ? movie.vote_average.toFixed(1) : '0.0',
+          genre: genre,
+          overview: movie.overview || '등록된 줄거리가 아직 없는 작품입니다.'
+        };
+      });
+
+    // Cache search result for 15 minutes (900 seconds)
+    apiCache.set(cacheKey, formattedList, 900);
+
+    return res.json({
+      success: true,
+      fromCache: false,
+      data: formattedList,
+    });
+  } catch (error) {
+    console.error('TMDB Search API Error:', error.message);
+    return res.status(500).json({
+      error: '영화 검색 중에 지연이 발생했습니다. 잠시 후 다시 시도해 주세요.',
+    });
+  }
+});
+
+// 5. POST /api/coach-review — AI Movie Review Critic & Coaching system
+app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
+  const { movieNm, directors, actors, genres, userReview } = req.body;
+
+  if (!movieNm || !userReview) {
+    return res.status(400).json({ error: '영화 제목 혹은 리뷰 내용이 유효하지 않습니다.' });
+  }
+
+  // Extend characters to 500 for training purposes
+  if (userReview.length > 500) {
+    return res.status(400).json({ error: '리뷰 훈련용 초안은 최대 500자까지 입력 가능합니다.' });
+  }
+
+  const safeReview = sanitizeInput(userReview);
+  const cleanDirectors = sanitizeInput(directors || '정보 없음');
+  const cleanActors = sanitizeInput(actors || '정보 없음');
+  const cleanGenres = sanitizeInput(genres || '정보 없음');
+
+  const isPlaceholderKey = !GEMINI_API_KEY || GEMINI_API_KEY.includes('YourActualGeminiApiKeyGoesHere');
+
+  // Fallback simulator for AI Coaching Evaluation when GEMINI_API_KEY is not configured
+  if (isPlaceholderKey) {
+    console.log('Gemini API key is placeholder or missing for coaching. Operating dynamic premium mock coach evaluator.');
+
+    // Dynamic mock evaluation score calculator based on review content length & some random variances
+    const baseScore = Math.min(75 + Math.round((safeReview.length / 500) * 15), 92);
+    const varFactor = (safeReview.length % 7) - 3; // -3 to +3 variance
+
+    const scoreExpression = Math.max(70, Math.min(98, baseScore + varFactor + 2));
+    const scoreLogic = Math.max(70, Math.min(98, baseScore - varFactor + 1));
+    const scoreAnalysis = Math.max(65, Math.min(98, baseScore + (safeReview.includes('감독') || safeReview.includes('연출') ? 5 : -2)));
+    const scoreVocabulary = Math.max(70, Math.min(98, baseScore + (safeReview.length > 100 ? 4 : -3)));
+    const scoreImpact = Math.max(65, Math.min(98, baseScore + varFactor));
+
+    const mockFeedbacks = [
+      `작성해주신 감상평은 《${movieNm}》이 품고 있는 ${cleanGenres} 특유의 짙은 분위기와 테마적 무게감을 정확하게 짚어내고 있습니다. 비록 짧은 초안이지만 영화 전체의 서사적 결을 충실히 느끼신 점이 돋보입니다. 다만, 연출가인 ${cleanDirectors}의 영상 미학적 디테일이나 주요 등장인물들 간의 심리적 밀당에 관한 비평적 어휘를 한 스푼만 더 얹는다면 비평가 못지않은 우수한 에세이로 거듭날 것입니다.`,
+      `관람 후 마음에 돋아난 솔직한 감흥을 정제되지 않은 언어로 훌륭히 건져 올리셨습니다. 영화 속 핵심 분위기에 대한 직관적인 해상도가 돋보이는 훌륭한 시도입니다. 글 전체의 논리적 긴장감을 더 높이기 위해선, 단순히 장면에 대한 묘사에서 한 단계 나아가 '왜 그 씬이 마음에 잔향을 남겼는지' 구체적인 이미지의 힘을 비평 어휘로 엮어보시는 것을 권합니다.`,
+      `《${movieNm}》의 복합적인 매력에 대한 리뷰어님만의 날카로운 감각적 직관이 잘 우러난 글입니다. 전반적인 표현력이 참신하며 어휘 선택도 매력적입니다. 여기서 한 걸음 더 나아가, ${cleanGenres} 문법이 이 영화 안에서 어떻게 파괴되고 혹은 새롭게 재탄생했는지 분석적인 요소를 추가한다면 한층 높은 설득력과 평론가적 문체를 확보하실 수 있습니다.`
+    ];
+
+    const mockCorrectedReviews = [
+      `"${safeReview}"라는 깊은 감상은 감독 ${cleanDirectors}이 심어둔 묵직한 미장센과 장르적 미학을 관객에게 온전히 전달합니다. 《${movieNm}》의 복합적인 서사와 배우진의 강렬한 앙상블은 한 편의 잘 짜여진 시각적 교향곡처럼 스크린에 가득 울려 퍼지며, 이는 관객들의 마음 깊은 곳에 가공되지 않은 짙은 잔향을 고스란히 이식해 냅니다.`,
+      `《${movieNm}》은 ${cleanGenres} 본연의 문법을 유려하게 정제해 낸 수작으로, "${safeReview}"라는 리뷰어의 분석처럼 매 씬마다 팽팽한 연출적 긴장감과 아름다운 시각적 조화가 빛납니다. 감독 ${cleanDirectors}의 정교한 프레이밍과 더불어 배우들의 섬세한 호흡은 상투적 감상의 지평을 거뿐히 넘어서는 품격 높은 정서적 몰입을 경험하게 만듭니다.`,
+      `리뷰어의 단평인 "${safeReview}"에서 엿볼 수 있듯, 《${movieNm}》은 세련된 미장센의 향연 뒤로 영화적 본질과 정교한 연출의 조화가 두드러지는 명작입니다. ${cleanGenres} 고유의 서사적 깊이와 배우들의 밀도 높은 연기는 보는 이를 완벽히 스크린 속에 봉인시키며, 크레딧이 올라간 이후에도 오랜 사유의 단초를 관객의 가슴속에 묵직하게 남겨둡니다.`
+    ];
+
+    const idx = safeReview.length % mockFeedbacks.length;
+
+    // Simulate delay for realism (1200ms for heavy AI analysis computation)
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    return res.json({
+      success: true,
+      scores: {
+        expression: scoreExpression,
+        logic: scoreLogic,
+        analysis: scoreAnalysis,
+        vocabulary: scoreVocabulary,
+        impact: scoreImpact
+      },
+      feedback: mockFeedbacks[idx],
+      corrected: mockCorrectedReviews[idx],
+      simulated: true
+    });
+  }
+
+  // Construct structured prompt to guide Gemini and explicitly demand robust JSON format
+  const prompt = `당신은 세계적인 권위를 가진 수석 영화 평론가이자, 후배 시네필의 평론 글쓰기 성장을 책임지는 전문 영화 비평 작문 코치입니다.
+사용자가 작성한 영화 감상평 초안을 자세히 분석하여 점수를 매기고, 전문적인 첨삭 가이드를 작성해주세요.
+
+영화 정보:
+- 제목: ${movieNm}
+- 감독: ${cleanDirectors}
+- 장르: ${cleanGenres}
+- 출연진: ${cleanActors}
+
+사용자의 감상평 초안:
+"${safeReview}"
+
+작성 규칙:
+1. 사용자의 감상평 초안을 바탕으로 엄격하고 영화학적인 관점에서 작문 평가를 실행하십시오.
+2. 아래에 정의된 JSON 형식으로만 정확하게 결과를 출력하십시오. 마크다운 기호(\`\`\`json ...) 등을 포함하지 말고 오직 순수 JSON 데이터만 반환해야 합니다. 다른 서두 설명이나 감사 인사 등 텍스트는 절대 포함하지 마십시오.
+
+반환할 JSON 구조 사양:
+{
+  "scores": {
+    "expression": (10~100 사이의 정수. 문장이 얼마나 영화적이고 풍부하게 묘사되었는지 여부),
+    "logic": (10~100 사이의 정수. 감상이 일관되게 전개되고 앞뒤 구조가 논리적인지 여부),
+    "analysis": (10~100 사이의 정수. 감독의 연출력, 배우 연기, 장르 특성 등 영화학적 세부 요소를 분석했는지 여부),
+    "vocabulary": (10~100 사이의 정수. 상투적인 단어 대신 '미장센', '서사적', '페이소스' 같은 영화적 어휘를 활용했는지 여부),
+    "impact": (10~100 사이의 정수. 독자에게 강한 공감이나 신선함을 전해주는 전체 글의 임팩트)
+  },
+  "feedback": "작성된 초안의 강점과 약점을 친근하면서도 날카롭게 짚어주고, 다음 글쓰기 때 어떤 어휘나 시각을 더하면 좋은지 한글 3문장 이내로 정리한 정교한 작문 피드백 가이드",
+  "corrected": "사용자의 초안 핵심 감성을 100% 보존하면서, 어휘의 품격을 높이고 호흡을 다듬어 마치 저명한 일간지 평론가 수준으로 화려하고 매끄럽게 교정한 세련된 2~3문장 분량의 시네필 첨삭 완성본 (200자~300자 내외)"
+}`;
+
+  try {
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 12000, // 12s timeout for complex critique processing
+      }
+    );
+
+    let generatedText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!generatedText) {
+      throw new Error('Invalid response structure from Gemini API');
+    }
+
+    generatedText = generatedText.trim();
+    
+    // JSON Parsing and extraction safety guard
+    let jsonResult;
+    try {
+      jsonResult = JSON.parse(generatedText);
+    } catch (parseError) {
+      console.warn('Direct JSON parsing failed. Attempting regex extract.', parseError.message);
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonResult = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('Could not parse JSON response from Gemini');
+      }
+    }
+
+    // Double check score schema robustness
+    if (!jsonResult.scores || !jsonResult.feedback || !jsonResult.corrected) {
+      throw new Error('Gemini API response is missing required coach schema fields');
+    }
+
+    return res.json({
+      success: true,
+      scores: {
+        expression: parseInt(jsonResult.scores.expression, 10) || 75,
+        logic: parseInt(jsonResult.scores.logic, 10) || 75,
+        analysis: parseInt(jsonResult.scores.analysis, 10) || 75,
+        vocabulary: parseInt(jsonResult.scores.vocabulary, 10) || 75,
+        impact: parseInt(jsonResult.scores.impact, 10) || 75
+      },
+      feedback: jsonResult.feedback.trim(),
+      corrected: jsonResult.corrected.trim(),
+      simulated: false
+    });
+
+  } catch (error) {
+    console.error('Gemini Coach API Error:', error.response?.data || error.message);
+    return res.status(500).json({
+      error: 'AI 평론 교정 중 서비스 일시 지연이 발생했습니다. 잠시 후 다시 시도해 주세요.',
+    });
+  }
+});
+
 // Serve frontend routing for SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -708,5 +946,5 @@ app.get('*', (req, res) => {
 
 // Start Express server
 app.listen(PORT, () => {
-  console.log(`CineSparks AI server running on port ${PORT}`);
+  console.log(`CineDiary AI server running on port ${PORT}`);
 });

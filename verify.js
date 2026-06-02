@@ -16,7 +16,7 @@ const TEST_DATE = getYesterdayDt();
 
 async function runTests() {
   console.log('==================================================');
-  console.log('🚀 CineSparks AI API Verification Suite Starting...');
+  console.log('🚀 CineDiary AI API Verification Suite Starting...');
   console.log('==================================================\n');
 
   let passedTests = 0;
@@ -232,7 +232,7 @@ async function runTests() {
   }
 
   console.log('==================================================');
-  console.log('📊 CineSparks AI API Verification Summary');
+  console.log('📊 CineDiary AI API Verification Summary');
   console.log(`   Total Tests Run: ${passedTests + failedTests}`);
   console.log(`   PASSED Tests: ${passedTests} / ${passedTests + failedTests}`);
   console.log(`   FAILED Tests: ${failedTests} / ${passedTests + failedTests}`);

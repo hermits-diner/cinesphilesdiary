@@ -17,12 +17,12 @@ const puppeteer = require('puppeteer');
     console.log('Navigating to http://localhost:5001 ...');
     await page.goto('http://localhost:5001', { waitUntil: 'networkidle2' });
     
-    console.log('Clicking button #cinesparkSpaceBtn...');
-    await page.click('#cinesparkSpaceBtn');
+    console.log('Clicking button #cineDiaryBtn...');
+    await page.click('#cineDiaryBtn');
     
     await new Promise(r => setTimeout(r, 1000));
     
-    const active = await page.$eval('#cinesparkSpaceModal', el => el.classList.contains('active'));
+    const active = await page.$eval('#cineDiaryModal', el => el.classList.contains('active'));
     console.log(active ? 'SUCCESS: Modal opened.' : 'FAIL: Modal did not open.');
   } catch (e) {
     console.error('Test execution failed:', e);

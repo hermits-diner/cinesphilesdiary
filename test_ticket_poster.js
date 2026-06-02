@@ -15,9 +15,9 @@ const puppeteer = require('puppeteer');
     console.log('Navigating to http://localhost:5001 ...');
     await page.goto('http://localhost:5001', { waitUntil: 'networkidle2' });
     
-    console.log('Opening CineSpark Space modal...');
+    console.log('Opening CineDiary modal...');
     await page.evaluate(() => {
-      document.getElementById('cinesparkSpaceBtn').click();
+      document.getElementById('cineDiaryBtn').click();
     });
     await new Promise(r => setTimeout(r, 500));
     

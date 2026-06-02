@@ -2,7 +2,7 @@
 // Dynamically detect Express API server location based on running environment
 const BACKEND_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? '' // Same-host relative path for local development
-  : (localStorage.getItem('CINESPARKS_BACKEND_URL') || ''); // Loaded from manual user settings on static hosting
+  : (localStorage.getItem('CINEDIARY_BACKEND_URL') || ''); // Loaded from manual user settings on static hosting
 
 let API_HEADERS = {
   'Content-Type': 'application/json'
@@ -230,7 +230,7 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 
 // 1. Initialize Date Constraints & Load Data
 window.addEventListener('DOMContentLoaded', async () => {
-  console.log('[CineSpark] DOMContentLoaded fired — starting initialization...');
+  console.log('[CineDiary] DOMContentLoaded fired — starting initialization...');
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   // Fetch auth token from server securely
@@ -385,7 +385,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Settings Modal actions
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
-      backendUrlInput.value = localStorage.getItem('CINESPARKS_BACKEND_URL') || '';
+      backendUrlInput.value = localStorage.getItem('CINEDIARY_BACKEND_URL') || '';
       settingsModal.classList.add('active');
     });
   }
@@ -410,10 +410,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       if (url) {
-        localStorage.setItem('CINESPARKS_BACKEND_URL', url);
+        localStorage.setItem('CINEDIARY_BACKEND_URL', url);
         showToast('설정 저장 완료', 'API 서버 주소가 저장되었습니다. 페이지를 리로드합니다.', 'success');
       } else {
-        localStorage.removeItem('CINESPARKS_BACKEND_URL');
+        localStorage.removeItem('CINEDIARY_BACKEND_URL');
         showToast('설정 초기화 완료', '로컬 테스트용 기본 경로로 초기화되었습니다. 페이지를 리로드합니다.', 'success');
       }
       setTimeout(() => location.reload(), 1500);
@@ -421,7 +421,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Show a warning toast on GitHub Pages if backend URL is not set yet!
-  if (!isLocal && !localStorage.getItem('CINESPARKS_BACKEND_URL')) {
+  if (!isLocal && !localStorage.getItem('CINEDIARY_BACKEND_URL')) {
     setTimeout(() => {
       showToast('API 서버 미등록 경고', 'GitHub Pages에서 전체 기능을 활성화하려면 우측 상단의 "서버 설정"을 눌러 배포된 Express 백엔드 주소를 입력해 주셔야 합니다.', 'error');
     }, 1000);
@@ -442,12 +442,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     deleteReviewBtn.addEventListener('click', deleteCinemaLog);
   }
 
-  // CineSpark Space Modal Open / Close Events are handled via highly resilient inline HTML onclick handlers to bypass any browser caching or timing issues!
-  const cinesparkSpaceBtn = document.getElementById('cinesparkSpaceBtn');
-  const cinesparkSpaceModal = document.getElementById('cinesparkSpaceModal');
+  // CineDiary Modal Open / Close Events are handled via highly resilient inline HTML onclick handlers to bypass any browser caching or timing issues!
+  const cinesparkSpaceBtn = document.getElementById('cineDiaryBtn');
+  const cinesparkSpaceModal = document.getElementById('cineDiaryModal');
   const spaceCloseBtn = document.getElementById('spaceCloseBtn');
 
-  console.log('[CineSpark] Space button found:', !!cinesparkSpaceBtn, '| Modal found:', !!cinesparkSpaceModal);
+  console.log('[CineDiary] Space button found:', !!cinesparkSpaceBtn, '| Modal found:', !!cinesparkSpaceModal);
   if (cinesparkSpaceModal) {
     cinesparkSpaceModal.addEventListener('click', (e) => {
       if (e.target === cinesparkSpaceModal) {
@@ -457,7 +457,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // --- CineSpark Space Tab Navigation Setup ---
+  // --- CineDiary Tab Navigation Setup ---
   const tabBtns = document.querySelectorAll('.space-tab-btn');
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -525,8 +525,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       // 1. Close movie details modal
       closeModal();
       
-      // 2. Open CineSpark Space modal
-      openCinesparkSpace();
+      // 2. Open CineDiary modal
+      openCineDiary();
       
       // 3. Switch to Ticket tab
       const ticketTabBtn = document.querySelector('.space-tab-btn[data-tab="tabTicket"]');
@@ -581,7 +581,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     let presets = [];
     try {
-      presets = JSON.parse(localStorage.getItem('CINESPARK_PRESETS') || '[]');
+      presets = JSON.parse(localStorage.getItem('CINEDIARY_PRESETS') || '[]');
     } catch (e) {
       console.error('Failed to parse presets:', e);
     }
@@ -604,7 +604,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const idx = parseInt(presetSelect.value, 10);
       let presets = [];
       try {
-        presets = JSON.parse(localStorage.getItem('CINESPARK_PRESETS') || '[]');
+        presets = JSON.parse(localStorage.getItem('CINEDIARY_PRESETS') || '[]');
       } catch (e) {}
       
       const allPresets = [...DEFAULT_PRESETS, ...presets];
@@ -656,12 +656,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       
       let presets = [];
       try {
-        presets = JSON.parse(localStorage.getItem('CINESPARK_PRESETS') || '[]');
+        presets = JSON.parse(localStorage.getItem('CINEDIARY_PRESETS') || '[]');
       } catch (e) {}
       
       presets.push(newPreset);
       try {
-        localStorage.setItem('CINESPARK_PRESETS', JSON.stringify(presets));
+        localStorage.setItem('CINEDIARY_PRESETS', JSON.stringify(presets));
         loadPresets();
         presetSelect.value = DEFAULT_PRESETS.length + presets.length - 1;
         showToast('프리셋 추가 완료', `나만의 커스텀 프리셋 "${cleanName}"이 성공적으로 등록되었습니다.`, 'success');
@@ -695,8 +695,336 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  console.log('[CineSpark] ✅ DOMContentLoaded initialization COMPLETE. All event listeners registered.');
+  // --- Global Movie Search Bar Bindings & Debouncing ---
+  const globalSearchEl = document.getElementById('globalMovieSearch');
+  const searchClearBtn = document.getElementById('searchClearBtn');
+  const searchDropdown = document.getElementById('searchDropdown');
+
+  if (globalSearchEl && searchDropdown) {
+    let searchTimeout = null;
+
+    globalSearchEl.addEventListener('input', () => {
+      const query = globalSearchEl.value.trim();
+      
+      // Toggle clear button
+      if (searchClearBtn) {
+        searchClearBtn.style.display = query.length > 0 ? 'block' : 'none';
+      }
+
+      clearTimeout(searchTimeout);
+      if (query.length === 0) {
+        searchDropdown.innerHTML = '';
+        searchDropdown.style.display = 'none';
+        return;
+      }
+
+      // Debounce: Wait 300ms before firing search request to optimize cost & API load!
+      searchTimeout = setTimeout(async () => {
+        searchDropdown.innerHTML = `
+          <div style="padding: 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.85rem;">
+            <i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.5rem; color: var(--color-primary);"></i> 검색 중...
+          </div>
+        `;
+        searchDropdown.style.display = 'block';
+
+        try {
+          const res = await fetch(`${BACKEND_BASE}/api/search?query=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: API_HEADERS
+          });
+          const result = await res.json();
+
+          if (!res.ok || !result.success) throw new Error(result.error || '검색 실패');
+
+          const movies = result.data || [];
+          if (movies.length === 0) {
+            searchDropdown.innerHTML = `<div class="search-no-results">"${escapeHtml(query)}"에 매칭되는 영화 검색 결과가 없습니다.</div>`;
+            return;
+          }
+
+          let dropdownHtml = '';
+          movies.forEach(movie => {
+            dropdownHtml += `
+              <div class="search-item" onclick="selectMovieFromSearch('${movie.movieCd}', '${escapeHtml(movie.movieNm)}')">
+                <img src="${escapeHtml(movie.poster || '')}" class="search-poster-thumb" alt="${escapeHtml(movie.movieNm)}">
+                <div class="search-info">
+                  <div class="search-title">${escapeHtml(movie.movieNm)}</div>
+                  <div class="search-meta">${escapeHtml(movie.genre || '장르 정보 없음')} • ${escapeHtml(movie.openDt ? movie.openDt.slice(0, 4) : '개봉연도 미정')}년 개봉 • ⭐ ${escapeHtml(movie.rating || '0.0')}</div>
+                </div>
+              </div>
+            `;
+          });
+          searchDropdown.innerHTML = dropdownHtml;
+
+        } catch (err) {
+          console.error(err);
+          searchDropdown.innerHTML = `<div class="search-no-results" style="color: var(--color-accent);"><i class="fa-solid fa-circle-exclamation"></i> 검색 지연이 발생했습니다.</div>`;
+        }
+      }, 300);
+    });
+
+    if (searchClearBtn) {
+      searchClearBtn.addEventListener('click', () => {
+        globalSearchEl.value = '';
+        searchClearBtn.style.display = 'none';
+        searchDropdown.innerHTML = '';
+        searchDropdown.style.display = 'none';
+        globalSearchEl.focus();
+      });
+    }
+
+    // Close dropdown on clicking outside
+    document.addEventListener('click', (e) => {
+      if (e.target !== globalSearchEl && e.target !== searchDropdown && !searchDropdown.contains(e.target)) {
+        searchDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  // --- AI Movie Review Coaching Click Handler ---
+  const coachReviewBtn = document.getElementById('coachReviewBtn');
+  if (coachReviewBtn) {
+    coachReviewBtn.addEventListener('click', coachUserReview);
+  }
+
+  console.log('[CineDiary] ✅ DOMContentLoaded initialization COMPLETE. All event listeners registered.');
 });
+
+// Global Movie Search: Select movie item and open its detail modal
+async function selectMovieFromSearch(movieCd, movieNm) {
+  const dropdown = document.getElementById('searchDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+  
+  const searchInput = document.getElementById('globalMovieSearch');
+  if (searchInput) searchInput.value = '';
+  
+  const clearBtn = document.getElementById('searchClearBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+
+  console.log(`[CineDiary] Movie selected from search: ${movieNm} (${movieCd})`);
+  openMovieDetails(movieCd, movieNm);
+}
+
+// AI Writer Review Coaching Trigger Logic (1day 3 times limit, LocalStorage cached)
+async function coachUserReview() {
+  if (!activeMovieInfo || !activeMovieInfo.movieNm) {
+    showToast('분석 실패', '영화 정보를 불러올 수 없습니다.', 'error');
+    return;
+  }
+
+  const reviewText = userReviewInput.value.trim();
+  if (!reviewText) {
+    showToast('초안 작성 누락', '코칭을 받기 위해 영화 감상평 초안을 먼저 작성해 주세요.', 'error');
+    userReviewInput.focus();
+    return;
+  }
+
+  const movieNm = activeMovieInfo.movieNm;
+  const directors = activeMovieInfo.directors || '정보 없음';
+  const actors = activeMovieInfo.actors || '정보 없음';
+  const genres = activeMovieInfo.genres || '정보 없음';
+
+  // 1. Check Rate Limit (1 day 3 times free limit)
+  const todayStr = new Date().toISOString().split('T')[0];
+  let limitData = { date: todayStr, count: 0 };
+  try {
+    const rawLimit = localStorage.getItem('CINEDIARY_COACH_LIMIT');
+    if (rawLimit) {
+      const parsed = JSON.parse(rawLimit);
+      if (parsed.date === todayStr) {
+        limitData = parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read coach limit:', err);
+  }
+
+  if (limitData.count >= 3) {
+    showToast('비평 코칭 한도 초과 🎟️', '오늘의 시네필 무료 코칭 한도(3회)를 다 소진하셨습니다. 가상 충전 광고를 관람하시겠습니까?', 'error');
+    // Simulate virtual ad watch for beautiful dynamic compliance!
+    if (confirm('30초 분량의 비평 보상형 동영상 광고(가상 시뮬레이션)를 시청하고 코칭 티켓 +1개를 충전하시겠습니까?')) {
+      showToast('광고 시청 중...', '가상 보상형 광고 30초가 송출 중입니다. 잠시만 시네필 광고를 감상해 주세요🍿', 'success');
+      
+      const coachBtn = document.getElementById('coachReviewBtn');
+      if (coachBtn) coachBtn.disabled = true;
+      
+      await new Promise(r => setTimeout(r, 2000)); // speed up for testing
+      
+      limitData.count = 2; // rollback count to allow one more fetch
+      localStorage.setItem('CINEDIARY_COACH_LIMIT', JSON.stringify(limitData));
+      
+      if (coachBtn) coachBtn.disabled = false;
+      showToast('코칭 티켓 충전 성공! 🎫', '비평 트레이너 충전 완료! 코칭 받기 버튼을 다시 눌러 비평을 시작하세요.', 'success');
+    }
+    return;
+  }
+
+  // 2. Check Local Cache (prevent redundant same-text review queries)
+  const cacheKey = `${movieNm}_${reviewText}`;
+  let coachCaches = {};
+  try {
+    coachCaches = JSON.parse(localStorage.getItem('CINEDIARY_COACH_CACHES') || '{}');
+  } catch (err) {
+    console.error('Failed to parse coach caches:', err);
+  }
+
+  const loader = document.getElementById('aiCoachLoading');
+  const resultPanel = document.getElementById('aiCoachResultPanel');
+
+  if (coachCaches[cacheKey]) {
+    console.log('[CineDiary] AI coach response cache hit! Instant rendering.');
+    showToast('로컬 분석 캐시 히트', '이미 첨삭 받은 문장이므로 즉각적인 로컬 로드를 수행합니다.', 'success');
+    
+    if (loader) loader.style.display = 'block';
+    if (resultPanel) resultPanel.style.display = 'none';
+    
+    await new Promise(r => setTimeout(r, 400)); // elegant delay for rendering visual transition
+    
+    if (loader) loader.style.display = 'none';
+    renderCoachResult(coachCaches[cacheKey], reviewText);
+    return;
+  }
+
+  // 3. Trigger network query
+  if (loader) loader.style.display = 'block';
+  if (resultPanel) resultPanel.style.display = 'none';
+  
+  const coachBtn = document.getElementById('coachReviewBtn');
+  if (coachBtn) coachBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${BACKEND_BASE}/api/coach-review`, {
+      method: 'POST',
+      headers: API_HEADERS,
+      body: JSON.stringify({
+        movieNm,
+        directors,
+        actors,
+        genres,
+        userReview: reviewText
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.error || 'AI 비평 분석에 실패했습니다.');
+
+    // Save cache
+    coachCaches[cacheKey] = result;
+    localStorage.setItem('CINEDIARY_COACH_CACHES', JSON.stringify(coachCaches));
+
+    // Update limit usage count (if not simulated fallback ad ticket)
+    limitData.count += 1;
+    localStorage.setItem('CINEDIARY_COACH_LIMIT', JSON.stringify(limitData));
+
+    // Render result
+    if (loader) loader.style.display = 'none';
+    renderCoachResult(result, reviewText);
+    showToast('AI 비평 첨삭 성공 🎓', `평론 코칭이 끝났습니다! 오늘의 코칭 가능 잔여 횟수: ${3 - limitData.count}회`, 'success');
+
+  } catch (err) {
+    console.error('Coach review failed:', err);
+    showToast('코칭 실패', err.message, 'error');
+    if (loader) loader.style.display = 'none';
+  } finally {
+    if (coachBtn) coachBtn.disabled = false;
+  }
+}
+
+// Render dynamic coach result metrics and slip cards
+function renderCoachResult(data, originalReviewText) {
+  const resultPanel = document.getElementById('aiCoachResultPanel');
+  if (!resultPanel) return;
+
+  const scores = data.scores || { expression: 75, logic: 75, analysis: 75, vocabulary: 75, impact: 75 };
+  const feedback = data.feedback || '우수한 영화적 직관이 묻어나는 리뷰입니다.';
+  const corrected = data.corrected || '훌륭히 교정된 평론가 스타일 감상평입니다.';
+
+  resultPanel.innerHTML = `
+    <div class="ai-coach-results-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
+        <h5 style="font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: #a78bfa; margin: 0;">
+          <i class="fa-solid fa-graduation-cap"></i> AI 수석 평론가 비평 피드백
+        </h5>
+        <span style="font-size: 0.65rem; background: rgba(139, 92, 246, 0.15); color: #c084fc; padding: 0.2rem 0.6rem; border-radius: 50px; font-weight: 700; letter-spacing: 0.05em;">COACHING ACTIVE</span>
+      </div>
+      
+      <div class="coach-metric-list">
+        <div class="coach-metric-item">
+          <div class="coach-metric-header">
+            <span>🎬 표현력 (Expression)</span>
+            <span>${scores.expression}점</span>
+          </div>
+          <div class="coach-metric-bar-bg">
+            <div class="coach-metric-bar-fg gauge-gradient-electric" id="bar_expression" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="coach-metric-item">
+          <div class="coach-metric-header">
+            <span>🧠 논리성 (Logic)</span>
+            <span>${scores.logic}점</span>
+          </div>
+          <div class="coach-metric-bar-bg">
+            <div class="coach-metric-bar-fg gauge-gradient-neon" id="bar_logic" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="coach-metric-item">
+          <div class="coach-metric-header">
+            <span>👁️ 연출 분석도 (Analysis)</span>
+            <span>${scores.analysis}점</span>
+          </div>
+          <div class="coach-metric-bar-bg">
+            <div class="coach-metric-bar-fg gauge-gradient-cyber" id="bar_analysis" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="coach-metric-item">
+          <div class="coach-metric-header">
+            <span>📖 어휘 독창성 (Vocabulary)</span>
+            <span>${scores.vocabulary}점</span>
+          </div>
+          <div class="coach-metric-bar-bg">
+            <div class="coach-metric-bar-fg gauge-gradient-electric" id="bar_vocabulary" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="coach-metric-item">
+          <div class="coach-metric-header">
+            <span>🔥 종합 전달력 (Impact)</span>
+            <span>${scores.impact}점</span>
+          </div>
+          <div class="coach-metric-bar-bg">
+            <div class="coach-metric-bar-fg gauge-gradient-neon" id="bar_impact" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 1.15rem; margin-top: 0.15rem;">
+        <div style="font-family: var(--font-outfit); font-size: 0.72rem; font-weight: 800; color: var(--color-primary); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 0.05em;">Critique Commentary</div>
+        <p style="font-size: 0.8rem; line-height: 1.6; color: var(--color-text-main); margin: 0; white-space: pre-line;">${escapeHtml(feedback)}</p>
+      </div>
+
+      <div class="coach-contrast-wrap">
+        <div class="contrast-card contrast-card-before">
+          <span class="contrast-label" style="color: var(--color-text-muted);"><i class="fa-solid fa-pen"></i> Review Draft (초안)</span>
+          <p class="contrast-text" style="color: var(--color-text-muted); margin: 0;">${escapeHtml(originalReviewText)}</p>
+        </div>
+        <div class="contrast-card contrast-card-after">
+          <span class="contrast-label" style="color: #f59e0b;"><i class="fa-solid fa-wand-magic-sparkles"></i> Cinephile Critique (첨삭본)</span>
+          <p class="contrast-text" style="color: #ffffff; font-weight: 500; font-size: 0.82rem; text-shadow: 0 1px 5px rgba(0,0,0,0.3); margin: 0;">${escapeHtml(corrected)}</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  resultPanel.style.display = 'block';
+
+  // Trigger smooth gradient bar charging animations
+  setTimeout(() => {
+    const metrics = ['expression', 'logic', 'analysis', 'vocabulary', 'impact'];
+    metrics.forEach(m => {
+      const bar = document.getElementById(`bar_${m}`);
+      if (bar) bar.style.width = `${scores[m]}%`;
+    });
+  }, 100);
+}
 
 // Centralized Ticket Booking Link Generator (Supports Affiliate Wrappers easily!)
 function getBookingUrl(movieNm) {
@@ -910,7 +1238,7 @@ function renderBoxOfficeList(moviesList) {
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
           
           <!-- Fine Aesthetic Label -->
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineSpark Archive</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineDiary Archive</div>
         </div>
       `;
     }
@@ -1007,7 +1335,7 @@ function renderWeeklyBoxOfficeList(moviesList) {
           <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
           <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineSpark Archive</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineDiary Archive</div>
         </div>
       `;
     }
@@ -1136,7 +1464,7 @@ function renderUpcomingList(moviesList) {
           <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
           <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineSpark Archive</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">CineDiary Archive</div>
         </div>
       `;
     }
@@ -1187,6 +1515,15 @@ function renderUpcomingList(moviesList) {
 
 // 3. Movie Details Modal Management
 async function openMovieDetails(movieCd, movieNm) {
+  // Reset AI Coach trainer panels
+  const aiCoachLoading = document.getElementById('aiCoachLoading');
+  const aiCoachResultPanel = document.getElementById('aiCoachResultPanel');
+  if (aiCoachLoading) aiCoachLoading.style.display = 'none';
+  if (aiCoachResultPanel) {
+    aiCoachResultPanel.style.display = 'none';
+    aiCoachResultPanel.innerHTML = '';
+  }
+
   // Pre-populate known info
   modalMovieTitle.textContent = movieNm;
   if (movieNm.length > 25) {
@@ -1237,7 +1574,7 @@ async function openMovieDetails(movieCd, movieNm) {
     <i class="${spec.iconClass}" style="font-size: 2.25rem; color: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));"></i>
     <div style="width: 25px; height: 1.5px; background: rgba(255, 255, 255, 0.25); margin: 0.15rem 0;"></div>
     <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(movieNm)}</div>
-    <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">CineSpark Archive</div>
+    <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">CineDiary Archive</div>
   `;
   
   const overviewContainer = document.getElementById('modalOverview');
@@ -1328,7 +1665,7 @@ async function openMovieDetails(movieCd, movieNm) {
         <i class="${specRefined.iconClass}" style="font-size: 2.25rem; color: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));"></i>
         <div style="width: 25px; height: 1.5px; background: rgba(255, 255, 255, 0.25); margin: 0.15rem 0;"></div>
         <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(data.movieNm)}</div>
-        <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">CineSpark Archive</div>
+        <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">CineDiary Archive</div>
       `;
       poster.style.display = 'none';
       posterPlaceholder.style.display = 'flex';
@@ -1401,7 +1738,7 @@ function closeModal() {
 function handleReviewInput(e) {
   const text = e.target.value;
   const length = text.length;
-  charCounter.textContent = `${length} / 150`;
+  charCounter.textContent = `${length} / 500`;
 }
 
 // Star Rating Setup & Interactive Hover / Selection Logic
@@ -1448,7 +1785,7 @@ function highlightStars(score) {
 function loadCinemaLog(movieCd) {
   if (!movieCd) return;
   
-  const cacheKey = `CINESPARK_LOG_${movieCd}`;
+  const cacheKey = `CINEDIARY_LOG_${movieCd}`;
   const savedData = localStorage.getItem(cacheKey);
   
   // Reset values default
@@ -1456,7 +1793,7 @@ function loadCinemaLog(movieCd) {
   highlightStars(0);
   ratingScoreText.textContent = '0.0 / 5.0';
   userReviewInput.value = '';
-  charCounter.textContent = '0 / 150';
+  charCounter.textContent = '0 / 500';
   
   if (deleteReviewBtn) deleteReviewBtn.style.display = 'none';
   
@@ -1489,7 +1826,7 @@ function saveCinemaLog() {
   }
   
   const comment = userReviewInput.value.trim();
-  const cacheKey = `CINESPARK_LOG_${activeMovieInfo.movieCd}`;
+  const cacheKey = `CINEDIARY_LOG_${activeMovieInfo.movieCd}`;
   
   const logData = {
     movieCd: activeMovieInfo.movieCd,
@@ -1514,7 +1851,7 @@ function saveCinemaLog() {
 function deleteCinemaLog() {
   if (!activeMovieInfo || !activeMovieInfo.movieCd) return;
   
-  const cacheKey = `CINESPARK_LOG_${activeMovieInfo.movieCd}`;
+  const cacheKey = `CINEDIARY_LOG_${activeMovieInfo.movieCd}`;
   const movieNm = activeMovieInfo.movieNm;
   
   try {
@@ -1526,7 +1863,7 @@ function deleteCinemaLog() {
     highlightStars(0);
     ratingScoreText.textContent = '0.0 / 5.0';
     userReviewInput.value = '';
-    charCounter.textContent = '0 / 150';
+    charCounter.textContent = '0 / 500';
     
     if (deleteReviewBtn) deleteReviewBtn.style.display = 'none';
   } catch (e) {
@@ -1568,15 +1905,15 @@ function showToast(title, desc, type = 'info') {
 }
 
 // ==========================================
-// CineSpark Space (나의 시네마 아지트) Core Logic
+// CineDiary (나의 시네마 다이어리) Core Logic
 // ==========================================
 
 let activeDiaryEmotion = '🍿';
 
-// Open the My CineSpark Space Hub Modal
-function openCinesparkSpace() {
-  console.log('[CineSpark] 🚀 openCinesparkSpace() function triggered!');
-  const cinesparkSpaceModal = document.getElementById('cinesparkSpaceModal');
+// Open the My CineDiary Modal
+function openCineDiary() {
+  console.log('[CineDiary] 🚀 openCineDiary() function triggered!');
+  const cinesparkSpaceModal = document.getElementById('cineDiaryModal');
   if (!cinesparkSpaceModal) {
     alert('모달 요소를 찾을 수 없습니다.');
     return;
@@ -1585,7 +1922,7 @@ function openCinesparkSpace() {
   // 1. OPEN IMMEDIATELY BEFORE ANY OTHER LOGIC
   cinesparkSpaceModal.classList.add('active');
   document.body.style.overflow = 'hidden';
-  console.log('[CineSpark] 모달 active 클래스 추가 완료.');
+  console.log('[CineDiary] 모달 active 클래스 추가 완료.');
   
   try {
     // 2. Set date inputs default to today's date if empty
@@ -1607,7 +1944,7 @@ function openCinesparkSpace() {
     try { loadSavedBuckets(); } catch (e) { console.error('Failed to load saved buckets:', e); }
     
   } catch (err) {
-    console.error('[CineSpark] openCinesparkSpace 처리 중 에러 발생:', err);
+    console.error('[CineDiary] openCineDiary 처리 중 에러 발생:', err);
   }
 }
 
@@ -1806,9 +2143,9 @@ async function saveTicketStub() {
   
   let tickets = [];
   try {
-    tickets = JSON.parse(localStorage.getItem('CINESPARK_TICKETS') || '[]');
+    tickets = JSON.parse(localStorage.getItem('CINEDIARY_TICKETS') || '[]');
   } catch (e) {
-    console.error('Failed to parse CINESPARK_TICKETS:', e);
+    console.error('Failed to parse CINEDIARY_TICKETS:', e);
   }
   
   if (!Array.isArray(tickets)) tickets = [];
@@ -1816,7 +2153,7 @@ async function saveTicketStub() {
   tickets.unshift(newTicket);
   
   try {
-    localStorage.setItem('CINESPARK_TICKETS', JSON.stringify(tickets));
+    localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 발급 성공', `영화 《${movieNm}》의 디지털 티켓이 보관함에 저장되었습니다.`, 'success');
     
     // Reset Form
@@ -1843,7 +2180,7 @@ function loadSavedTickets() {
   
   let tickets = [];
   try {
-    tickets = JSON.parse(localStorage.getItem('CINESPARK_TICKETS') || '[]');
+    tickets = JSON.parse(localStorage.getItem('CINEDIARY_TICKETS') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -1913,7 +2250,7 @@ function loadSavedTickets() {
       </button>
       <div class="ticket-stub">
         <div class="ticket-header" style="background: ${gradient}">
-          <span class="ticket-logo">CINE<span>SPARK</span> TICKET</span>
+          <span class="ticket-logo">CINE<span>DIARY</span> TICKET</span>
           <span class="spec-label" style="margin-bottom:0; color: #fff;">${escapeHtml(theater)}</span>
         </div>
         ${posterAreaHtml}
@@ -1974,7 +2311,7 @@ function deleteTicketStub(e, id) {
   
   let tickets = [];
   try {
-    tickets = JSON.parse(localStorage.getItem('CINESPARK_TICKETS') || '[]');
+    tickets = JSON.parse(localStorage.getItem('CINEDIARY_TICKETS') || '[]');
   } catch (err) {
     console.error(err);
   }
@@ -1983,7 +2320,7 @@ function deleteTicketStub(e, id) {
   tickets = tickets.filter(t => t && t.id !== id);
   
   try {
-    localStorage.setItem('CINESPARK_TICKETS', JSON.stringify(tickets));
+    localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 삭제 완료', '디지털 티켓이 보관함에서 제거되었습니다.', 'success');
     loadSavedTickets();
   } catch (err) {
@@ -2029,7 +2366,7 @@ function saveDiaryEntry() {
   
   let diaries = [];
   try {
-    diaries = JSON.parse(localStorage.getItem('CINESPARK_DIARIES') || '[]');
+    diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2039,8 +2376,8 @@ function saveDiaryEntry() {
   diaries.unshift(newDiary);
   
   try {
-    localStorage.setItem('CINESPARK_DIARIES', JSON.stringify(diaries));
-    showToast('일기 저장 완료', '오늘의 영화 감상이 아지트에 소중히 보관되었습니다.', 'success');
+    localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
+    showToast('일기 저장 완료', '오늘의 영화 감상이 다이어리에 소중히 보관되었습니다.', 'success');
     
     // Reset Form
     if (diaryTitleEl) diaryTitleEl.value = '';
@@ -2074,7 +2411,7 @@ function loadSavedDiaries() {
   
   let diaries = [];
   try {
-    diaries = JSON.parse(localStorage.getItem('CINESPARK_DIARIES') || '[]');
+    diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2128,7 +2465,7 @@ function deleteDiaryEntry(e, id) {
   
   let diaries = [];
   try {
-    diaries = JSON.parse(localStorage.getItem('CINESPARK_DIARIES') || '[]');
+    diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]');
   } catch (err) {
     console.error(err);
   }
@@ -2137,7 +2474,7 @@ function deleteDiaryEntry(e, id) {
   diaries = diaries.filter(d => d && d.id !== id);
   
   try {
-    localStorage.setItem('CINESPARK_DIARIES', JSON.stringify(diaries));
+    localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 삭제 완료', '일기 기록이 보관함에서 삭제되었습니다.', 'success');
     loadSavedDiaries();
   } catch (err) {
@@ -2163,7 +2500,7 @@ function createBucketBoard() {
   
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2173,8 +2510,8 @@ function createBucketBoard() {
   boards.push(newBoard);
   
   try {
-    localStorage.setItem('CINESPARK_BUCKETS', JSON.stringify(boards));
-    showToast('보드 생성 완료', `새로운 영화 챌린지 《${title}》 보드가 아지트에 배치되었습니다.`, 'success');
+    localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+    showToast('보드 생성 완료', `새로운 영화 챌린지 《${title}》 보드가 다이어리에 배치되었습니다.`, 'success');
     
     if (bucketListTitleEl) bucketListTitleEl.value = '';
     loadSavedBuckets();
@@ -2191,7 +2528,7 @@ function loadSavedBuckets() {
   
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2281,7 +2618,7 @@ function deleteBucketBoard(e, id) {
   
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (err) {
     console.error(err);
   }
@@ -2290,8 +2627,8 @@ function deleteBucketBoard(e, id) {
   boards = boards.filter(b => b && b.id !== id);
   
   try {
-    localStorage.setItem('CINESPARK_BUCKETS', JSON.stringify(boards));
-    showToast('보드 삭제 완료', '영화 챌린지 보드가 아지트에서 철거되었습니다.', 'success');
+    localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+    showToast('보드 삭제 완료', '영화 챌린지 보드가 다이어리에서 철거되었습니다.', 'success');
     loadSavedBuckets();
   } catch (err) {
     console.error(err);
@@ -2311,7 +2648,7 @@ function addMovieToBucket(boardId) {
   
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2332,7 +2669,7 @@ function addMovieToBucket(boardId) {
   board.items.push(newItem);
   
   try {
-    localStorage.setItem('CINESPARK_BUCKETS', JSON.stringify(boards));
+    localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     inputEl.value = '';
     loadSavedBuckets();
   } catch (e) {
@@ -2344,7 +2681,7 @@ function addMovieToBucket(boardId) {
 function toggleBucketItem(boardId, itemId) {
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (e) {
     console.error(e);
   }
@@ -2361,7 +2698,7 @@ function toggleBucketItem(boardId, itemId) {
   item.checked = !item.checked;
   
   try {
-    localStorage.setItem('CINESPARK_BUCKETS', JSON.stringify(boards));
+    localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     loadSavedBuckets();
     
     if (item.checked) {
@@ -2377,7 +2714,7 @@ function deleteBucketItem(e, boardId, itemId) {
   
   let boards = [];
   try {
-    boards = JSON.parse(localStorage.getItem('CINESPARK_BUCKETS') || '[]');
+    boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]');
   } catch (err) {
     console.error(err);
   }
@@ -2390,7 +2727,7 @@ function deleteBucketItem(e, boardId, itemId) {
   board.items = board.items.filter(i => i && i.id !== itemId);
   
   try {
-    localStorage.setItem('CINESPARK_BUCKETS', JSON.stringify(boards));
+    localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     loadSavedBuckets();
   } catch (err) {
     console.error(err);
@@ -2398,7 +2735,7 @@ function deleteBucketItem(e, boardId, itemId) {
 }
 
 // Expose functions globally for inline HTML event handlers
-window.openCinesparkSpace = openCinesparkSpace;
+window.openCineDiary = openCineDiary;
 window.updateLiveTicketPreview = updateLiveTicketPreview;
 window.saveTicketStub = saveTicketStub;
 window.deleteTicketStub = deleteTicketStub;

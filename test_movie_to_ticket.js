@@ -37,14 +37,14 @@ const puppeteer = require('puppeteer');
     });
     console.log('Is Movie Details Modal active:', isDetailModalActive);
     
-    console.log('Clicking the "아지트에 티켓 저장" button inside the details modal...');
+    console.log('Clicking the "다이어리에 티켓 저장" button inside the details modal...');
     await page.click('#modalIssueTicketBtn');
     await new Promise(r => setTimeout(r, 800));
     
     // Verify details modal closed and space modal opened
     const modalStates = await page.evaluate(() => {
       const movieModal = document.getElementById('movieModal');
-      const spaceModal = document.getElementById('cinesparkSpaceModal');
+      const spaceModal = document.getElementById('cineDiaryModal');
       return {
         movieModalActive: movieModal ? movieModal.classList.contains('active') : false,
         spaceModalActive: spaceModal ? spaceModal.classList.contains('active') : false
