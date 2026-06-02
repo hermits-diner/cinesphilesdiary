@@ -1881,16 +1881,18 @@ async function openMovieDetails(movieCd, movieNm) {
       overviewContainer.style.display = 'block';
     }
 
-    // Embed Youtube Trailer dynamically (Prefers TMDB precise trailer key, falls back to dynamic search results page)
+    // Embed Youtube Trailer dynamically with robust error-proofing
     const trailerFrameWrap = document.getElementById('modalTrailerFrameWrap');
     const trailerFallback = document.getElementById('modalTrailerFallback');
     const trailerYoutubeBtn = document.getElementById('modalTrailerYoutubeBtn');
+    const targetTrailerContainer = document.getElementById('modalTrailerContainer');
+    const targetTrailerFrame = document.getElementById('modalTrailerFrame');
     
-    if (data.trailerKey) {
+    if (data.trailerKey && targetTrailerFrame) {
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'block';
       if (trailerFallback) trailerFallback.style.display = 'none';
-      trailerFrame.src = `https://www.youtube.com/embed/${data.trailerKey}?autoplay=0&rel=0`;
-      trailerContainer.style.display = 'block';
+      targetTrailerFrame.src = `https://www.youtube.com/embed/${encodeURIComponent(data.trailerKey)}?autoplay=0&rel=0`;
+      if (targetTrailerContainer) targetTrailerContainer.style.display = 'block';
     } else {
       // Show gorgeous YouTube CTA card fallback
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'none';
@@ -1901,8 +1903,8 @@ async function openMovieDetails(movieCd, movieNm) {
           trailerYoutubeBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(data.movieNm + ' 공식 예고편')}`;
         }
       }
-      trailerFrame.src = ''; // Clear iframe src to prevent background resource loading
-      trailerContainer.style.display = 'block';
+      if (targetTrailerFrame) targetTrailerFrame.src = ''; // Clear iframe src
+      if (targetTrailerContainer) targetTrailerContainer.style.display = 'block';
     }
     
     // Enable inputs once detailed loading completes
