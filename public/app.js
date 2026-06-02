@@ -755,6 +755,36 @@ window.addEventListener('DOMContentLoaded', async () => {
     coachDiaryBtn.addEventListener('click', coachDiaryReview);
   }
 
+  // --- YouTube iframe error 153 auto-detection via postMessage ---
+  // When YouTube blocks external embedding, it posts a message with data.info === 150 or 101 (licensing/restriction errors)
+  window.addEventListener('message', (event) => {
+    if (!event.origin.includes('youtube.com')) return;
+    try {
+      const ytData = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+      // YouTube error codes: 101 & 150 = content owner blocks embedding; 153 = player config error
+      const isEmbedBlocked = ytData?.info === 150 || ytData?.info === 101 || ytData?.event === 'onError';
+      if (!isEmbedBlocked) return;
+
+      const frameWrap = document.getElementById('modalTrailerFrameWrap');
+      const fallback = document.getElementById('modalTrailerFallback');
+      const directBtn = document.getElementById('modalTrailerDirectBtn');
+      const youtubeBtn = document.getElementById('modalTrailerYoutubeBtn');
+      const bypassDiv = document.querySelector('.iframe-restriction-bypass');
+
+      if (frameWrap) frameWrap.style.display = 'none';
+      if (bypassDiv) bypassDiv.style.display = 'none';
+      if (fallback) {
+        fallback.style.display = 'flex';
+        // Carry over the direct link to the fallback youtube button too
+        if (directBtn && youtubeBtn) {
+          youtubeBtn.href = directBtn.href;
+        }
+      }
+    } catch (_) {
+      // Silently ignore non-JSON or unrelated postMessages
+    }
+  });
+
   console.log('[CineDiary] ✅ DOMContentLoaded initialization COMPLETE. All event listeners registered.');
 });
 
@@ -1897,7 +1927,7 @@ async function openMovieDetails(movieCd, movieNm) {
     if (data.trailerKey && targetTrailerFrame) {
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'block';
       if (trailerFallback) trailerFallback.style.display = 'none';
-      targetTrailerFrame.src = `https://www.youtube.com/embed/${encodeURIComponent(data.trailerKey)}?autoplay=0&rel=0`;
+      targetTrailerFrame.src = `https://www.youtube.com/embed/${encodeURIComponent(data.trailerKey)}?autoplay=0&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
       if (trailerDirectBtn) {
         trailerDirectBtn.href = `https://www.youtube.com/watch?v=${encodeURIComponent(data.trailerKey)}`;
         trailerDirectBtn.style.display = 'inline-flex';

@@ -615,8 +615,10 @@
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding: 2vh 0;
+      overflow-y: auto;
       z-index: 100;
       opacity: 0;
       pointer-events: none;
@@ -642,6 +644,7 @@
       transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
     }
 
     .modal-overlay.active .modal-card {
@@ -667,7 +670,7 @@
 
     /* Modal Header */
     .modal-header {
-      padding: 3rem 2rem 1.5rem 2rem;
+      padding: 2.25rem 2rem 1.25rem 2rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       position: relative;
       z-index: 2;
@@ -675,7 +678,7 @@
       gap: 1.5rem;
       align-items: flex-end;
       background: linear-gradient(to bottom, rgba(14, 16, 28, 0) 0%, rgba(14, 16, 28, 0.95) 100%);
-      min-height: 240px;
+      min-height: 200px;
     }
 
     /* Floating poster in Modal Header */
@@ -755,8 +758,7 @@
     /* Modal Body */
     .modal-body {
       padding: 1.5rem 2rem 2rem 2rem;
-      overflow-y: auto;
-      max-height: 70vh;
+      overflow-y: visible;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
@@ -3200,15 +3202,15 @@
           <span class="spec-label">공식 예고편 (Official Trailer)</span>
           <div class="iframe-ratio" id="modalTrailerFrameWrap" style="display: none;">
             <iframe id="modalTrailerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <!-- Iframe restriction safety guide caption & bypass button to solve YouTube Error 153 -->
-            <div class="iframe-restriction-bypass" style="margin-top: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%;">
-              <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; max-width: 480px; margin: 0 auto;">
-                <i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> 일부 예고편은 영화사 권리 정책(오류 153 등)에 의해 외부 인라인 재생이 제한될 수 있습니다. 화면이 안 나오거나 재생 오류가 발생할 경우 아래 직접보기 버튼을 클릭해 주세요.
-              </p>
-              <a href="#" target="_blank" id="modalTrailerDirectBtn" class="unified-booking-btn btn-youtube" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25); display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; font-size: 0.78rem; text-decoration: none; border-radius: 8px; color: #fff; cursor: pointer; transition: var(--transition-smooth);" title="YouTube 공식 앱/사이트에서 동영상 감상">
-                <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> YouTube에서 직접 감상하기
-              </a>
-            </div>
+          </div>
+          <!-- Iframe restriction safety guide caption & bypass button to solve YouTube Error 153 (outside iframe-ratio to prevent overflow:hidden clipping) -->
+          <div class="iframe-restriction-bypass" style="margin-top: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%;">
+            <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; max-width: 480px; margin: 0 auto;">
+              <i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> 일부 예고편은 영화사 권리 정책(오류 153 등)에 의해 외부 인라인 재생이 제한될 수 있습니다. 화면이 안 나오거나 재생 오류가 발생할 경우 아래 직접보기 버튼을 클릭해 주세요.
+            </p>
+            <a href="#" target="_blank" id="modalTrailerDirectBtn" class="unified-booking-btn btn-youtube" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25); display: none; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; font-size: 0.78rem; text-decoration: none; border-radius: 8px; color: #fff; cursor: pointer; transition: var(--transition-smooth);" title="YouTube 공식 앱/사이트에서 동영상 감상">
+              <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> YouTube에서 직접 감상하기
+            </a>
           </div>
           <!-- Premium Fallback CTA Card if trailer is unavailable -->
           <div id="modalTrailerFallback" style="display: none; background: rgba(255,255,255,0.015); border: 1px solid var(--border-glow); border-radius: 20px; padding: 2.25rem 1.5rem; text-align: center; flex-direction: column; align-items: center; justify-content: center; gap: 0.85rem; box-shadow: var(--shadow-premium);">
