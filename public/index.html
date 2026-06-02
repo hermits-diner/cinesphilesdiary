@@ -3243,27 +3243,9 @@
             <button id="deleteReviewBtn" class="ai-btn" style="background: var(--gradient-bronze); box-shadow: none; display: none;" title="관람 로그 삭제">
               <i class="fa-solid fa-trash"></i> 기록 삭제
             </button>
-            <button id="coachReviewBtn" class="ai-coach-trigger-btn" title="AI 수석 평론가에게 작문 코칭 및 첨삭 받기">
-              <i class="fa-solid fa-graduation-cap"></i> AI 비평 코칭 받기
-            </button>
             <button id="saveReviewBtn" class="ai-btn" title="관람 로그 저장">
               <i class="fa-solid fa-floppy-disk"></i> 관람 기록 저장
             </button>
-          </div>
-          
-          <!-- Dynamic AI Coach Area -->
-          <div id="aiCoachLoading" style="display: none;">
-            <div class="projector-loader">
-              <div class="projector-icon-wrap">
-                <i class="fa-solid fa-video projector-light-beam"></i>
-                <div class="projector-spinner"></div>
-              </div>
-              <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 700; color: var(--color-primary); margin-top: 0.5rem; letter-spacing: 0.05em;">AI CRITIC ANALYZING...</div>
-              <p style="font-size: 0.78rem; color: var(--color-text-muted); max-width: 320px; line-height: 1.4;">수석 영화 평론가가 리뷰어님의 문장을 면밀하게 감상하고 평가하는 중입니다. 잠시만 대기해 주세요.</p>
-            </div>
-          </div>
-          <div id="aiCoachResultPanel" style="display: none;">
-            <!-- JavaScript를 통해 동적 렌더링될 AI 피드백 카드 -->
           </div>
         </div>
       </div>
@@ -3454,6 +3436,10 @@
                 <i class="fa-solid fa-pen-nib"></i> 오늘의 영화 생각 기록
               </span>
               <div class="space-input-group">
+                <label for="diaryMovieNm" class="spec-label">영화 제목</label>
+                <input type="text" id="diaryMovieNm" class="space-input" placeholder="일기를 작성할 영화 제목 (예: 라라랜드)" required>
+              </div>
+              <div class="space-input-group">
                 <label for="diaryTitle" class="spec-label">일기 제목</label>
                 <input type="text" id="diaryTitle" class="space-input" placeholder="예: 새벽에 넷플릭스로 명작 발견!" required>
               </div>
@@ -3527,9 +3513,29 @@
                 <textarea id="diaryContent" class="review-textarea" placeholder="영화를 보며 느꼈던 감정이나 OST, 명대사, 그날의 감상을 솔직하게 일기처럼 적어보세요..." style="min-height: 140px;"></textarea>
               </div>
 
-              <button id="saveDiaryBtn" class="ai-btn" style="justify-content: center; padding: 0.7rem;">
-                <i class="fa-solid fa-floppy-disk"></i> 다이어리 저장하기
-              </button>
+              <div class="review-btn-wrap" style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap; margin-top: 0.5rem;">
+                <button type="button" id="coachDiaryBtn" class="ai-coach-trigger-btn" title="AI 영화 평론가 & 작문 교육자에게 일기 코칭 및 첨삭 받기">
+                  <i class="fa-solid fa-graduation-cap"></i> AI 비평 & 글쓰기 코칭
+                </button>
+                <button id="saveDiaryBtn" class="ai-btn" title="다이어리 일기 저장">
+                  <i class="fa-solid fa-floppy-disk"></i> 다이어리 저장하기
+                </button>
+              </div>
+
+              <!-- Diary Dynamic AI Coach Area -->
+              <div id="diaryAiCoachLoading" style="display: none; margin-top: 1rem; width: 100%;">
+                <div class="projector-loader" style="background: rgba(255, 255, 255, 0.01); border: 1px dashed var(--border-glow); border-radius: 20px;">
+                  <div class="projector-icon-wrap">
+                    <i class="fa-solid fa-video projector-light-beam"></i>
+                    <div class="projector-spinner"></div>
+                  </div>
+                  <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 700; color: var(--color-primary); margin-top: 0.5rem; letter-spacing: 0.05em;">AI CRITIC & WRITING COACH ANALYZING...</div>
+                  <p style="font-size: 0.78rem; color: var(--color-text-muted); max-width: 380px; line-height: 1.4; margin: 0 auto;">수석 평론가이자 작문 교육자가 리뷰어님의 문학적 문장을 정밀 분석하며 첨삭 에세이를 창조하는 중입니다. 잠시만 대기해 주세요.</p>
+                </div>
+              </div>
+              <div id="diaryAiCoachResultPanel" style="display: none; margin-top: 1rem; width: 100%;">
+                <!-- JavaScript를 통해 동적 렌더링될 AI 피드백 카드 -->
+              </div>
             </div>
 
             <!-- Right Side Diary Feed list -->

@@ -587,6 +587,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         loadTicketPosterPreview(movieNm);
       }
       
+      const diaryMovieNmEl = document.getElementById('diaryMovieNm');
+      if (diaryMovieNmEl) {
+        diaryMovieNmEl.value = movieNm;
+      }
+      
       // 5. Focus companion input to guide user
       const ticketCompanionsEl = document.getElementById('ticketCompanions');
       if (ticketCompanionsEl) {
@@ -744,10 +749,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Spotlight search input wiring (runs once on DOMContentLoaded)
   initSpotlightSearch();
 
-  // --- AI Movie Review Coaching Click Handler ---
-  const coachReviewBtn = document.getElementById('coachReviewBtn');
-  if (coachReviewBtn) {
-    coachReviewBtn.addEventListener('click', coachUserReview);
+  // --- AI Movie Diary Coaching Click Handler ---
+  const coachDiaryBtn = document.getElementById('coachDiaryBtn');
+  if (coachDiaryBtn) {
+    coachDiaryBtn.addEventListener('click', coachDiaryReview);
   }
 
   console.log('[CineDiary] ✅ DOMContentLoaded initialization COMPLETE. All event listeners registered.');
@@ -871,24 +876,33 @@ window.openSpotlight  = openSpotlight;
 window.closeSpotlight = closeSpotlight;
 window.handleSpotlightBackdrop = handleSpotlightBackdrop;
 
-// AI Writer Review Coaching Trigger Logic (1day 3 times limit, LocalStorage cached)
-async function coachUserReview() {
-  if (!activeMovieInfo || !activeMovieInfo.movieNm) {
-    showToast('분석 실패', '영화 정보를 불러올 수 없습니다.', 'error');
+// AI Writer Diary Coaching Trigger Logic (1day 3 times limit, LocalStorage cached)
+
+async function coachDiaryReview() {
+  const diaryMovieNmEl = document.getElementById('diaryMovieNm');
+  const diaryTitleEl = document.getElementById('diaryTitle');
+  const diaryContentEl = document.getElementById('diaryContent');
+  const diaryContextEl = document.getElementById('diaryContext');
+
+  if (!diaryMovieNmEl || !diaryContentEl) return;
+
+  const movieNm = diaryMovieNmEl.value.trim();
+  const diaryTitle = diaryTitleEl ? diaryTitleEl.value.trim() : '오늘의 감상';
+  const diaryContent = diaryContentEl.value.trim();
+  const diaryContext = diaryContextEl ? diaryContextEl.value : '일상 속에서';
+  const emotion = activeDiaryEmotion || '🍿';
+
+  if (!movieNm) {
+    showToast('영화명 누락', '코칭을 받기 위해 대상 영화 제목을 먼저 입력해 주세요.', 'error');
+    diaryMovieNmEl.focus();
     return;
   }
 
-  const reviewText = userReviewInput.value.trim();
-  if (!reviewText) {
-    showToast('초안 작성 누락', '코칭을 받기 위해 영화 감상평 초안을 먼저 작성해 주세요.', 'error');
-    userReviewInput.focus();
+  if (!diaryContent) {
+    showToast('본문 작성 누락', '코칭을 받기 위해 일기장 감상문 본문을 먼저 작성해 주세요.', 'error');
+    diaryContentEl.focus();
     return;
   }
-
-  const movieNm = activeMovieInfo.movieNm;
-  const directors = activeMovieInfo.directors || '정보 없음';
-  const actors = activeMovieInfo.actors || '정보 없음';
-  const genres = activeMovieInfo.genres || '정보 없음';
 
   // 1. Check Rate Limit (1 day 3 times free limit)
   const todayStr = new Date().toISOString().split('T')[0];
@@ -905,15 +919,14 @@ async function coachUserReview() {
     console.error('Failed to read coach limit:', err);
   }
 
+  const coachBtn = document.getElementById('coachDiaryBtn');
+
   if (limitData.count >= 3) {
     showToast('비평 코칭 한도 초과 🎟️', '오늘의 시네필 무료 코칭 한도(3회)를 다 소진하셨습니다. 가상 충전 광고를 관람하시겠습니까?', 'error');
-    // Simulate virtual ad watch for beautiful dynamic compliance!
     if (confirm('30초 분량의 비평 보상형 동영상 광고(가상 시뮬레이션)를 시청하고 코칭 티켓 +1개를 충전하시겠습니까?')) {
       showToast('광고 시청 중...', '가상 보상형 광고 30초가 송출 중입니다. 잠시만 시네필 광고를 감상해 주세요🍿', 'success');
       
-      const coachBtn = document.getElementById('coachReviewBtn');
       if (coachBtn) coachBtn.disabled = true;
-      
       await new Promise(r => setTimeout(r, 2000)); // speed up for testing
       
       limitData.count = 2; // rollback count to allow one more fetch
@@ -926,7 +939,7 @@ async function coachUserReview() {
   }
 
   // 2. Check Local Cache (prevent redundant same-text review queries)
-  const cacheKey = `${movieNm}_${reviewText}`;
+  const cacheKey = `diary_${movieNm}_${diaryContent}`;
   let coachCaches = {};
   try {
     coachCaches = JSON.parse(localStorage.getItem('CINEDIARY_COACH_CACHES') || '{}');
@@ -934,28 +947,26 @@ async function coachUserReview() {
     console.error('Failed to parse coach caches:', err);
   }
 
-  const loader = document.getElementById('aiCoachLoading');
-  const resultPanel = document.getElementById('aiCoachResultPanel');
+  const loader = document.getElementById('diaryAiCoachLoading');
+  const resultPanel = document.getElementById('diaryAiCoachResultPanel');
 
   if (coachCaches[cacheKey]) {
-    console.log('[CineDiary] AI coach response cache hit! Instant rendering.');
-    showToast('로컬 분석 캐시 히트', '이미 첨삭 받은 문장이므로 즉각적인 로컬 로드를 수행합니다.', 'success');
+    console.log('[CineDiary] AI diary coach response cache hit! Instant rendering.');
+    showToast('로컬 분석 캐시 히트', '이미 첨삭 받은 일기이므로 즉각적인 로컬 로드를 수행합니다.', 'success');
     
     if (loader) loader.style.display = 'block';
     if (resultPanel) resultPanel.style.display = 'none';
     
-    await new Promise(r => setTimeout(r, 400)); // elegant delay for rendering visual transition
+    await new Promise(r => setTimeout(r, 450)); // elegant delay for rendering visual transition
     
     if (loader) loader.style.display = 'none';
-    renderCoachResult(coachCaches[cacheKey], reviewText);
+    renderDiaryCoachResult(coachCaches[cacheKey], diaryContent);
     return;
   }
 
   // 3. Trigger network query
   if (loader) loader.style.display = 'block';
   if (resultPanel) resultPanel.style.display = 'none';
-  
-  const coachBtn = document.getElementById('coachReviewBtn');
   if (coachBtn) coachBtn.disabled = true;
 
   try {
@@ -964,10 +975,10 @@ async function coachUserReview() {
       headers: API_HEADERS,
       body: JSON.stringify({
         movieNm,
-        directors,
-        actors,
-        genres,
-        userReview: reviewText
+        diaryTitle,
+        diaryContent,
+        diaryContext,
+        emotion
       })
     });
 
@@ -984,11 +995,11 @@ async function coachUserReview() {
 
     // Render result
     if (loader) loader.style.display = 'none';
-    renderCoachResult(result, reviewText);
+    renderDiaryCoachResult(result, diaryContent);
     showToast('AI 비평 첨삭 성공 🎓', `평론 코칭이 끝났습니다! 오늘의 코칭 가능 잔여 횟수: ${3 - limitData.count}회`, 'success');
 
   } catch (err) {
-    console.error('Coach review failed:', err);
+    console.error('Coach diary review failed:', err);
     showToast('코칭 실패', err.message, 'error');
     if (loader) loader.style.display = 'none';
   } finally {
@@ -996,20 +1007,20 @@ async function coachUserReview() {
   }
 }
 
-// Render dynamic coach result metrics and slip cards
-function renderCoachResult(data, originalReviewText) {
-  const resultPanel = document.getElementById('aiCoachResultPanel');
+// Render dynamic coach result metrics and slip cards for daily journal
+function renderDiaryCoachResult(data, originalContentText) {
+  const resultPanel = document.getElementById('diaryAiCoachResultPanel');
   if (!resultPanel) return;
 
-  const scores = data.scores || { expression: 75, logic: 75, analysis: 75, vocabulary: 75, impact: 75 };
-  const feedback = data.feedback || '우수한 영화적 직관이 묻어나는 리뷰입니다.';
-  const corrected = data.corrected || '훌륭히 교정된 평론가 스타일 감상평입니다.';
+  const scores = data.scores || { expression: 75, structure: 75, analysis: 75, vocabulary: 75, coachability: 75 };
+  const feedback = data.feedback || '영화적 정서가 물씬 배어 나오는 훌륭한 영화 일기입니다.';
+  const corrected = data.corrected || '평론가 스타일로 교정된 화려한 시네필 비평 에세이입니다.';
 
   resultPanel.innerHTML = `
-    <div class="ai-coach-results-card">
+    <div class="ai-coach-results-card" style="margin-top: 1.5rem;">
       <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
         <h5 style="font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: #a78bfa; margin: 0;">
-          <i class="fa-solid fa-graduation-cap"></i> AI 수석 평론가 비평 피드백
+          <i class="fa-solid fa-graduation-cap"></i> AI 영화 평론 지도 교수 비평 피드백
         </h5>
         <span style="font-size: 0.65rem; background: rgba(139, 92, 246, 0.15); color: #c084fc; padding: 0.2rem 0.6rem; border-radius: 50px; font-weight: 700; letter-spacing: 0.05em;">COACHING ACTIVE</span>
       </div>
@@ -1021,60 +1032,63 @@ function renderCoachResult(data, originalReviewText) {
             <span>${scores.expression}점</span>
           </div>
           <div class="coach-metric-bar-bg">
-            <div class="coach-metric-bar-fg gauge-gradient-electric" id="bar_expression" style="width: 0%;"></div>
+            <div class="coach-metric-bar-fg gauge-gradient-electric" id="diary_bar_expression" style="width: 0%;"></div>
           </div>
         </div>
         <div class="coach-metric-item">
           <div class="coach-metric-header">
-            <span>🧠 논리성 (Logic)</span>
-            <span>${scores.logic}점</span>
+            <span>🧩 구조적 정밀성 (Structure)</span>
+            <span>${scores.structure}점</span>
           </div>
           <div class="coach-metric-bar-bg">
-            <div class="coach-metric-bar-fg gauge-gradient-neon" id="bar_logic" style="width: 0%;"></div>
+            <div class="coach-metric-bar-fg gauge-gradient-neon" id="diary_bar_structure" style="width: 0%;"></div>
           </div>
         </div>
         <div class="coach-metric-item">
           <div class="coach-metric-header">
-            <span>👁️ 연출 분석도 (Analysis)</span>
+            <span>👁️ 영화적 깊이 (Analysis)</span>
             <span>${scores.analysis}점</span>
           </div>
           <div class="coach-metric-bar-bg">
-            <div class="coach-metric-bar-fg gauge-gradient-cyber" id="bar_analysis" style="width: 0%;"></div>
+            <div class="coach-metric-bar-fg gauge-gradient-cyber" id="diary_bar_analysis" style="width: 0%;"></div>
           </div>
         </div>
         <div class="coach-metric-item">
           <div class="coach-metric-header">
-            <span>📖 어휘 독창성 (Vocabulary)</span>
+            <span>📖 어휘 참신성 (Vocabulary)</span>
             <span>${scores.vocabulary}점</span>
           </div>
           <div class="coach-metric-bar-bg">
-            <div class="coach-metric-bar-fg gauge-gradient-electric" id="bar_vocabulary" style="width: 0%;"></div>
+            <div class="coach-metric-bar-fg gauge-gradient-electric" id="diary_bar_vocabulary" style="width: 0%;"></div>
           </div>
         </div>
         <div class="coach-metric-item">
           <div class="coach-metric-header">
-            <span>🔥 종합 전달력 (Impact)</span>
-            <span>${scores.impact}점</span>
+            <span>🌱 성장 잠재력 (Coachability)</span>
+            <span>${scores.coachability}점</span>
           </div>
           <div class="coach-metric-bar-bg">
-            <div class="coach-metric-bar-fg gauge-gradient-neon" id="bar_impact" style="width: 0%;"></div>
+            <div class="coach-metric-bar-fg gauge-gradient-neon" id="diary_bar_coachability" style="width: 0%;"></div>
           </div>
         </div>
       </div>
 
       <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; padding: 1.15rem; margin-top: 0.15rem;">
-        <div style="font-family: var(--font-outfit); font-size: 0.72rem; font-weight: 800; color: var(--color-primary); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 0.05em;">Critique Commentary</div>
+        <div style="font-family: var(--font-outfit); font-size: 0.72rem; font-weight: 800; color: var(--color-primary); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 0.05em;">Educator Commentary (지도 조언)</div>
         <p style="font-size: 0.8rem; line-height: 1.6; color: var(--color-text-main); margin: 0; white-space: pre-line;">${escapeHtml(feedback)}</p>
       </div>
 
       <div class="coach-contrast-wrap">
         <div class="contrast-card contrast-card-before">
-          <span class="contrast-label" style="color: var(--color-text-muted);"><i class="fa-solid fa-pen"></i> Review Draft (초안)</span>
-          <p class="contrast-text" style="color: var(--color-text-muted); margin: 0;">${escapeHtml(originalReviewText)}</p>
+          <span class="contrast-label" style="color: var(--color-text-muted);"><i class="fa-solid fa-pen"></i> 나의 일기 초안 (Draft)</span>
+          <p class="contrast-text" style="color: var(--color-text-muted); margin: 0; font-size: 0.78rem;">${escapeHtml(originalContentText)}</p>
         </div>
-        <div class="contrast-card contrast-card-after">
-          <span class="contrast-label" style="color: #f59e0b;"><i class="fa-solid fa-wand-magic-sparkles"></i> Cinephile Critique (첨삭본)</span>
-          <p class="contrast-text" style="color: #ffffff; font-weight: 500; font-size: 0.82rem; text-shadow: 0 1px 5px rgba(0,0,0,0.3); margin: 0;">${escapeHtml(corrected)}</p>
+        <div class="contrast-card contrast-card-after" style="padding-bottom: 3.5rem;">
+          <span class="contrast-label" style="color: #f59e0b;"><i class="fa-solid fa-wand-magic-sparkles"></i> 비평 에세이 첨삭본 (Critique)</span>
+          <p class="contrast-text" style="color: #ffffff; font-weight: 500; font-size: 0.8rem; text-shadow: 0 1px 5px rgba(0,0,0,0.3); margin: 0; line-height: 1.55;">${escapeHtml(corrected)}</p>
+          <button type="button" id="applyDiaryCritiqueBtn" class="ai-btn" style="position: absolute; bottom: 12px; right: 12px; font-size: 0.7rem; padding: 0.4rem 0.75rem; background: var(--gradient-neon); border: none; font-weight: 700; color: #fff; cursor: pointer; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.25rem;" title="첨삭된 문장으로 일기 본문 덮어쓰기">
+            <i class="fa-solid fa-file-signature"></i> 이 첨삭본으로 본문 덮어쓰기
+          </button>
         </div>
       </div>
     </div>
@@ -1082,11 +1096,23 @@ function renderCoachResult(data, originalReviewText) {
 
   resultPanel.style.display = 'block';
 
+  // Apply essay rewrite handler
+  const applyBtn = document.getElementById('applyDiaryCritiqueBtn');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      const diaryContentEl = document.getElementById('diaryContent');
+      if (diaryContentEl) {
+        diaryContentEl.value = corrected;
+        showToast('첨삭본 적용 완료', '에세이 첨삭본이 본문에 정상 이식되었습니다! 다이어리 저장하기를 통해 최종 보관하실 수 있습니다.', 'success');
+      }
+    });
+  }
+
   // Trigger smooth gradient bar charging animations
   setTimeout(() => {
-    const metrics = ['expression', 'logic', 'analysis', 'vocabulary', 'impact'];
+    const metrics = ['expression', 'structure', 'analysis', 'vocabulary', 'coachability'];
     metrics.forEach(m => {
-      const bar = document.getElementById(`bar_${m}`);
+      const bar = document.getElementById(`diary_bar_${m}`);
       if (bar) bar.style.width = `${scores[m]}%`;
     });
   }, 100);

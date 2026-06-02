@@ -886,23 +886,35 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
   }
 });
 
-// 5. POST /api/coach-review — AI Movie Review Critic & Coaching system
+// 5. POST /api/coach-review — AI Movie Diary Critique & Coaching system (Persona: Review Expert & Writing Educator)
 app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
-  const { movieNm, directors, actors, genres, userReview } = req.body;
+  const { movieNm, diaryTitle, diaryContent, diaryContext, emotion } = req.body;
 
-  if (!movieNm || !userReview) {
-    return res.status(400).json({ error: '영화 제목 혹은 리뷰 내용이 유효하지 않습니다.' });
+  if (!movieNm || !diaryContent) {
+    return res.status(400).json({ error: '영화 제목 혹은 일기 내용이 유효하지 않습니다.' });
   }
 
-  // Extend characters to 500 for training purposes
-  if (userReview.length > 500) {
-    return res.status(400).json({ error: '리뷰 훈련용 초안은 최대 500자까지 입력 가능합니다.' });
+  // Extend character limit to 1000 for descriptive diary entries
+  if (diaryContent.length > 1000) {
+    return res.status(400).json({ error: '일기장 코칭용 본문은 최대 1000자까지 입력 가능합니다.' });
   }
 
-  const safeReview = sanitizeInput(userReview);
-  const cleanDirectors = sanitizeInput(directors || '정보 없음');
-  const cleanActors = sanitizeInput(actors || '정보 없음');
-  const cleanGenres = sanitizeInput(genres || '정보 없음');
+  const safeMovieNm = sanitizeInput(movieNm);
+  const safeTitle = sanitizeInput(diaryTitle || '오늘의 감상');
+  const safeContent = sanitizeInput(diaryContent);
+  const safeContext = sanitizeInput(diaryContext || '일상 속에서');
+  const safeEmotion = sanitizeInput(emotion || '🍿');
+
+  // Auto-fetch TMDB Assets for rich RAG context
+  let genres = '영화';
+  try {
+    const tmdb = await getTmdbAssets(safeMovieNm, '');
+    if (tmdb && tmdb.genre) {
+      genres = tmdb.genre;
+    }
+  } catch (tmdbErr) {
+    console.error('Failed to pre-fetch RAG assets for coach-review:', tmdbErr.message);
+  }
 
   const isPlaceholderKey = !GEMINI_API_KEY || GEMINI_API_KEY.includes('YourActualGeminiApiKeyGoesHere');
 
@@ -911,28 +923,28 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
     console.log('Gemini API key is placeholder or missing for coaching. Operating dynamic premium mock coach evaluator.');
 
     // Dynamic mock evaluation score calculator based on review content length & some random variances
-    const baseScore = Math.min(75 + Math.round((safeReview.length / 500) * 15), 92);
-    const varFactor = (safeReview.length % 7) - 3; // -3 to +3 variance
+    const baseScore = Math.min(75 + Math.round((safeContent.length / 1000) * 15), 92);
+    const varFactor = (safeContent.length % 7) - 3; // -3 to +3 variance
 
     const scoreExpression = Math.max(70, Math.min(98, baseScore + varFactor + 2));
-    const scoreLogic = Math.max(70, Math.min(98, baseScore - varFactor + 1));
-    const scoreAnalysis = Math.max(65, Math.min(98, baseScore + (safeReview.includes('감독') || safeReview.includes('연출') ? 5 : -2)));
-    const scoreVocabulary = Math.max(70, Math.min(98, baseScore + (safeReview.length > 100 ? 4 : -3)));
-    const scoreImpact = Math.max(65, Math.min(98, baseScore + varFactor));
+    const scoreStructure = Math.max(70, Math.min(98, baseScore - varFactor + 1));
+    const scoreAnalysis = Math.max(65, Math.min(98, baseScore + (safeContent.includes('감독') || safeContent.includes('연출') ? 5 : -2)));
+    const scoreVocabulary = Math.max(70, Math.min(98, baseScore + (safeContent.length > 150 ? 4 : -3)));
+    const scoreCoachability = Math.max(65, Math.min(98, baseScore + varFactor));
 
     const mockFeedbacks = [
-      `작성해주신 감상평은 《${movieNm}》이 품고 있는 ${cleanGenres} 특유의 짙은 분위기와 테마적 무게감을 정확하게 짚어내고 있습니다. 비록 짧은 초안이지만 영화 전체의 서사적 결을 충실히 느끼신 점이 돋보입니다. 다만, 연출가인 ${cleanDirectors}의 영상 미학적 디테일이나 주요 등장인물들 간의 심리적 밀당에 관한 비평적 어휘를 한 스푼만 더 얹는다면 비평가 못지않은 우수한 에세이로 거듭날 것입니다.`,
-      `관람 후 마음에 돋아난 솔직한 감흥을 정제되지 않은 언어로 훌륭히 건져 올리셨습니다. 영화 속 핵심 분위기에 대한 직관적인 해상도가 돋보이는 훌륭한 시도입니다. 글 전체의 논리적 긴장감을 더 높이기 위해선, 단순히 장면에 대한 묘사에서 한 단계 나아가 '왜 그 씬이 마음에 잔향을 남겼는지' 구체적인 이미지의 힘을 비평 어휘로 엮어보시는 것을 권합니다.`,
-      `《${movieNm}》의 복합적인 매력에 대한 리뷰어님만의 날카로운 감각적 직관이 잘 우러난 글입니다. 전반적인 표현력이 참신하며 어휘 선택도 매력적입니다. 여기서 한 걸음 더 나아가, ${cleanGenres} 문법이 이 영화 안에서 어떻게 파괴되고 혹은 새롭게 재탄생했는지 분석적인 요소를 추가한다면 한층 높은 설득력과 평론가적 문체를 확보하실 수 있습니다.`
+      `작성해주신 영화 일기 《${safeTitle}》는 영화 《${safeMovieNm}》이 품고 있는 ${genres} 장르 특유의 짙은 매력을 훌륭히 건져 올리고 있습니다. 관람 환경("${safeContext}")에서 느끼신 솔직한 소회가 돋보이나, 영화의 세부적인 연출이나 핵심 연기에 관한 분석 어휘를 조금만 더 엮으신다면 한층 높은 수준의 비평 에세이가 될 것입니다.`,
+      `영화를 감상하고 마음에 스며든 감정을 정제되고 다정한 언어로 잘 빚어내셨습니다. 글 전체의 구조적 완결성을 더 높이기 위해선, 단순히 인상 깊었던 장면에 대한 열거에서 한 단계 나아가 '왜 그 씬이 나에게 감동을 주었는지' 그날의 감정 날씨("${safeEmotion}")와 엮어 묘사해 보시는 것을 교육적으로 추천해 드립니다.`,
+      `영화 《${safeMovieNm}》에 대한 리뷰어님만의 독창적인 감수성과 사색이 잘 돋보이는 훌륭한 영화 일기입니다. 표현력이 매우 참신하며 어휘 선택도 깊이가 느껴집니다. 서사 구조의 흐름과 문맥의 일관성을 조금 더 보완한다면 전문 평론 못지않은 깊이를 갖추게 될 것입니다.`
     ];
 
     const mockCorrectedReviews = [
-      `"${safeReview}"라는 깊은 감상은 감독 ${cleanDirectors}이 심어둔 묵직한 미장센과 장르적 미학을 관객에게 온전히 전달합니다. 《${movieNm}》의 복합적인 서사와 배우진의 강렬한 앙상블은 한 편의 잘 짜여진 시각적 교향곡처럼 스크린에 가득 울려 퍼지며, 이는 관객들의 마음 깊은 곳에 가공되지 않은 짙은 잔향을 고스란히 이식해 냅니다.`,
-      `《${movieNm}》은 ${cleanGenres} 본연의 문법을 유려하게 정제해 낸 수작으로, "${safeReview}"라는 리뷰어의 분석처럼 매 씬마다 팽팽한 연출적 긴장감과 아름다운 시각적 조화가 빛납니다. 감독 ${cleanDirectors}의 정교한 프레이밍과 더불어 배우들의 섬세한 호흡은 상투적 감상의 지평을 거뿐히 넘어서는 품격 높은 정서적 몰입을 경험하게 만듭니다.`,
-      `리뷰어의 단평인 "${safeReview}"에서 엿볼 수 있듯, 《${movieNm}》은 세련된 미장센의 향연 뒤로 영화적 본질과 정교한 연출의 조화가 두드러지는 명작입니다. ${cleanGenres} 고유의 서사적 깊이와 배우들의 밀도 높은 연기는 보는 이를 완벽히 스크린 속에 봉인시키며, 크레딧이 올라간 이후에도 오랜 사유의 단초를 관객의 가슴속에 묵직하게 남겨둡니다.`
+      `《${safeMovieNm}》을 보고 적어 내려간 리뷰어의 다이어리 《${safeTitle}》는 ${genres} 장르가 스크린 너머로 전달하는 정서적 깊이를 가감 없이 포착해 낸다. "${safeContent.slice(0, 120)}..."로 대변되는 관람 소회는 스크린의 프레이밍과 정교한 미장센이 빚어낸 감동의 파고를 유려한 비평의 호흡으로 정제하여 독창적인 사유의 텍스트로 치환시켜 내고 있다.`,
+      `"${safeContent.slice(0, 120)}..."라는 깊은 여운은 영화 《${safeMovieNm}》의 문학적 본질을 리뷰어 특유의 섬세한 정서로 빚어낸 훌륭한 비평적 기록이다. 감독의 묵직한 연출 문법과 배우들의 잔잔한 연기 앙상블은 그날의 관람 환경("${safeContext}") 속에서 한 편의 수려한 시각적 잔향으로 굳건히 영구 보존된다.`,
+      `영화 《${safeMovieNm}》의 다채로운 변주를 리뷰어만의 독보적인 혜안으로 풀어낸 이 일기는, 상투적인 관람 후기를 뛰어넘는 훌륭한 문학적 에세이다. "${safeContent.slice(0, 120)}..." 속의 직관적 감상에 논리성과 정밀한 비평 어휘를 얹음으로써, 텍스트 전체의 정서적 밀도가 저명한 문화 평론가 수준으로 화려하게 승화되어 깊은 잔향을 더한다.`
     ];
 
-    const idx = safeReview.length % mockFeedbacks.length;
+    const idx = safeContent.length % mockFeedbacks.length;
 
     // Simulate delay for realism (1200ms for heavy AI analysis computation)
     await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -941,10 +953,10 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
       success: true,
       scores: {
         expression: scoreExpression,
-        logic: scoreLogic,
+        structure: scoreStructure,
         analysis: scoreAnalysis,
         vocabulary: scoreVocabulary,
-        impact: scoreImpact
+        coachability: scoreCoachability
       },
       feedback: mockFeedbacks[idx],
       corrected: mockCorrectedReviews[idx],
@@ -952,34 +964,39 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
     });
   }
 
-  // Construct structured prompt to guide Gemini and explicitly demand robust JSON format
-  const prompt = `당신은 세계적인 권위를 가진 수석 영화 평론가이자, 후배 시네필의 평론 글쓰기 성장을 책임지는 전문 영화 비평 작문 코치입니다.
-사용자가 작성한 영화 감상평 초안을 자세히 분석하여 점수를 매기고, 전문적인 첨삭 가이드를 작성해주세요.
+  // Construct structured prompt to guide Gemini as a strict hybrid persona (Review Expert + Writing Educator)
+  const prompt = `당신은 세계적인 권위를 가진 수석 영화 평론가이자, 후배 시네필의 문학적이고 영화학적인 영화 일기(에세이) 작문 성장을 책임지는 다정하고 전문적인 글쓰기 지도 교수(교육자)입니다.
+사용자가 작성한 영화 일기/감상평 초안을 자세히 분석하여 5가지 영역의 점수를 매기고, 다정한 교육자적 관점의 첨삭 가이드와 전문적인 평론가 수준의 첨삭 완성본을 작성해주세요.
 
 영화 정보:
-- 제목: ${movieNm}
-- 감독: ${cleanDirectors}
-- 장르: ${cleanGenres}
-- 출연진: ${cleanActors}
+- 제목: ${safeMovieNm}
+- 장르: ${genres}
 
-사용자의 감상평 초안:
-"${safeReview}"
+사용자의 영화 일기 메타 정보:
+- 일기 제목: ${safeTitle}
+- 관람 환경: ${safeContext}
+- 감정 날씨: ${safeEmotion}
+
+사용자의 일기 본문 초안:
+"${safeContent}"
 
 작성 규칙:
-1. 사용자의 감상평 초안을 바탕으로 엄격하고 영화학적인 관점에서 작문 평가를 실행하십시오.
-2. 아래에 정의된 JSON 형식으로만 정확하게 결과를 출력하십시오. 마크다운 기호(\`\`\`json ...) 등을 포함하지 말고 오직 순수 JSON 데이터만 반환해야 합니다. 다른 서두 설명이나 감사 인사 등 텍스트는 절대 포함하지 마십시오.
+1. 당신의 역할은 두 가지가 결합되어야 합니다:
+   - **글쓰기 교육자**: 사용자가 쓴 일기의 고유한 정서와 개성을 칭찬하고 격려하며, 글의 구조, 문장 흐름, 맞춤법/표현을 다정하고 날카롭게 교정해주는 피드백 코멘터리를 한글 3문장 이내로 다정하게 제공하십시오.
+   - **영화 평론 전문가**: 사용자가 본문에서 표현하고 싶어 한 핵심 메시지를 100% 보존하되, '미장센', '서사적 페이소스', '프레이밍', '장르적 변주' 등 영화학적 비평 용어를 유려하게 녹여내어 저명한 문화 일간지 평론가 수준으로 고급스럽고 우아하게 탈바꿈시킨 350자~450자 분량의 첨삭본을 작성하십시오.
+2. 아래에 정의된 JSON 형식으로만 정확하게 결과를 출력하십시오. 마크다운 기호(\`\`\`json ...) 등을 포함하지 말고 오직 순수 JSON 데이터만 반환해야 합니다.
 
 반환할 JSON 구조 사양:
 {
   "scores": {
-    "expression": (10~100 사이의 정수. 문장이 얼마나 영화적이고 풍부하게 묘사되었는지 여부),
-    "logic": (10~100 사이의 정수. 감상이 일관되게 전개되고 앞뒤 구조가 논리적인지 여부),
-    "analysis": (10~100 사이의 정수. 감독의 연출력, 배우 연기, 장르 특성 등 영화학적 세부 요소를 분석했는지 여부),
-    "vocabulary": (10~100 사이의 정수. 상투적인 단어 대신 '미장센', '서사적', '페이소스' 같은 영화적 어휘를 활용했는지 여부),
-    "impact": (10~100 사이의 정수. 독자에게 강한 공감이나 신선함을 전해주는 전체 글의 임팩트)
+    "expression": (10~100 사이의 정수. 문장이 얼마나 영화적이고 풍부하게 감정을 묘사했는지 여부),
+    "structure": (10~100 사이의 정수. 다이어리의 주제가 일관되게 전개되고 논리적인 구조를 가졌는지 여부),
+    "analysis": (10~100 사이의 정수. 영화의 장르 특성이나 연출, 정서를 깊이 이해하고 분석했는지 여부),
+    "vocabulary": (10~100 사이의 정수. 상투적인 말 대신 참신하고 품격 있는 어휘를 구사했는지 여부),
+    "coachability": (10~100 사이의 정수. 교육 피드백을 적용했을 때 향후 작문 실력이 얼마나 발전할 수 있을지에 대한 잠재지수)
   },
-  "feedback": "작성된 초안의 강점과 약점을 친근하면서도 날카롭게 짚어주고, 다음 글쓰기 때 어떤 어휘나 시각을 더하면 좋은지 한글 3문장 이내로 정리한 정교한 작문 피드백 가이드",
-  "corrected": "사용자의 초안 핵심 감성을 100% 보존하면서, 어휘의 품격을 높이고 호흡을 다듬어 마치 저명한 일간지 평론가 수준으로 화려하고 매끄럽게 교정한 세련된 2~3문장 분량의 시네필 첨삭 완성본 (200자~300자 내외)"
+  "feedback": "교육자로서 리뷰어의 강점을 먼저 칭찬하고, 보완할 글쓰기 팁을 친근하면서도 정확하게 짚어주는 한글 3문장 이내의 작문 피드백 가이드",
+  "corrected": "원래 일기의 감정선과 핵심 감상을 고스란히 이식하되, 전문가적인 격조 높은 영화 평론가 문체로 아름답고 세련되게 재창조한 첨삭 완성본 (350자~450자 내외)"
 }`;
 
   try {
@@ -1037,10 +1054,10 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
       success: true,
       scores: {
         expression: parseInt(jsonResult.scores.expression, 10) || 75,
-        logic: parseInt(jsonResult.scores.logic, 10) || 75,
+        structure: parseInt(jsonResult.scores.structure, 10) || parseInt(jsonResult.scores.logic, 10) || 75,
         analysis: parseInt(jsonResult.scores.analysis, 10) || 75,
         vocabulary: parseInt(jsonResult.scores.vocabulary, 10) || 75,
-        impact: parseInt(jsonResult.scores.impact, 10) || 75
+        coachability: parseInt(jsonResult.scores.coachability, 10) || parseInt(jsonResult.scores.impact, 10) || 75
       },
       feedback: jsonResult.feedback.trim(),
       corrected: jsonResult.corrected.trim(),
