@@ -770,6 +770,89 @@ app.get('/api/search', checkAuth, async (req, res) => {
   }
 });
 
+// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR
+app.get('/api/global-trending', checkAuth, async (req, res) => {
+  const startTime = Date.now();
+  const { region } = req.query;
+
+  const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR'];
+  const regionKey = validRegions.includes(region) ? region : 'ALL';
+  const cacheKey = `global_trending_${regionKey}`;
+  const cachedData = apiCache.get(cacheKey);
+
+  if (cachedData) {
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: true,
+      latency: `${latency}ms`,
+      data: cachedData,
+    });
+  }
+
+  try {
+    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+    let url = '';
+    let rawList = [];
+
+    if (regionKey === 'ALL') {
+      // 1. Worldwide trending movies
+      url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${tmdbKey}&language=ko-KR`;
+      const response = await axios.get(url, { timeout: 5000 });
+      rawList = response.data?.results || [];
+    } else {
+      // 2. Region specific popular movies
+      url = `https://api.themoviedb.org/3/movie/popular?api_key=${tmdbKey}&language=ko-KR&region=${regionKey}`;
+      const response = await axios.get(url, { timeout: 5000 });
+      rawList = response.data?.results || [];
+    }
+
+    const genreMap = {
+      28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
+      99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
+      36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
+      10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
+      10752: '전쟁', 37: '서부'
+    };
+
+    const formattedList = rawList
+      .filter(movie => movie.title && movie.poster_path)
+      .map((movie, index) => {
+        const primaryGenreId = movie.genre_ids?.[0];
+        const genre = genreMap[primaryGenreId] || '영화';
+
+        return {
+          rank: String(index + 1),
+          movieCd: `TMDB_${movie.id}`,
+          movieNm: movie.title,
+          openDt: movie.release_date || '개봉 정보 없음',
+          poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : null,
+          rating: movie.vote_average ? movie.vote_average.toFixed(1) : '0.0',
+          genre: genre,
+          overview: movie.overview || '등록된 영화 설명이 아직 없습니다.',
+          popularity: movie.popularity ? Math.round(movie.popularity).toLocaleString('ko-KR') : '0'
+        };
+      });
+
+    // Cache results for 12 hours (43200 seconds)
+    apiCache.set(cacheKey, formattedList, 43200);
+
+    const latency = Date.now() - startTime;
+    return res.json({
+      success: true,
+      fromCache: false,
+      latency: `${latency}ms`,
+      data: formattedList,
+    });
+  } catch (error) {
+    console.error('TMDB Global Trending API Error:', error.message);
+    return res.status(500).json({
+      error: '글로벌 인기 영화 차트를 가져오는 도중 서버 지연이 발생했습니다.',
+    });
+  }
+});
+
 // 5. POST /api/coach-review — AI Movie Review Critic & Coaching system
 app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
   const { movieNm, directors, actors, genres, userReview } = req.body;

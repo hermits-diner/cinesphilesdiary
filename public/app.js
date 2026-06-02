@@ -107,7 +107,8 @@ function getGenrePlaceholder(genre, movieNm) {
 let activeMovieInfo = null;
 let activeRating = 0; // Selected rating state (1-5 stars)
 let currentNation = 'ALL'; // Nationality filter state ('ALL', 'K', 'F')
-let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'WEEKLYBOXOFFICE', 'UPCOMING')
+let currentGlobalRegion = 'ALL'; // Global region filter state ('ALL', 'US', 'JP', 'GB', 'FR')
+let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'WEEKLYBOXOFFICE', 'UPCOMING', 'GLOBALTRENDING')
 
 // Calculate which week of the month a date belongs to
 function getWeekOfMonth(dateStr) {
@@ -294,6 +295,24 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // Global Trending Nationality/Region Filter Tabs Click Event Listeners
+  const globalFilterBtns = document.querySelectorAll('#globalNationTabsContainer .boxoffice-filter-btn');
+  globalFilterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const selectedRegion = btn.getAttribute('data-global-region') || 'ALL';
+      if (selectedRegion === currentGlobalRegion) return;
+
+      currentGlobalRegion = selectedRegion;
+
+      // Update active class
+      globalFilterBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Reload global trending data
+      loadGlobalTrendingData(currentGlobalRegion);
+    });
+  });
+
   // Main Content View Mode Switcher
   const tabBoxOfficeBtn = document.getElementById('tabBoxOfficeBtn');
   const tabWeeklyBoxOfficeBtn = document.getElementById('tabWeeklyBoxOfficeBtn');
@@ -301,6 +320,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const mainSectionIcon = document.getElementById('mainSectionIcon');
   const mainSectionText = document.getElementById('mainSectionText');
   const nationTabsContainer = document.getElementById('nationTabsContainer');
+
+  const tabGlobalTrendingBtn = document.getElementById('tabGlobalTrendingBtn');
+  const globalNationTabsContainer = document.getElementById('globalNationTabsContainer');
 
   if (tabBoxOfficeBtn && tabWeeklyBoxOfficeBtn && tabUpcomingBtn) {
     tabBoxOfficeBtn.addEventListener('click', () => {
@@ -310,8 +332,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       tabBoxOfficeBtn.classList.add('active');
       tabWeeklyBoxOfficeBtn.classList.remove('active');
       tabUpcomingBtn.classList.remove('active');
+      if (tabGlobalTrendingBtn) tabGlobalTrendingBtn.classList.remove('active');
 
       if (nationTabsContainer) nationTabsContainer.style.display = '';
+      if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
       if (currentDateTitle) currentDateTitle.style.display = '';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-chart-line';
@@ -333,8 +357,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       tabWeeklyBoxOfficeBtn.classList.add('active');
       tabBoxOfficeBtn.classList.remove('active');
       tabUpcomingBtn.classList.remove('active');
+      if (tabGlobalTrendingBtn) tabGlobalTrendingBtn.classList.remove('active');
 
       if (nationTabsContainer) nationTabsContainer.style.display = '';
+      if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
       if (currentDateTitle) currentDateTitle.style.display = '';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-calendar-days';
@@ -359,8 +385,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       tabUpcomingBtn.classList.add('active');
       tabBoxOfficeBtn.classList.remove('active');
       tabWeeklyBoxOfficeBtn.classList.remove('active');
+      if (tabGlobalTrendingBtn) tabGlobalTrendingBtn.classList.remove('active');
 
       if (nationTabsContainer) nationTabsContainer.style.display = 'none';
+      if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
       if (currentDateTitle) currentDateTitle.style.display = 'none';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-hourglass-half';
@@ -371,6 +399,30 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       loadUpcomingMovies();
     });
+
+    if (tabGlobalTrendingBtn) {
+      tabGlobalTrendingBtn.addEventListener('click', () => {
+        if (currentViewMode === 'GLOBALTRENDING') return;
+        currentViewMode = 'GLOBALTRENDING';
+
+        tabGlobalTrendingBtn.classList.add('active');
+        tabBoxOfficeBtn.classList.remove('active');
+        tabWeeklyBoxOfficeBtn.classList.remove('active');
+        tabUpcomingBtn.classList.remove('active');
+
+        if (nationTabsContainer) nationTabsContainer.style.display = 'none';
+        if (globalNationTabsContainer) globalNationTabsContainer.style.display = '';
+        if (currentDateTitle) currentDateTitle.style.display = 'none';
+        if (mainSectionIcon) {
+          mainSectionIcon.className = 'fa-solid fa-earth-americas';
+        }
+        if (mainSectionText) {
+          mainSectionText.textContent = '글로벌 인기 영화';
+        }
+
+        loadGlobalTrendingData(currentGlobalRegion);
+      });
+    }
   }
   
   if (modalCloseBtn) {
@@ -1427,6 +1479,118 @@ async function loadUpcomingMovies() {
       </div>
     `;
   }
+}
+
+// 2.7. Fetch and Render Global Trending & Popular Charts
+async function loadGlobalTrendingData(region = currentGlobalRegion) {
+  renderSkeletons();
+  
+  try {
+    const response = await fetch(`${BACKEND_BASE}/api/global-trending?region=${region}`, {
+      method: 'GET',
+      headers: API_HEADERS
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to fetch global trending movies');
+    }
+    
+    renderGlobalTrendingList(result.data);
+  } catch (error) {
+    console.error('Error loading global trending:', error);
+    showToast('데이터 조회 실패', error.message, 'error');
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--color-accent); margin-bottom: 1rem;"></i>
+        <p>${error.message}</p>
+        <button onclick="loadGlobalTrendingData('${region}')" style="margin-top: 1.5rem; background: var(--gradient-primary); border: none; color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          다시 시도하기
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Render actual Global Trending Card List
+function renderGlobalTrendingList(moviesList) {
+  if (!moviesList || moviesList.length === 0) {
+    movieGrid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
+        <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+        <p>조회된 글로벌 인기 영화 데이터가 존재하지 않습니다.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  movieGrid.innerHTML = '';
+  
+  moviesList.forEach((movie, index) => {
+    const rank = parseInt(movie.rank, 10);
+    const isTopThree = rank <= 3;
+    const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
+    
+    let posterHtml = '';
+    if (movie.poster) {
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster-bg" alt="" aria-hidden="true" loading="lazy"><img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+    } else {
+      const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
+      posterHtml = `
+        <div class="poster-placeholder" style="background: ${spec.gradientStr}; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; text-align: center; gap: 0.85rem; position: relative; height: 100%;">
+          <div class="genre-tag-badge" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 0.25rem 0.65rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">${escapeHtml(spec.genreName)}</div>
+          <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
+          <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
+          <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">Cinephile's Diary</div>
+        </div>
+      `;
+    }
+
+    const ratingHtml = movie.rating 
+      ? `<div class="rating-badge"><i class="fa-solid fa-star"></i> ${movie.rating}</div>`
+      : '';
+    
+    const bookingUrl = getBookingUrl(movie.movieNm);
+
+    const movieCard = document.createElement('div');
+    movieCard.className = 'movie-card';
+    movieCard.style.animationDelay = `${index * 0.05}s`;
+    
+    movieCard.innerHTML = `
+      <div class="rank-badge ${badgeClass}">${movie.rank}</div>
+      <div class="poster-container">
+        ${posterHtml}
+        ${ratingHtml}
+      </div>
+      <div class="movie-header-info">
+        <h3 class="movie-title">${movie.movieNm}</h3>
+        <div class="movie-meta-list">
+          <div class="movie-meta-item">
+            <i class="fa-regular fa-calendar"></i>
+            <span>개봉일: ${formatOpenDate(movie.openDt)}</span>
+          </div>
+          <div class="movie-meta-item">
+            <i class="fa-solid fa-fire" style="color: var(--color-primary);"></i>
+            <span>인기 지수: ${movie.popularity}</span>
+          </div>
+          <div class="movie-meta-item" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.45; margin-top: 0.6rem; height: 2.9em;">
+            <span style="font-style: italic; color: rgba(255,255,255,0.15); font-family: Georgia, serif; font-size: 1.1rem; line-height: 0; vertical-align: bottom; margin-right: 2px;">“</span>
+            <span>${movie.overview || '이 영화에 대한 풍부한 줄거리 정보가 아직 등록되지 않았습니다.'}</span>
+          </div>
+        </div>
+        <div class="unified-booking-container">
+          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
+          </a>
+        </div>
+      </div>
+    `;
+    
+    movieCard.addEventListener('click', () => openMovieDetails(movie.movieCd, movie.movieNm));
+    movieGrid.appendChild(movieCard);
+  });
 }
 
 // Render actual Upcoming Releases Card List
