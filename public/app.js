@@ -1927,7 +1927,7 @@ async function openMovieDetails(movieCd, movieNm) {
     if (data.trailerKey && targetTrailerFrame) {
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'block';
       if (trailerFallback) trailerFallback.style.display = 'none';
-      targetTrailerFrame.src = `https://www.youtube.com/embed/${encodeURIComponent(data.trailerKey)}?autoplay=0&rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+      targetTrailerFrame.src = `https://www.youtube.com/embed/${data.trailerKey}?autoplay=0&rel=0`;
       if (trailerDirectBtn) {
         trailerDirectBtn.href = `https://www.youtube.com/watch?v=${encodeURIComponent(data.trailerKey)}`;
         trailerDirectBtn.style.display = 'inline-flex';
