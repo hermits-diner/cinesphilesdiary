@@ -420,13 +420,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Show a warning toast on GitHub Pages if backend URL is not set yet!
-  if (!isLocal && !localStorage.getItem('CINEDIARY_BACKEND_URL')) {
-    setTimeout(() => {
-      showToast('API 서버 미등록 경고', 'GitHub Pages에서 전체 기능을 활성화하려면 우측 상단의 "서버 설정"을 눌러 배포된 Express 백엔드 주소를 입력해 주셔야 합니다.', 'error');
-    }, 1000);
-  }
-
   // Textarea input and rating setup management
   if (userReviewInput) {
     userReviewInput.addEventListener('input', handleReviewInput);
