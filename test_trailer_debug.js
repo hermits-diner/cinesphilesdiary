@@ -33,16 +33,35 @@ const puppeteer = require('puppeteer');
       const frameWrap = document.getElementById('modalTrailerFrameWrap');
       const frame = document.getElementById('modalTrailerFrame');
       const fallback = document.getElementById('modalTrailerFallback');
+      const directBtn = document.getElementById('modalTrailerDirectBtn');
       
       return {
         containerDisplay: container ? container.style.display : 'NOT FOUND',
         frameWrapDisplay: frameWrap ? frameWrap.style.display : 'NOT FOUND',
         fallbackDisplay: fallback ? fallback.style.display : 'NOT FOUND',
-        frameSrc: frame ? frame.src : 'NOT FOUND'
+        frameSrc: frame ? frame.src : 'NOT FOUND',
+        directBtnDisplay: directBtn ? directBtn.style.display : 'NOT FOUND',
+        directBtnHref: directBtn ? directBtn.getAttribute('href') : 'NOT FOUND'
       };
     });
     
-    console.log('📊 Trailer Component DOM States:', info);
+    console.log('📊 Trailer Component DOM States (Open Modal):', info);
+    
+    console.log('4. Invoking closeModal() to verify clean-up...');
+    await page.evaluate(() => {
+      closeModal();
+    });
+    
+    // Check trailer DOM states after closing
+    const afterCloseInfo = await page.evaluate(() => {
+      const frame = document.getElementById('modalTrailerFrame');
+      const directBtn = document.getElementById('modalTrailerDirectBtn');
+      return {
+        frameSrc: frame ? frame.src : 'NOT FOUND',
+        directBtnHref: directBtn ? directBtn.getAttribute('href') : 'NOT FOUND'
+      };
+    });
+    console.log('📊 Trailer Component DOM States (After Close):', afterCloseInfo);
     
   } catch (e) {
     console.error('❌ Debug run failed:', e);

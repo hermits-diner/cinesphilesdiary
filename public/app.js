@@ -1790,11 +1790,16 @@ async function openMovieDetails(movieCd, movieNm) {
   const trailerFrame = document.getElementById('modalTrailerFrame');
   const trailerFrameWrap = document.getElementById('modalTrailerFrameWrap');
   const trailerFallback = document.getElementById('modalTrailerFallback');
+  const trailerDirectBtn = document.getElementById('modalTrailerDirectBtn');
   
   if (trailerContainer) trailerContainer.style.display = 'none';
   if (trailerFrame) trailerFrame.src = '';
   if (trailerFrameWrap) trailerFrameWrap.style.display = 'none';
   if (trailerFallback) trailerFallback.style.display = 'none';
+  if (trailerDirectBtn) {
+    trailerDirectBtn.href = '#';
+    trailerDirectBtn.style.display = 'none';
+  }
   
   // Set skeleton states for modal specs
   specGenre.textContent = '정보 조회 중...';
@@ -1885,6 +1890,7 @@ async function openMovieDetails(movieCd, movieNm) {
     const trailerFrameWrap = document.getElementById('modalTrailerFrameWrap');
     const trailerFallback = document.getElementById('modalTrailerFallback');
     const trailerYoutubeBtn = document.getElementById('modalTrailerYoutubeBtn');
+    const trailerDirectBtn = document.getElementById('modalTrailerDirectBtn');
     const targetTrailerContainer = document.getElementById('modalTrailerContainer');
     const targetTrailerFrame = document.getElementById('modalTrailerFrame');
     
@@ -1892,6 +1898,10 @@ async function openMovieDetails(movieCd, movieNm) {
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'block';
       if (trailerFallback) trailerFallback.style.display = 'none';
       targetTrailerFrame.src = `https://www.youtube.com/embed/${encodeURIComponent(data.trailerKey)}?autoplay=0&rel=0`;
+      if (trailerDirectBtn) {
+        trailerDirectBtn.href = `https://www.youtube.com/watch?v=${encodeURIComponent(data.trailerKey)}`;
+        trailerDirectBtn.style.display = 'inline-flex';
+      }
       if (targetTrailerContainer) targetTrailerContainer.style.display = 'block';
     } else {
       // Show gorgeous YouTube CTA card fallback
@@ -1902,6 +1912,10 @@ async function openMovieDetails(movieCd, movieNm) {
         if (trailerYoutubeBtn) {
           trailerYoutubeBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(data.movieNm + ' 공식 예고편')}`;
         }
+      }
+      if (trailerDirectBtn) {
+        trailerDirectBtn.href = '#';
+        trailerDirectBtn.style.display = 'none';
       }
       if (targetTrailerFrame) targetTrailerFrame.src = ''; // Clear iframe src
       if (targetTrailerContainer) targetTrailerContainer.style.display = 'block';
@@ -1938,6 +1952,10 @@ function closeModal() {
   const trailerFrame = document.getElementById('modalTrailerFrame');
   if (trailerFrame) {
     trailerFrame.src = '';
+  }
+  const trailerDirectBtn = document.getElementById('modalTrailerDirectBtn');
+  if (trailerDirectBtn) {
+    trailerDirectBtn.href = '#';
   }
 }
 
