@@ -1220,7 +1220,7 @@ function renderBoxOfficeList(moviesList) {
     // Check if poster exists, otherwise render beautiful custom dynamic gradient card matching the genre!
     let posterHtml = '';
     if (movie.poster) {
-      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster-bg" alt="" aria-hidden="true" loading="lazy"><img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
     } else {
       const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
       posterHtml = `
@@ -1274,7 +1274,7 @@ function renderBoxOfficeList(moviesList) {
         </div>
         ${rankChangeHtml}
         <div class="unified-booking-container">
-          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
             <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
           </a>
         </div>
@@ -1326,7 +1326,7 @@ function renderWeeklyBoxOfficeList(moviesList) {
     // Check if poster exists
     let posterHtml = '';
     if (movie.poster) {
-      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster-bg" alt="" aria-hidden="true" loading="lazy"><img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
     } else {
       const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
       posterHtml = `
@@ -1371,7 +1371,7 @@ function renderWeeklyBoxOfficeList(moviesList) {
         </div>
         ${rankChangeHtml}
         <div class="unified-booking-container">
-          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
             <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
           </a>
         </div>
@@ -1455,7 +1455,7 @@ function renderUpcomingList(moviesList) {
     // Check if poster exists
     let posterHtml = '';
     if (movie.poster) {
-      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
+      posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster-bg" alt="" aria-hidden="true" loading="lazy"><img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
     } else {
       const spec = getGenrePlaceholder(movie.genre, movie.movieNm);
       posterHtml = `
@@ -1655,6 +1655,7 @@ async function openMovieDetails(movieCd, movieNm) {
     
     if (data.poster) {
       poster.src = data.poster;
+      poster.alt = `${movieNm} 포스터`;
       poster.style.display = 'block';
       posterPlaceholder.style.display = 'none';
     } else {
@@ -2064,7 +2065,7 @@ function updateLiveTicketPreview() {
   // Apply dynamic color gradient to header background based on theater type
   const headerBg = document.getElementById('ticketHeaderBg');
   if (headerBg) {
-    let gradient = 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(16, 185, 129, 0.2) 100%)';
+    let gradient = 'linear-gradient(135deg, rgba(229, 169, 169, 0.25) 0%, rgba(212, 175, 55, 0.2) 100%)';
     if (theater === 'CGV') {
       gradient = 'linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.15) 100%)';
     } else if (theater === '롯데시네마') {
@@ -2208,7 +2209,7 @@ function loadSavedTickets() {
     }
     
     // Determine theater theme colors for dynamic backgrounds
-    let gradient = 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(16, 185, 129, 0.2) 100%)';
+    let gradient = 'linear-gradient(135deg, rgba(229, 169, 169, 0.25) 0%, rgba(212, 175, 55, 0.2) 100%)';
     const theater = ticket.theater || 'CGV';
     if (theater === 'CGV') {
       gradient = 'linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.15) 100%)';
@@ -2747,4 +2748,76 @@ window.deleteBucketBoard = deleteBucketBoard;
 window.addMovieToBucket = addMovieToBucket;
 window.toggleBucketItem = toggleBucketItem;
 window.deleteBucketItem = deleteBucketItem;
+
+// ---- Modal accessibility: focus trap, ESC-to-close, and focus restoration ----
+(function initModalA11y() {
+  const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const lastFocusedByModal = new WeakMap();
+
+  function getActiveModal() {
+    return document.querySelector('.modal-overlay.active');
+  }
+
+  function getVisibleFocusable(modal) {
+    return Array.from(modal.querySelectorAll(FOCUSABLE)).filter((el) => {
+      return el.offsetParent !== null || el === document.activeElement;
+    });
+  }
+
+  // Watch each modal for the 'active' class toggling to manage focus
+  document.querySelectorAll('.modal-overlay').forEach((modal) => {
+    let wasActive = modal.classList.contains('active');
+    const observer = new MutationObserver(() => {
+      const isActive = modal.classList.contains('active');
+      if (isActive === wasActive) return;
+      wasActive = isActive;
+
+      if (isActive) {
+        lastFocusedByModal.set(modal, document.activeElement);
+        // Defer so content/poster has rendered before focusing
+        setTimeout(() => {
+          const focusables = getVisibleFocusable(modal);
+          const target = modal.querySelector('.modal-close-btn') || focusables[0] || modal;
+          if (target && typeof target.focus === 'function') target.focus();
+        }, 30);
+      } else {
+        const prev = lastFocusedByModal.get(modal);
+        if (prev && typeof prev.focus === 'function' && document.body.contains(prev)) {
+          prev.focus();
+        }
+        lastFocusedByModal.delete(modal);
+      }
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const modal = getActiveModal();
+    if (!modal) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      const closeBtn = modal.querySelector('.modal-close-btn');
+      if (closeBtn) closeBtn.click();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const focusables = getVisibleFocusable(modal);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!modal.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+})();
 
