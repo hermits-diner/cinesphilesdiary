@@ -216,14 +216,14 @@
       padding: 3rem 4.5rem 2.6rem;
       width: min(800px, 88vw);
       /* Cinema screen frame — subtle amber border */
-      border: 1px solid rgba(210, 175, 60, 0.20);
-      border-top-color: rgba(230, 200, 90, 0.35);
+      border: 1px solid rgba(160, 175, 220, 0.22);
+      border-top-color: rgba(200, 210, 245, 0.38);
       border-radius: 3px;
-      /* Inner screen glow + outer depth shadow */
+      /* Cool silver glow matching screen */
       box-shadow:
-        0 0 80px rgba(180, 140, 50, 0.10),
-        inset 0 0 70px rgba(180, 140, 50, 0.05),
-        0 0 0 6px rgba(5, 3, 8, 0.55);
+        0 0 80px rgba(140, 155, 210, 0.10),
+        inset 0 0 70px rgba(140, 155, 210, 0.05),
+        0 0 0 6px rgba(5, 3, 10, 0.55);
       /* Slight warm tint to reinforce "on screen" feel */
       background: rgba(15, 10, 5, 0.12);
       margin-bottom: 0.4rem;
@@ -235,8 +235,8 @@
       position: absolute;
       top: -2px; left: -2px;
       width: 18px; height: 18px;
-      border-top: 2px solid rgba(215, 180, 65, 0.55);
-      border-left: 2px solid rgba(215, 180, 65, 0.55);
+      border-top: 2px solid rgba(180, 195, 235, 0.55);
+      border-left: 2px solid rgba(180, 195, 235, 0.55);
       border-radius: 3px 0 0 0;
     }
 
@@ -246,8 +246,8 @@
       position: absolute;
       bottom: -2px; right: -2px;
       width: 18px; height: 18px;
-      border-bottom: 2px solid rgba(215, 180, 65, 0.55);
-      border-right: 2px solid rgba(215, 180, 65, 0.55);
+      border-bottom: 2px solid rgba(180, 195, 235, 0.55);
+      border-right: 2px solid rgba(180, 195, 235, 0.55);
       border-radius: 0 0 3px 0;
     }
 
@@ -2690,29 +2690,33 @@
     <div class="cinema-scene">
       <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <radialGradient id="g-scrn" cx="50%" cy="45%" r="55%">
-            <stop offset="0%"   stop-color="#b8a878"/>
-            <stop offset="35%"  stop-color="#9a8448"/>
-            <stop offset="70%"  stop-color="#6e5c2c"/>
-            <stop offset="100%" stop-color="#3e3010"/>
+          <!-- Cool silver screen: center highlight → deep blue-purple edge -->
+          <radialGradient id="g-scrn" cx="50%" cy="42%" r="58%">
+            <stop offset="0%"   stop-color="#dce2f0"/>
+            <stop offset="30%"  stop-color="#b0b8d4"/>
+            <stop offset="65%"  stop-color="#6870a0"/>
+            <stop offset="100%" stop-color="#2c3060"/>
           </radialGradient>
+          <!-- Ambient: cool lavender spill on ceiling -->
           <radialGradient id="g-amb" cx="50%" cy="0%" r="75%" gradientUnits="userSpaceOnUse" fx="720" fy="44">
-            <stop offset="0%"   stop-color="#c8a040" stop-opacity="0.15"/>
-            <stop offset="100%" stop-color="#c8a040" stop-opacity="0"/>
+            <stop offset="0%"   stop-color="#a0a8d8" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#a0a8d8" stop-opacity="0"/>
           </radialGradient>
+          <!-- Beam: warm rosegold — 유일한 난색 포인트 -->
           <linearGradient id="g-beam" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%"   stop-color="#d4b860" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#d4b860" stop-opacity="0.18"/>
+            <stop offset="0%"   stop-color="#e5a9a9" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0.22"/>
           </linearGradient>
+          <!-- Seats: dark indigo — 배경과 동일 계열, 실루엣으로만 -->
           <linearGradient id="g-sF" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#3a1418"/>
-            <stop offset="45%"  stop-color="#260c10"/>
-            <stop offset="100%" stop-color="#130508"/>
+            <stop offset="0%"   stop-color="#1c1e30"/>
+            <stop offset="50%"  stop-color="#111320"/>
+            <stop offset="100%" stop-color="#080a12"/>
           </linearGradient>
           <linearGradient id="g-sB" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#281014"/>
-            <stop offset="50%"  stop-color="#1a080c"/>
-            <stop offset="100%" stop-color="#0e0406"/>
+            <stop offset="0%"   stop-color="#141628"/>
+            <stop offset="50%"  stop-color="#0c0e1c"/>
+            <stop offset="100%" stop-color="#060810"/>
           </linearGradient>
           <linearGradient id="g-over" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
             <stop offset="0%"   stop-color="#07050b" stop-opacity="0.96"/>
