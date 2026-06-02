@@ -2267,6 +2267,7 @@ function loadSavedTickets() {
         <div class="ticket-header" style="background: ${gradient}">
           <span class="ticket-logo">CINE<span>DIARY</span> TICKET</span>
           <span class="spec-label" style="margin-bottom:0; color: #fff;">${escapeHtml(theater)}</span>
+          <div class="ticket-punch-line"></div>
         </div>
         ${posterAreaHtml}
         <div class="ticket-body">
