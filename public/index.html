@@ -139,32 +139,72 @@
 
     .brand {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      align-items: baseline;
+      gap: 0;
     }
 
-    .brand-logo {
-      font-size: 2.5rem;
-      background: var(--gradient-neon);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 10px rgba(229, 169, 169, 0.5));
-    }
-
+    /* Typography-only brand mark — no icon */
     .brand-title {
       font-family: var(--font-outfit);
-      font-size: 2.25rem;
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      background: linear-gradient(to right, #ffffff, #9ca3af);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: baseline;
+      gap: 0.3em;
+      line-height: 1;
+      margin: 0;
     }
 
-    .brand-title span {
-      background: var(--gradient-neon);
+    /* Clip container: overflow hidden so the word reveals upward */
+    .brand-clip {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    /* "Cinephile's" — thin italic, subdued */
+    .brand-cinephile {
+      display: inline-block;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1.45rem;
+      letter-spacing: 0.04em;
+      color: rgba(253, 251, 247, 0.55);
+      animation: brandReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+    }
+
+    /* "Diary" — heavy, rosegold shimmer */
+    .brand-diary {
+      display: inline-block;
+      font-style: normal;
+      font-weight: 900;
+      font-size: 2.55rem;
+      letter-spacing: -0.05em;
+      background: linear-gradient(
+        105deg,
+        #c9908d 0%,
+        #e5a9a9 20%,
+        #d4af37 42%,
+        #f5e0a0 52%,
+        #d4af37 62%,
+        #e5a9a9 80%,
+        #c9908d 100%
+      );
+      background-size: 240% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation:
+        brandReveal   0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both,
+        shimmerFlow   6s  linear 1.2s infinite;
+    }
+
+    @keyframes brandReveal {
+      from { transform: translateY(115%); }
+      to   { transform: translateY(0);    }
+    }
+
+    @keyframes shimmerFlow {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
     }
 
     .brand-subtitle {
@@ -1874,8 +1914,11 @@
       header {
         margin-bottom: 2.5rem;
       }
-      .brand-title {
-        font-size: 1.75rem;
+      .brand-cinephile {
+        font-size: 1.1rem;
+      }
+      .brand-diary {
+        font-size: 1.95rem;
       }
       .controls-wrapper {
         padding: 0.6rem 1.25rem;
@@ -2521,8 +2564,10 @@
     <!-- Header Area -->
     <header>
       <div class="brand">
-        <i class="fa-solid fa-wand-magic-sparkles brand-logo"></i>
-        <h1 class="brand-title">Cinephile's <span>Diary</span></h1>
+        <h1 class="brand-title">
+          <span class="brand-clip"><em class="brand-cinephile">Cinephile's</em></span>
+          <span class="brand-clip"><strong class="brand-diary">Diary</strong></span>
+        </h1>
       </div>
       <p class="brand-subtitle">스크린의 모든 여운을 기록하고 탐색하는 시네필 다이어리.</p>
       
