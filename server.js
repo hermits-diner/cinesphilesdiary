@@ -935,8 +935,8 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
         const diffTime = targetDate.getTime() - releaseDate.getTime();
         const diffDays = diffTime / (1000 * 60 * 60 * 24);
         
-        // Exclude future releases or movies older than 365 days relative to targetDt
-        return diffDays >= 0 && diffDays <= 365;
+        // Exclude future releases or movies older than 90 days relative to targetDt (approx. 3 months)
+        return diffDays >= 0 && diffDays <= 90;
       })
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
