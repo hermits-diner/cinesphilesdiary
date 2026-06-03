@@ -924,6 +924,10 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       .filter(movie => !allowedLangs || allowedLangs.includes(movie.original_language))
       .filter(movie => {
         if (!movie.release_date) return false;
+        
+        // Exclude old classic movies (cataloged on TMDB before 2020) that are re-released
+        if (movie.id < 700000) return false;
+
         const releaseDate = new Date(movie.release_date);
         const targetDate = new Date(
           targetDt.slice(0, 4) + '-' + targetDt.slice(4, 6) + '-' + targetDt.slice(6, 8)
