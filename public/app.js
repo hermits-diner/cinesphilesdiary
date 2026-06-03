@@ -107,7 +107,7 @@ function getGenrePlaceholder(genre, movieNm) {
 let activeMovieInfo = null;
 let activeRating = 0; // Selected rating state (1-5 stars)
 let currentNation = 'ALL'; // Nationality filter state ('ALL', 'K', 'F')
-let currentGlobalRegion = 'ALL'; // Global region filter state ('ALL', 'US', 'JP', 'GB', 'FR', 'KR', 'IN', 'DE', 'ES')
+let currentGlobalRegion = 'ALL'; // Global region filter state ('ALL', 'US', 'JP', 'GB', 'FR', 'IN', 'DE', 'ES')
 let currentViewMode = 'BOXOFFICE'; // Main view mode ('BOXOFFICE', 'WEEKLYBOXOFFICE', 'UPCOMING', 'GLOBALTRENDING')
 
 // Calculate which week of the month a date belongs to

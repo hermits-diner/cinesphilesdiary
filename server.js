@@ -857,7 +857,7 @@ function generateBoxOffice(movieId, targetDt, regionKey, index, releaseDate) {
   };
 }
 
-// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR|KR|IN|DE|ES&targetDt=YYYYMMDD
+// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR|IN|DE|ES&targetDt=YYYYMMDD
 app.get('/api/global-trending', checkAuth, async (req, res) => {
   const startTime = Date.now();
   const { region, targetDt } = req.query;
@@ -866,7 +866,7 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
     return res.status(400).json({ error: 'Invalid Date: targetDt parameter must be YYYYMMDD.' });
   }
 
-  const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR', 'KR', 'IN', 'DE', 'ES'];
+  const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR', 'IN', 'DE', 'ES'];
   const regionKey = validRegions.includes(region) ? region : 'ALL';
   const cacheKey = `global_trending_${regionKey}_${targetDt}`;
   const cachedData = apiCache.get(cacheKey);
@@ -889,7 +889,6 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
     'FR': ['fr', 'en'],
     'DE': ['de', 'en'],
     'ES': ['es', 'en'],
-    'KR': ['ko', 'en'],
     'IN': ['hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa', 'gu', 'en']
   };
 
