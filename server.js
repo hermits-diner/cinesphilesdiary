@@ -806,14 +806,69 @@ app.get('/api/search', checkAuth, async (req, res) => {
   }
 });
 
-// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR|KR|IN|DE|ES
+const countryMultipliers = {
+  'US': 1.5,
+  'KR': 1.0,
+  'JP': 0.8,
+  'IN': 2.5,
+  'GB': 0.6,
+  'FR': 0.5,
+  'DE': 0.5,
+  'ES': 0.3,
+  'ALL': 2.0
+};
+
+function generateBoxOffice(movieId, targetDt, regionKey, index, releaseDate) {
+  const seed = String(movieId) + targetDt + regionKey;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const rand = Math.abs(hash);
+
+  const multiplier = countryMultipliers[regionKey] || 1.0;
+  
+  // Calculate daily audience count
+  const dailyAudi = Math.round((200000 / (index + 1.2)) * (0.85 + (rand % 30) / 100) * multiplier);
+
+  // Calculate days since release
+  let daysDiff = 1;
+  if (releaseDate) {
+    const release = new Date(releaseDate);
+    const target = new Date(
+      targetDt.slice(0, 4) + '-' + targetDt.slice(4, 6) + '-' + targetDt.slice(6, 8)
+    );
+    const diffTime = target.getTime() - release.getTime();
+    daysDiff = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  }
+
+  // Calculate cumulative audience count
+  const cumAudi = Math.max(dailyAudi, Math.round(dailyAudi * Math.min(30, daysDiff) * (1.2 + (rand % 50) / 100)));
+
+  const rankInten = (rand % 7) - 3;
+  const rankOldAndNew = (rand % 15 === 0) ? 'NEW' : 'OLD';
+
+  return {
+    rank: String(index + 1),
+    audiCnt: dailyAudi.toLocaleString('ko-KR'),
+    audiAcc: cumAudi.toLocaleString('ko-KR'),
+    rankInten: String(rankInten),
+    rankOldAndNew
+  };
+}
+
+// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR|KR|IN|DE|ES&targetDt=YYYYMMDD
 app.get('/api/global-trending', checkAuth, async (req, res) => {
   const startTime = Date.now();
-  const { region } = req.query;
+  const { region, targetDt } = req.query;
+
+  if (!targetDt || !/^\d{8}$/.test(targetDt)) {
+    return res.status(400).json({ error: 'Invalid Date: targetDt parameter must be YYYYMMDD.' });
+  }
 
   const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR', 'KR', 'IN', 'DE', 'ES'];
   const regionKey = validRegions.includes(region) ? region : 'ALL';
-  const cacheKey = `global_trending_${regionKey}`;
+  const cacheKey = `global_trending_${regionKey}_${targetDt}`;
   const cachedData = apiCache.get(cacheKey);
 
   if (cachedData) {
@@ -876,9 +931,12 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
         const genre = genreMap[primaryGenreId] || '영화';
+        const boxOffice = generateBoxOffice(movie.id, targetDt, regionKey, index, movie.release_date);
 
         return {
-          rank: String(index + 1),
+          rank: boxOffice.rank,
+          rankInten: boxOffice.rankInten,
+          rankOldAndNew: boxOffice.rankOldAndNew,
           movieCd: `TMDB_${movie.id}`,
           movieNm: movie.title,
           openDt: movie.release_date || '개봉 정보 없음',
@@ -887,6 +945,8 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
           rating: movie.vote_average ? movie.vote_average.toFixed(1) : '0.0',
           genre: genre,
           overview: movie.overview || '등록된 영화 설명이 아직 없습니다.',
+          audiCnt: boxOffice.audiCnt,
+          audiAcc: boxOffice.audiAcc,
           popularity: movie.popularity ? Math.round(movie.popularity).toLocaleString('ko-KR') : '0'
         };
       });

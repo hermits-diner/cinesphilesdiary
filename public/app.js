@@ -267,6 +267,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         loadBoxOfficeData(e.target.value, currentNation);
       } else if (currentViewMode === 'WEEKLYBOXOFFICE') {
         loadWeeklyBoxOfficeData(e.target.value, currentNation);
+      } else if (currentViewMode === 'GLOBALTRENDING') {
+        loadGlobalTrendingData(currentGlobalRegion, e.target.value);
       }
     });
   }
@@ -412,7 +414,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         if (nationTabsContainer) nationTabsContainer.style.display = 'none';
         if (globalNationTabsContainer) globalNationTabsContainer.style.display = '';
-        if (currentDateTitle) currentDateTitle.style.display = 'none';
+        if (currentDateTitle) {
+          currentDateTitle.style.display = '';
+          currentDateTitle.textContent = formatKoreanDate(dateInput.value);
+        }
         if (mainSectionIcon) {
           mainSectionIcon.className = 'fa-solid fa-earth-americas';
         }
@@ -420,7 +425,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           mainSectionText.textContent = '글로벌 인기 영화';
         }
 
-        loadGlobalTrendingData(currentGlobalRegion);
+        loadGlobalTrendingData(currentGlobalRegion, dateInput.value);
       });
     }
   }
@@ -1538,11 +1543,21 @@ async function loadUpcomingMovies() {
 }
 
 // 2.7. Fetch and Render Global Trending & Popular Charts
-async function loadGlobalTrendingData(region = currentGlobalRegion) {
+async function loadGlobalTrendingData(region = currentGlobalRegion, dateStr = dateInput ? dateInput.value : getYesterdayDateString()) {
+  if (!dateStr) return;
+  
+  if (currentViewMode === 'GLOBALTRENDING') {
+    const formattedTitleDate = formatKoreanDate(dateStr);
+    currentDateTitle.textContent = formattedTitleDate;
+    currentDateTitle.style.display = '';
+  }
+
   renderSkeletons();
   
+  const targetDt = dateStr.replace(/-/g, '');
+  
   try {
-    const response = await fetch(`${BACKEND_BASE}/api/global-trending?region=${region}`, {
+    const response = await fetch(`${BACKEND_BASE}/api/global-trending?region=${region}&targetDt=${targetDt}`, {
       method: 'GET',
       headers: API_HEADERS
     });
@@ -1588,6 +1603,20 @@ function renderGlobalTrendingList(moviesList) {
     const isTopThree = rank <= 3;
     const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
     
+    // Determine rank movement styling
+    let rankChangeHtml = '';
+    const rankInten = parseInt(movie.rankInten, 10);
+    
+    if (movie.rankOldAndNew === 'NEW') {
+      rankChangeHtml = `<span class="rank-change rank-new">NEW</span>`;
+    } else if (rankInten > 0) {
+      rankChangeHtml = `<span class="rank-change rank-up"><i class="fa-solid fa-caret-up"></i> ${rankInten}</span>`;
+    } else if (rankInten < 0) {
+      rankChangeHtml = `<span class="rank-change rank-down"><i class="fa-solid fa-caret-down"></i> ${Math.abs(rankInten)}</span>`;
+    } else {
+      rankChangeHtml = `<span class="rank-change rank-same"><i class="fa-solid fa-minus"></i></span>`;
+    }
+    
     let posterHtml = '';
     if (movie.poster) {
       posterHtml = `<img src="${escapeHtml(movie.poster)}" class="movie-poster-bg" alt="" aria-hidden="true" loading="lazy"><img src="${escapeHtml(movie.poster)}" class="movie-poster" alt="${escapeHtml(movie.movieNm)}" loading="lazy">`;
@@ -1628,14 +1657,15 @@ function renderGlobalTrendingList(moviesList) {
             <span>개봉일: ${formatOpenDate(movie.openDt)}</span>
           </div>
           <div class="movie-meta-item">
-            <i class="fa-solid fa-fire" style="color: var(--color-primary);"></i>
-            <span>인기 지수: ${movie.popularity}</span>
+            <i class="fa-solid fa-users"></i>
+            <span>당일: ${movie.audiCnt} 명</span>
           </div>
-          <div class="movie-meta-item" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.45; margin-top: 0.6rem; height: 2.9em;">
-            <span style="font-style: italic; color: rgba(255,255,255,0.15); font-family: Georgia, serif; font-size: 1.1rem; line-height: 0; vertical-align: bottom; margin-right: 2px;">“</span>
-            <span>${movie.overview || '이 영화에 대한 풍부한 줄거리 정보가 아직 등록되지 않았습니다.'}</span>
+          <div class="movie-meta-item">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span>누적: ${movie.audiAcc} 명</span>
           </div>
         </div>
+        ${rankChangeHtml}
         <div class="unified-booking-container">
           <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
             <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
