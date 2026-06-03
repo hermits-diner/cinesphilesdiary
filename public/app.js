@@ -1954,12 +1954,16 @@ async function openMovieDetails(movieCd, movieNm) {
     const targetTrailerContainer = document.getElementById('modalTrailerContainer');
     const targetTrailerFrame = document.getElementById('modalTrailerFrame');
     
+    const isForeign = data.movieNmEn && data.movieNmEn !== 'Movie Details' && data.movieNmEn !== data.movieNm;
+    const ytQuery = isForeign ? data.movieNmEn : data.movieNm;
+    const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQuery)}`;
+
     if (data.trailerKey && targetTrailerFrame) {
       if (trailerFrameWrap) trailerFrameWrap.style.display = 'block';
       if (trailerFallback) trailerFallback.style.display = 'none';
       targetTrailerFrame.src = `https://www.youtube.com/embed/${data.trailerKey}?autoplay=0&rel=0`;
       if (trailerDirectBtn) {
-        trailerDirectBtn.href = `https://www.youtube.com/watch?v=${encodeURIComponent(data.trailerKey)}`;
+        trailerDirectBtn.href = ytSearchUrl;
         trailerDirectBtn.style.display = 'inline-flex';
       }
       if (targetTrailerContainer) targetTrailerContainer.style.display = 'block';
@@ -1970,7 +1974,7 @@ async function openMovieDetails(movieCd, movieNm) {
         trailerFallback.style.display = 'flex';
         // Set dynamic search URL for search results
         if (trailerYoutubeBtn) {
-          trailerYoutubeBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(data.movieNm + ' 공식 예고편')}`;
+          trailerYoutubeBtn.href = ytSearchUrl;
         }
       }
       if (trailerDirectBtn) {
