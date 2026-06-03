@@ -2695,6 +2695,18 @@
             <stop offset="0%"   stop-color="#e5a9a9" stop-opacity="0"/>
             <stop offset="100%" stop-color="#d4af37" stop-opacity="0.22"/>
           </linearGradient>
+          <!-- 3D Ray: bright golden-white highlight for screen corners -->
+          <linearGradient id="g-ray" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"   stop-color="#fff" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#fffdf0" stop-opacity="0.45"/>
+          </linearGradient>
+          <!-- Lens: intense projector bulb glow at the rear -->
+          <radialGradient id="g-lens" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#ffffff"/>
+            <stop offset="25%"  stop-color="#fff3d1" stop-opacity="0.9"/>
+            <stop offset="60%"  stop-color="#e5a9a9" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#e5a9a9" stop-opacity="0"/>
+          </radialGradient>
           <!-- Seats: dark wine -->
           <linearGradient id="g-sF" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stop-color="#3d1520"/>
@@ -2802,6 +2814,13 @@
 
         <!-- 6. Projector beam: projects from rear booth (bottom) to fill rectangular screen (top) -->
         <polygon class="cinema-beam-poly" points="720,920 280,383 280,55 1160,55 1160,383" fill="url(#g-beam)"/>
+        <!-- 3D volumetric edge rays targeting the four corners of the screen -->
+        <polygon class="cinema-beam-poly" points="720,920 280,55 285,65" fill="url(#g-ray)"/>
+        <polygon class="cinema-beam-poly" points="720,920 1160,55 1155,65" fill="url(#g-ray)"/>
+        <polygon class="cinema-beam-poly" points="720,920 280,383 290,380" fill="url(#g-ray)"/>
+        <polygon class="cinema-beam-poly" points="720,920 1160,383 1150,380" fill="url(#g-ray)"/>
+        <!-- Rear projector lens glow source -->
+        <circle cx="720" cy="920" r="16" fill="url(#g-lens)"/>
 
         <!-- 7. Floor between screen and first seats (reduced gap) -->
         <rect x="0" y="396" width="1440" height="65" fill="#09070e"/>
