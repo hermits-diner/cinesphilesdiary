@@ -923,10 +923,16 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       .filter(movie => movie.title && movie.poster_path)
       .filter(movie => !allowedLangs || allowedLangs.includes(movie.original_language))
       .filter(movie => {
-        if (regionKey === 'ALL') return true;
         if (!movie.release_date) return false;
-        const year = parseInt(movie.release_date.slice(0, 4), 10);
-        return year >= 2025;
+        const releaseDate = new Date(movie.release_date);
+        const targetDate = new Date(
+          targetDt.slice(0, 4) + '-' + targetDt.slice(4, 6) + '-' + targetDt.slice(6, 8)
+        );
+        const diffTime = targetDate.getTime() - releaseDate.getTime();
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        
+        // Exclude future releases or movies older than 365 days relative to targetDt
+        return diffDays >= 0 && diffDays <= 365;
       })
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
