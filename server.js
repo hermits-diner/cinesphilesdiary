@@ -867,6 +867,12 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
     const formattedList = rawList
       .filter(movie => movie.title && movie.poster_path)
       .filter(movie => !allowedLangs || allowedLangs.includes(movie.original_language))
+      .filter(movie => {
+        if (regionKey === 'ALL') return true;
+        if (!movie.release_date) return false;
+        const year = parseInt(movie.release_date.slice(0, 4), 10);
+        return year >= 2025;
+      })
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
         const genre = genreMap[primaryGenreId] || '영화';
