@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,12 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=Parisienne&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=Parisienne&display=swap"
+    rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Inline modal interaction fallbacks for instant responsiveness and caching survival -->
   <script>
     function openCineDiary() {
@@ -32,7 +35,7 @@
       }
     }
   </script>
-  
+
   <style>
     /* Design Tokens & Variables */
     :root {
@@ -41,23 +44,28 @@
       --bg-modal: rgba(16, 14, 21, 0.88);
       --border-glow: rgba(229, 169, 169, 0.18);
       --border-glow-hover: rgba(229, 169, 169, 0.38);
-      
-      --color-primary: #e5a9a9; /* Soft Rosegold */
-      --color-secondary: #d4af37; /* Antique Gold */
-      --color-accent: #b38cb4; /* Soft Mauve Lavender */
-      --color-text-main: #fdfbf7; /* Warm Cream Paper */
-      --color-text-muted: #c3bcca; /* Lightened for WCAG AA contrast on dark bg */
-      
+
+      --color-primary: #e5a9a9;
+      /* Soft Rosegold */
+      --color-secondary: #d4af37;
+      /* Antique Gold */
+      --color-accent: #b38cb4;
+      /* Soft Mauve Lavender */
+      --color-text-main: #fdfbf7;
+      /* Warm Cream Paper */
+      --color-text-muted: #c3bcca;
+      /* Lightened for WCAG AA contrast on dark bg */
+
       --gradient-gold: linear-gradient(135deg, #d4af37 0%, #b48a1c 100%);
       --gradient-silver: linear-gradient(135deg, #a39ca8 0%, #766e7c 100%);
       --gradient-bronze: linear-gradient(135deg, #b45309 0%, #78350f 100%);
       --gradient-primary: linear-gradient(135deg, #e5a9a9 0%, #b38cb4 100%);
       --gradient-neon: linear-gradient(135deg, #e5a9a9 0%, #d4af37 100%);
       --gradient-dark: linear-gradient(180deg, #16131c 0%, #0c0b11 100%);
-      
+
       --font-outfit: 'Outfit', 'Noto Sans KR', sans-serif;
       --font-inter: 'Inter', 'Noto Sans KR', sans-serif;
-      
+
       --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
       --shadow-neon: 0 0 20px rgba(229, 169, 169, 0.18);
       --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,6 +88,7 @@
 
     /* Accessibility: respect users who prefer reduced motion */
     @media (prefers-reduced-motion: reduce) {
+
       *,
       *::before,
       *::after {
@@ -88,6 +97,7 @@
         transition-duration: 0.001ms !important;
         scroll-behavior: auto !important;
       }
+
       .movie-card:hover {
         transform: none;
       }
@@ -95,7 +105,7 @@
 
     body {
       background-color: var(--bg-dark);
-      background-image: 
+      background-image:
         radial-gradient(at 10% 20%, rgba(229, 169, 169, 0.18) 0px, transparent 50%),
         radial-gradient(at 90% 80%, rgba(212, 175, 55, 0.1) 0px, transparent 50%),
         radial-gradient(at 50% 50%, rgba(179, 140, 180, 0.1) 0px, transparent 50%);
@@ -111,13 +121,16 @@
     ::-webkit-scrollbar {
       width: 8px;
     }
+
     ::-webkit-scrollbar-track {
       background: var(--bg-dark);
     }
+
     ::-webkit-scrollbar-thumb {
       background: rgba(229, 169, 169, 0.3);
       border-radius: 4px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(229, 169, 169, 0.5);
     }
@@ -149,12 +162,31 @@
     }
 
     @keyframes beamFlicker {
-      0%, 100% { opacity: 1;    }
-      18%      { opacity: 0.65; }
-      34%      { opacity: 1;    }
-      58%      { opacity: 0.75; }
-      74%      { opacity: 1;    }
-      88%      { opacity: 0.85; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      18% {
+        opacity: 0.65;
+      }
+
+      34% {
+        opacity: 1;
+      }
+
+      58% {
+        opacity: 0.75;
+      }
+
+      74% {
+        opacity: 1;
+      }
+
+      88% {
+        opacity: 0.85;
+      }
     }
 
     /* Floating dust particles */
@@ -177,15 +209,34 @@
     }
 
     @keyframes particleDrift {
-      0%   { transform: translateY(0)      translateX(0);         opacity: 0;         }
-      8%   {                                                        opacity: var(--op); }
-      92%  {                                                        opacity: var(--op); }
-      100% { transform: translateY(-100vh) translateX(var(--dx)); opacity: 0;         }
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+
+      8% {
+        opacity: var(--op);
+      }
+
+      92% {
+        opacity: var(--op);
+      }
+
+      100% {
+        transform: translateY(-100vh) translateX(var(--dx));
+        opacity: 0;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .cinema-beam-poly         { animation: none !important; opacity: 0.6; }
-      .cinema-particles span    { display: none !important; }
+      .cinema-beam-poly {
+        animation: none !important;
+        opacity: 0.6;
+      }
+
+      .cinema-particles span {
+        display: none !important;
+      }
     }
 
     /* Layout & Header */
@@ -266,33 +317,41 @@
       font-weight: 900;
       font-size: 3.6rem;
       letter-spacing: -0.05em;
-      background: linear-gradient(
-        105deg,
-        #c9908d 0%,
-        #e5a9a9 20%,
-        #d4af37 42%,
-        #f5e0a0 52%,
-        #d4af37 62%,
-        #e5a9a9 80%,
-        #c9908d 100%
-      );
+      background: linear-gradient(105deg,
+          #c9908d 0%,
+          #e5a9a9 20%,
+          #d4af37 42%,
+          #f5e0a0 52%,
+          #d4af37 62%,
+          #e5a9a9 80%,
+          #c9908d 100%);
       background-size: 240% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation:
-        brandReveal   0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both,
-        shimmerFlow   6s  linear 1.2s infinite;
+        brandReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both,
+        shimmerFlow 6s linear 1.2s infinite;
     }
 
     @keyframes brandReveal {
-      from { transform: translateY(115%); }
-      to   { transform: translateY(0);    }
+      from {
+        transform: translateY(115%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
     }
 
     @keyframes shimmerFlow {
-      0%   { background-position: 200% center; }
-      100% { background-position: -200% center; }
+      0% {
+        background-position: 200% center;
+      }
+
+      100% {
+        background-position: -200% center;
+      }
     }
 
     .brand-subtitle {
@@ -317,7 +376,8 @@
       transition: var(--transition-smooth);
     }
 
-    .controls-wrapper:focus-within, .controls-wrapper:hover {
+    .controls-wrapper:focus-within,
+    .controls-wrapper:hover {
       border-color: var(--color-primary);
       box-shadow: 0 0 25px rgba(229, 169, 169, 0.15);
     }
@@ -352,6 +412,7 @@
       opacity: 0.8;
       transition: var(--transition-smooth);
     }
+
     .date-picker-input::-webkit-calendar-picker-indicator:hover {
       opacity: 1;
       transform: scale(1.1);
@@ -409,7 +470,7 @@
       height: 380px;
       position: relative;
       overflow: hidden;
-      background: rgba(255,255,255,0.02);
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .movie-poster {
@@ -454,7 +515,7 @@
 
     .placeholder-icon {
       font-size: 3rem;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255, 255, 255, 0.4);
       animation: pulse 3s infinite;
     }
 
@@ -463,7 +524,7 @@
       font-size: 1.5rem;
       font-weight: 800;
       color: #ffffff;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     /* Rating Badge on Card */
@@ -505,10 +566,31 @@
       z-index: 5;
     }
 
-    .rank-badge.rank-1 { background: var(--gradient-gold); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-    .rank-badge.rank-2 { background: var(--gradient-silver); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-    .rank-badge.rank-3 { background: var(--gradient-bronze); color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-    .rank-badge.rank-other { background: rgba(9, 10, 15, 0.75); backdrop-filter: blur(6px); border-right: 1px solid var(--border-glow); border-bottom: 1px solid var(--border-glow); color: var(--color-text-main); }
+    .rank-badge.rank-1 {
+      background: var(--gradient-gold);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .rank-badge.rank-2 {
+      background: var(--gradient-silver);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .rank-badge.rank-3 {
+      background: var(--gradient-bronze);
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .rank-badge.rank-other {
+      background: rgba(9, 10, 15, 0.75);
+      backdrop-filter: blur(6px);
+      border-right: 1px solid var(--border-glow);
+      border-bottom: 1px solid var(--border-glow);
+      color: var(--color-text-main);
+    }
 
     /* Card Details */
     .movie-header-info {
@@ -568,14 +650,29 @@
       width: fit-content;
     }
 
-    .rank-up { color: #f43f5e; }
-    .rank-down { color: #3b82f6; }
-    .rank-same { color: var(--color-text-muted); }
-    .rank-new { background: linear-gradient(135deg, #b38cb4 0%, #8c6a8d 100%); color: #ffffff; font-size: 0.75rem; border-radius: 8px; text-transform: uppercase; }
+    .rank-up {
+      color: #f43f5e;
+    }
+
+    .rank-down {
+      color: #3b82f6;
+    }
+
+    .rank-same {
+      color: var(--color-text-muted);
+    }
+
+    .rank-new {
+      background: linear-gradient(135deg, #b38cb4 0%, #8c6a8d 100%);
+      color: #ffffff;
+      font-size: 0.75rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
 
     /* Skeletons */
     .skeleton {
-      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
       background-size: 200% 100%;
       animation: loading-shimmer 1.5s infinite;
       border-radius: 8px;
@@ -593,15 +690,47 @@
       padding-bottom: 1.25rem;
     }
 
-    .skeleton-badge { width: 54px; height: 54px; border-bottom-right-radius: 24px; position: absolute; top:0; left:0; }
-    .skeleton-poster { width: 100%; height: 380px; }
-    .skeleton-title { width: 75%; height: 24px; margin: 1.25rem 1.25rem 0.5rem 1.25rem; }
-    .skeleton-text { width: 50%; height: 16px; margin: 0 1.25rem 0.5rem 1.25rem; }
-    .skeleton-btn { width: calc(100% - 2.5rem); height: 38px; margin: 1rem 1.25rem 0 1.25rem; border-radius: 12px; }
+    .skeleton-badge {
+      width: 54px;
+      height: 54px;
+      border-bottom-right-radius: 24px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .skeleton-poster {
+      width: 100%;
+      height: 380px;
+    }
+
+    .skeleton-title {
+      width: 75%;
+      height: 24px;
+      margin: 1.25rem 1.25rem 0.5rem 1.25rem;
+    }
+
+    .skeleton-text {
+      width: 50%;
+      height: 16px;
+      margin: 0 1.25rem 0.5rem 1.25rem;
+    }
+
+    .skeleton-btn {
+      width: calc(100% - 2.5rem);
+      height: 38px;
+      margin: 1rem 1.25rem 0 1.25rem;
+      border-radius: 12px;
+    }
 
     @keyframes loading-shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
     }
 
     /* Modal Overlay */
@@ -664,8 +793,8 @@
       transform: scale(1.05);
       z-index: 1;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 100%);
     }
 
     /* Modal Header */
@@ -711,7 +840,7 @@
 
     .modal-poster-placeholder i {
       font-size: 2rem;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.6);
     }
 
     .modal-close-btn {
@@ -824,7 +953,8 @@
       position: relative;
       width: 100%;
       height: 0;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      padding-bottom: 56.25%;
+      /* 16:9 aspect ratio */
       border-radius: 20px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -975,9 +1105,11 @@
       margin-top: 0.5rem;
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
     }
+
     a.btn-youtube {
       background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
     }
+
     a.btn-youtube:hover {
       background: linear-gradient(135deg, #f55757 0%, #c81e1e 100%);
     }
@@ -1078,7 +1210,7 @@
     /* Toast Notifications */
     .toast-container {
       position: fixed;
-      bottom: 2rem;
+      bottom: 6.2rem;
       right: 2rem;
       z-index: 1000;
       display: flex;
@@ -1093,7 +1225,7 @@
       border-radius: 16px;
       padding: 1rem 1.25rem;
       width: 320px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
@@ -1111,9 +1243,17 @@
       margin-top: 0.1rem;
     }
 
-    .toast-success .toast-icon { color: var(--color-secondary); }
-    .toast-error .toast-icon { color: var(--color-accent); }
-    .toast-info .toast-icon { color: var(--color-primary); }
+    .toast-success .toast-icon {
+      color: var(--color-secondary);
+    }
+
+    .toast-error .toast-icon {
+      color: var(--color-accent);
+    }
+
+    .toast-info .toast-icon {
+      color: var(--color-primary);
+    }
 
     .toast-content {
       display: flex;
@@ -1136,29 +1276,66 @@
 
     /* Keyframes Animations */
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
     }
 
     @keyframes fadeInUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes dots {
-      0%, 20% { content: ''; }
-      40% { content: '.'; }
-      60% { content: '..'; }
-      80%, 100% { content: '...'; }
+
+      0%,
+      20% {
+        content: '';
+      }
+
+      40% {
+        content: '.';
+      }
+
+      60% {
+        content: '..';
+      }
+
+      80%,
+      100% {
+        content: '...';
+      }
     }
 
     /* Unified Booking Button styling */
@@ -1313,6 +1490,7 @@
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1328,11 +1506,13 @@
       overflow-x: auto;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none; /* Hide scrollbar for Firefox */
+      scrollbar-width: none;
+      /* Hide scrollbar for Firefox */
     }
-    
+
     .space-tabs-header::-webkit-scrollbar {
-      display: none; /* Hide scrollbar for Chrome/Safari */
+      display: none;
+      /* Hide scrollbar for Chrome/Safari */
     }
 
     .space-tab-btn {
@@ -1422,6 +1602,7 @@
       flex-direction: column;
       position: relative;
     }
+
     .ticket-poster {
       height: 185px;
       overflow: hidden;
@@ -1432,7 +1613,7 @@
       justify-content: center;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
     }
-    
+
     .ticket-poster-img {
       width: 100%;
       height: 100%;
@@ -1441,11 +1622,11 @@
       z-index: 2;
       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .ticket-poster:hover .ticket-poster-img {
       transform: scale(1.05);
     }
-    
+
     .ticket-poster-overlay {
       position: absolute;
       bottom: 0;
@@ -1455,7 +1636,7 @@
       background: linear-gradient(to top, rgba(9, 10, 15, 0.95) 0%, rgba(9, 10, 15, 0) 100%);
       pointer-events: none;
     }
-    
+
     .ticket-poster-placeholder-icon {
       font-size: 3.5rem;
       color: rgba(255, 255, 255, 0.05);
@@ -1486,20 +1667,28 @@
     }
 
     /* Punched Stub Circles on the sides (음영 및 로즈골드 테두리로 시인성 극대화) */
-    .ticket-header::before, .ticket-header::after {
+    .ticket-header::before,
+    .ticket-header::after {
       content: '';
       position: absolute;
       width: 14px;
       height: 14px;
-      background-color: #0c0b11; /* matches modal card background */
+      background-color: #0c0b11;
+      /* matches modal card background */
       border-radius: 50%;
       bottom: -7px;
       z-index: 10;
       border: 1.5px solid rgba(229, 169, 169, 0.35);
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
     }
-    .ticket-header::before { left: -8px; }
-    .ticket-header::after { right: -8px; }
+
+    .ticket-header::before {
+      left: -8px;
+    }
+
+    .ticket-header::after {
+      right: -8px;
+    }
 
     .ticket-logo {
       font-family: var(--font-outfit);
@@ -1585,11 +1774,27 @@
       height: 100%;
       width: 1px;
     }
-    .barcode-line.thick-1 { width: 3px; }
-    .barcode-line.thick-2 { width: 4px; }
-    .barcode-line.thin { width: 1px; opacity: 0.7; }
-    .barcode-line.space-thin { margin-right: 2px; }
-    .barcode-line.space-thick { margin-right: 4px; }
+
+    .barcode-line.thick-1 {
+      width: 3px;
+    }
+
+    .barcode-line.thick-2 {
+      width: 4px;
+    }
+
+    .barcode-line.thin {
+      width: 1px;
+      opacity: 0.7;
+    }
+
+    .barcode-line.space-thin {
+      margin-right: 2px;
+    }
+
+    .barcode-line.space-thick {
+      margin-right: 4px;
+    }
 
     .ticket-serial {
       font-family: monospace;
@@ -1653,6 +1858,7 @@
     select.space-input {
       background-color: var(--bg-dark);
     }
+
     select.space-input option {
       background-color: var(--bg-dark);
       color: #fff;
@@ -1713,6 +1919,7 @@
     .space-ticket-carousel::-webkit-scrollbar {
       height: 6px;
     }
+
     .space-ticket-carousel::-webkit-scrollbar-thumb {
       background: rgba(212, 175, 55, 0.2);
       border-radius: 3px;
@@ -1724,6 +1931,7 @@
       transition: var(--transition-smooth);
       position: relative;
     }
+
     .carousel-stub-item:hover {
       transform: scale(1.0);
     }
@@ -1790,6 +1998,7 @@
       font-weight: 700;
       color: var(--color-text-muted);
     }
+
     .emotion-btn.active .emotion-btn-desc {
       color: var(--color-secondary);
     }
@@ -1808,7 +2017,8 @@
     .diary-feed-card {
       background: #ffffff !important;
       border: 1px solid rgba(0, 0, 0, 0.06) !important;
-      padding: 1.35rem 1.35rem 2.25rem 1.35rem !important; /* Thick bottom margin for polaroid vibe */
+      padding: 1.35rem 1.35rem 2.25rem 1.35rem !important;
+      /* Thick bottom margin for polaroid vibe */
       border-radius: 24px !important;
       position: relative;
       transition: var(--transition-spring);
@@ -1816,7 +2026,7 @@
       flex-direction: column;
       gap: 0.65rem;
       color: #1f1f2e !important;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255,255,255,0.1);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
     }
 
     .diary-feed-card:hover {
@@ -1885,19 +2095,28 @@
       opacity: 0.5;
       transition: var(--transition-smooth);
     }
+
     .diary-feed-card:hover .diary-delete-btn {
       opacity: 1;
     }
+
     .diary-delete-btn:hover {
       color: var(--color-accent) !important;
     }
 
     /* Elegant Font Bindings & Input Focus System */
-    .review-textarea, #ticketReview, #userReviewInput, #ticketMovieNm, #ticketSeat, #ticketCompanions, #ticketSnacks {
+    .review-textarea,
+    #ticketReview,
+    #userReviewInput,
+    #ticketMovieNm,
+    #ticketSeat,
+    #ticketCompanions,
+    #ticketSnacks {
       font-family: 'Noto Serif KR', 'Inter', Georgia, serif !important;
     }
 
-    .space-input:focus, .review-textarea:focus {
+    .space-input:focus,
+    .review-textarea:focus {
       border-color: var(--color-primary) !important;
       background: rgba(229, 169, 169, 0.03) !important;
       box-shadow: 0 0 15px rgba(229, 169, 169, 0.35) !important;
@@ -2018,41 +2237,52 @@
       .container {
         padding: 1.5rem 1rem 3rem 1rem;
       }
+
       header {
         margin-bottom: 2.5rem;
       }
+
       .screen-stage {
         padding: 1.8rem 1rem 1.4rem;
         width: 96vw;
       }
+
       .brand-cinephile {
         font-size: 1.8rem;
       }
+
       .brand-diary {
         font-size: 2.6rem;
       }
+
       .controls-wrapper {
         padding: 0.6rem 1.25rem;
       }
+
       .modal-card {
         width: 95%;
         border-radius: 20px;
       }
+
       .modal-body {
         padding: 1.25rem 1.25rem 1.5rem 1.25rem;
       }
+
       .spec-grid {
         grid-template-columns: 1fr;
       }
+
       .spec-item.full-width {
         grid-column: span 1;
       }
+
       .toast-container {
         bottom: 1rem;
         right: 1rem;
         left: 1rem;
         width: calc(100% - 2rem);
       }
+
       .toast {
         width: 100%;
       }
@@ -2115,7 +2345,7 @@
       color: #ffffff;
       box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
     }
-    
+
     .boxoffice-filter-btn.active i {
       transform: scale(1.1);
     }
@@ -2221,6 +2451,7 @@
         opacity: 0;
         transform: translateY(-10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -2250,7 +2481,7 @@
       object-fit: cover;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-      background: rgba(255,255,255,0.02);
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .search-info {
@@ -2345,8 +2576,13 @@
     }
 
     @keyframes spotlightFadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     .spotlight-modal {
@@ -2354,14 +2590,21 @@
       background: rgba(16, 14, 22, 0.96);
       border: 1px solid rgba(229, 169, 169, 0.2);
       border-radius: 20px;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255,255,255,0.04);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04);
       overflow: hidden;
       animation: spotlightSlideIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     @keyframes spotlightSlideIn {
-      from { opacity: 0; transform: scale(0.96) translateY(-12px); }
-      to   { opacity: 1; transform: scale(1)    translateY(0);      }
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     .spotlight-input-wrap {
@@ -2502,11 +2745,14 @@
     }
 
     @keyframes projectorBeamPulse {
-      0%, 100% {
+
+      0%,
+      100% {
         opacity: 0.3;
         transform: scale(0.9);
         filter: drop-shadow(0 0 2px rgba(203, 163, 204, 0.3));
       }
+
       50% {
         opacity: 1;
         transform: scale(1.1);
@@ -2572,7 +2818,8 @@
     .coach-metric-bar-fg {
       height: 100%;
       border-radius: 50px;
-      width: 0%; /* Dynamic animation width */
+      width: 0%;
+      /* Dynamic animation width */
       transition: width 1.2s cubic-bezier(0.1, 0.8, 0.25, 1);
     }
 
@@ -2581,10 +2828,12 @@
       background: linear-gradient(90deg, #e5a9a9 0%, #b38cb4 100%);
       box-shadow: 0 0 10px rgba(229, 169, 169, 0.4);
     }
+
     .gauge-gradient-neon {
       background: linear-gradient(90deg, #b38cb4 0%, #e5a9a9 100%);
       box-shadow: 0 0 10px rgba(179, 140, 180, 0.4);
     }
+
     .gauge-gradient-cyber {
       background: linear-gradient(90deg, #e5a9a9 0%, #d4af37 100%);
       box-shadow: 0 0 10px rgba(229, 169, 169, 0.4);
@@ -2623,8 +2872,11 @@
     .contrast-card-before::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(rgba(255,255,255,0.005) 50%, rgba(0,0,0,0.02) 50%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255, 255, 255, 0.005) 50%, rgba(0, 0, 0, 0.02) 50%);
       background-size: 100% 4px;
       pointer-events: none;
       opacity: 0.4;
@@ -2641,8 +2893,11 @@
     .contrast-card-after::after {
       content: '';
       position: absolute;
-      top: -1px; left: -1px; right: -1px; bottom: -1px;
-      background: linear-gradient(135deg, rgba(245,158,11,0.5) 0%, transparent 40%, transparent 60%, rgba(217,119,6,0.4) 100%);
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.5) 0%, transparent 40%, transparent 60%, rgba(217, 119, 6, 0.4) 100%);
       pointer-events: none;
       z-index: 1;
       border-radius: 18px;
@@ -2667,8 +2922,45 @@
       position: relative;
       z-index: 2;
     }
+
+    /* Floating Home Button styling */
+    .floating-home-btn {
+      position: fixed;
+      bottom: 2.2rem;
+      right: 2.2rem;
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background: rgba(24, 20, 29, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(229, 169, 169, 0.22);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(229, 169, 169, 0.1);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .floating-home-btn:hover {
+      background: rgba(41, 33, 49, 0.9);
+      border-color: rgba(229, 169, 169, 0.55);
+      color: #fff;
+      transform: scale(1.12) translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 169, 169, 0.35);
+    }
+
+    .floating-home-btn:active {
+      transform: scale(0.95) translateY(0);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Cinema atmosphere: full hall SVG scene + floating particles -->
@@ -2680,307 +2972,311 @@
         <defs>
           <!-- Cool silver screen: center highlight → deep blue-purple edge -->
           <radialGradient id="g-scrn" cx="50%" cy="42%" r="58%">
-            <stop offset="0%"   stop-color="#fdfaed"/>
-            <stop offset="30%"  stop-color="#dce0f0"/>
-            <stop offset="65%"  stop-color="#605c7a"/>
-            <stop offset="100%" stop-color="#1c1628"/>
+            <stop offset="0%" stop-color="#fdfaed" />
+            <stop offset="30%" stop-color="#dce0f0" />
+            <stop offset="65%" stop-color="#605c7a" />
+            <stop offset="100%" stop-color="#1c1628" />
           </radialGradient>
           <!-- Ambient: warm red spill on ceiling -->
           <radialGradient id="g-amb" cx="50%" cy="0%" r="75%" gradientUnits="userSpaceOnUse" fx="720" fy="44">
-            <stop offset="0%"   stop-color="#801018" stop-opacity="0.25"/>
-            <stop offset="100%" stop-color="#801018" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#801018" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#801018" stop-opacity="0" />
           </radialGradient>
           <!-- Beam: warm rosegold — 유일한 난색 포인트 -->
           <linearGradient id="g-beam" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%"   stop-color="#e5a9a9" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#d4af37" stop-opacity="0.22"/>
+            <stop offset="0%" stop-color="#e5a9a9" stop-opacity="0" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0.22" />
           </linearGradient>
           <!-- 3D Ray: bright golden-white highlight for screen corners -->
           <linearGradient id="g-ray" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%"   stop-color="#fff" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#fffdf0" stop-opacity="0.45"/>
+            <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+            <stop offset="100%" stop-color="#fffdf0" stop-opacity="0.45" />
           </linearGradient>
           <!-- Lens: intense projector bulb glow at the rear -->
           <radialGradient id="g-lens" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stop-color="#ffffff"/>
-            <stop offset="25%"  stop-color="#fff3d1" stop-opacity="0.9"/>
-            <stop offset="60%"  stop-color="#e5a9a9" stop-opacity="0.4"/>
-            <stop offset="100%" stop-color="#e5a9a9" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="25%" stop-color="#fff3d1" stop-opacity="0.9" />
+            <stop offset="60%" stop-color="#e5a9a9" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="#e5a9a9" stop-opacity="0" />
           </radialGradient>
           <!-- Seats: dark wine red -->
           <linearGradient id="g-sF" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#8c1822"/>
-            <stop offset="50%"  stop-color="#540a10"/>
-            <stop offset="100%" stop-color="#240205"/>
+            <stop offset="0%" stop-color="#8c1822" />
+            <stop offset="50%" stop-color="#540a10" />
+            <stop offset="100%" stop-color="#240205" />
           </linearGradient>
           <linearGradient id="g-sB" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#6a0f16"/>
-            <stop offset="50%"  stop-color="#3c060a"/>
-            <stop offset="100%" stop-color="#180103"/>
+            <stop offset="0%" stop-color="#6a0f16" />
+            <stop offset="50%" stop-color="#3c060a" />
+            <stop offset="100%" stop-color="#180103" />
           </linearGradient>
           <!-- Dark burgundy overlay for maximum readability -->
           <linearGradient id="g-over" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#080204" stop-opacity="0.95"/>
-            <stop offset="30%"  stop-color="#080204" stop-opacity="0.80"/>
-            <stop offset="50%"  stop-color="#080204" stop-opacity="0.45"/>
-            <stop offset="70%"  stop-color="#080204" stop-opacity="0.18"/>
-            <stop offset="100%" stop-color="#080204" stop-opacity="0.55"/>
+            <stop offset="0%" stop-color="#080204" stop-opacity="0.95" />
+            <stop offset="30%" stop-color="#080204" stop-opacity="0.80" />
+            <stop offset="50%" stop-color="#080204" stop-opacity="0.45" />
+            <stop offset="70%" stop-color="#080204" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#080204" stop-opacity="0.55" />
           </linearGradient>
           <!-- Clip paths: bound acoustic panels within wall shapes -->
-          <clipPath id="c-lw"><polygon points="0,0 268,44 268,396 0,900"/></clipPath>
-          <clipPath id="c-rw"><polygon points="1440,0 1172,44 1172,396 1440,900"/></clipPath>
+          <clipPath id="c-lw">
+            <polygon points="0,0 268,44 268,396 0,900" />
+          </clipPath>
+          <clipPath id="c-rw">
+            <polygon points="1440,0 1172,44 1172,396 1440,900" />
+          </clipPath>
         </defs>
 
         <!-- 1. Base dark background -->
-        <rect width="1440" height="900" fill="#0c0406"/>
+        <rect width="1440" height="900" fill="#0c0406" />
 
         <!-- 2. Ceiling glow from screen -->
-        <rect width="1440" height="520" fill="url(#g-amb)"/>
+        <rect width="1440" height="520" fill="url(#g-amb)" />
 
         <!-- 3. Side walls + acoustic panels -->
 
         <!-- Left wall base -->
-        <polygon points="0,0 268,44 268,396 0,900" fill="#1f0508"/>
+        <polygon points="0,0 268,44 268,396 0,900" fill="#1f0508" />
 
         <!-- Left wall: acoustic panels (3 cols × 3 rows, clipped to wall) -->
         <g clip-path="url(#c-lw)">
           <!-- Structural column dividers -->
-          <line x1="90"  y1="44" x2="90"  y2="396" stroke="#0e0204" stroke-width="4"/>
-          <line x1="180" y1="44" x2="180" y2="396" stroke="#0e0204" stroke-width="4"/>
+          <line x1="90" y1="44" x2="90" y2="396" stroke="#0e0204" stroke-width="4" />
+          <line x1="180" y1="44" x2="180" y2="396" stroke="#0e0204" stroke-width="4" />
 
           <!-- Col A (inner, x=192) — shadow then panel -->
-          <rect x="194" y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="192" y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="194" y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="192" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="194" y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="192" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="194" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="192" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="194" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="192" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="194" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="192" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
 
           <!-- Col B (mid, x=102) -->
-          <rect x="104" y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="102" y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="104" y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="102" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="104" y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="102" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="104" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="102" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="104" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="102" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="104" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="102" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
 
           <!-- Col C (outer, x=12) -->
-          <rect x="14"  y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="12"  y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="14"  y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="12"  y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="14"  y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="12"  y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="14" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="12" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="14" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="12" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="14" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="12" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
         </g>
 
         <!-- Right wall base -->
-        <polygon points="1440,0 1172,44 1172,396 1440,900" fill="#1f0508"/>
+        <polygon points="1440,0 1172,44 1172,396 1440,900" fill="#1f0508" />
 
         <!-- Right wall: acoustic panels (mirrored) -->
         <g clip-path="url(#c-rw)">
           <!-- Structural column dividers -->
-          <line x1="1350" y1="44" x2="1350" y2="396" stroke="#0e0204" stroke-width="4"/>
-          <line x1="1260" y1="44" x2="1260" y2="396" stroke="#0e0204" stroke-width="4"/>
+          <line x1="1350" y1="44" x2="1350" y2="396" stroke="#0e0204" stroke-width="4" />
+          <line x1="1260" y1="44" x2="1260" y2="396" stroke="#0e0204" stroke-width="4" />
 
           <!-- Col A (inner, x=1190) -->
-          <rect x="1188" y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1186" y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1188" y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1186" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1188" y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1186" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="1188" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1186" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1188" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1186" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1188" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1186" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
 
           <!-- Col B (mid, x=1280) -->
-          <rect x="1278" y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1276" y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1278" y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1276" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1278" y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1276" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="1278" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1276" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1278" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1276" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1278" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1276" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
 
           <!-- Col C (outer, x=1370) -->
-          <rect x="1368" y="60"  width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1366" y="58"  width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1368" y="162" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1366" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
-          <rect x="1368" y="264" width="58" height="88" fill="#090102" rx="2"/>
-          <rect x="1366" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2"/>
+          <rect x="1368" y="60" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1366" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1368" y="162" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1366" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1368" y="264" width="58" height="88" fill="#090102" rx="2" />
+          <rect x="1366" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
         </g>
 
         <!-- 4. Screen frame -->
-        <rect x="268" y="44" width="904" height="352" fill="#070509" rx="3"/>
+        <rect x="268" y="44" width="904" height="352" fill="#070509" rx="3" />
 
         <!-- 4.1 Stage Spotlights (recessed lights at the top of the frame) -->
         <g opacity="0.85">
-          <circle cx="380" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="380" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="490" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="490" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="600" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="600" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="710" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="710" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="820" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="820" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="930" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="930" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
-          <circle cx="1040" cy="48" r="3" fill="#ffffff"/>
-          <circle cx="1040" cy="48" r="8" fill="#ffd899" opacity="0.4"/>
+          <circle cx="380" cy="48" r="3" fill="#ffffff" />
+          <circle cx="380" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="490" cy="48" r="3" fill="#ffffff" />
+          <circle cx="490" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="600" cy="48" r="3" fill="#ffffff" />
+          <circle cx="600" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="710" cy="48" r="3" fill="#ffffff" />
+          <circle cx="710" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="820" cy="48" r="3" fill="#ffffff" />
+          <circle cx="820" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="930" cy="48" r="3" fill="#ffffff" />
+          <circle cx="930" cy="48" r="8" fill="#ffd899" opacity="0.4" />
+          <circle cx="1040" cy="48" r="3" fill="#ffffff" />
+          <circle cx="1040" cy="48" r="8" fill="#ffd899" opacity="0.4" />
         </g>
 
         <!-- 5. Screen (warm glow) -->
-        <rect x="280" y="55" width="880" height="328" fill="url(#g-scrn)" rx="2"/>
+        <rect x="280" y="55" width="880" height="328" fill="url(#g-scrn)" rx="2" />
 
 
 
         <!-- 7. Floor between screen and first seats (reduced gap) -->
-        <rect x="0" y="396" width="1440" height="65" fill="#09070e"/>
+        <rect x="0" y="396" width="1440" height="65" fill="#09070e" />
 
         <!-- 8+9. Seats shifted up 50px to close gap with screen -->
         <g transform="translate(0,-50)">
 
-        <!-- 8. Screen light warm wash on front rows -->
-        <rect x="0" y="750" width="1440" height="140" fill="#d4a840" fill-opacity="0.07"/>
+          <!-- 8. Screen light warm wash on front rows -->
+          <rect x="0" y="750" width="1440" height="140" fill="#d4a840" fill-opacity="0.07" />
 
-        <!-- 9. SEAT ROWS — Row 1 (front/largest, y=785) -->
-        <g fill="url(#g-sF)">
-          <rect x="90"   y="785" width="70" height="52" rx="16"/>
-          <rect x="174"  y="785" width="70" height="52" rx="16"/>
-          <rect x="258"  y="785" width="70" height="52" rx="16"/>
-          <rect x="342"  y="785" width="70" height="52" rx="16"/>
-          <rect x="426"  y="785" width="70" height="52" rx="16"/>
-          <rect x="510"  y="785" width="70" height="52" rx="16"/>
-          <rect x="594"  y="785" width="70" height="52" rx="16"/>
-          <rect x="678"  y="785" width="70" height="52" rx="16"/>
-          <rect x="762"  y="785" width="70" height="52" rx="16"/>
-          <rect x="846"  y="785" width="70" height="52" rx="16"/>
-          <rect x="930"  y="785" width="70" height="52" rx="16"/>
-          <rect x="1014" y="785" width="70" height="52" rx="16"/>
-          <rect x="1098" y="785" width="70" height="52" rx="16"/>
-          <rect x="1182" y="785" width="70" height="52" rx="16"/>
-          <rect x="1266" y="785" width="70" height="52" rx="16"/>
-        </g>
+          <!-- 9. SEAT ROWS — Row 1 (front/largest, y=785) -->
+          <g fill="url(#g-sF)">
+            <rect x="90" y="785" width="70" height="52" rx="16" />
+            <rect x="174" y="785" width="70" height="52" rx="16" />
+            <rect x="258" y="785" width="70" height="52" rx="16" />
+            <rect x="342" y="785" width="70" height="52" rx="16" />
+            <rect x="426" y="785" width="70" height="52" rx="16" />
+            <rect x="510" y="785" width="70" height="52" rx="16" />
+            <rect x="594" y="785" width="70" height="52" rx="16" />
+            <rect x="678" y="785" width="70" height="52" rx="16" />
+            <rect x="762" y="785" width="70" height="52" rx="16" />
+            <rect x="846" y="785" width="70" height="52" rx="16" />
+            <rect x="930" y="785" width="70" height="52" rx="16" />
+            <rect x="1014" y="785" width="70" height="52" rx="16" />
+            <rect x="1098" y="785" width="70" height="52" rx="16" />
+            <rect x="1182" y="785" width="70" height="52" rx="16" />
+            <rect x="1266" y="785" width="70" height="52" rx="16" />
+          </g>
 
-        <!-- Row 2 (y=714) -->
-        <g fill="url(#g-sF)">
-          <rect x="158"  y="714" width="59" height="44" rx="14"/>
-          <rect x="229"  y="714" width="59" height="44" rx="14"/>
-          <rect x="300"  y="714" width="59" height="44" rx="14"/>
-          <rect x="371"  y="714" width="59" height="44" rx="14"/>
-          <rect x="442"  y="714" width="59" height="44" rx="14"/>
-          <rect x="513"  y="714" width="59" height="44" rx="14"/>
-          <rect x="584"  y="714" width="59" height="44" rx="14"/>
-          <rect x="655"  y="714" width="59" height="44" rx="14"/>
-          <rect x="726"  y="714" width="59" height="44" rx="14"/>
-          <rect x="797"  y="714" width="59" height="44" rx="14"/>
-          <rect x="868"  y="714" width="59" height="44" rx="14"/>
-          <rect x="939"  y="714" width="59" height="44" rx="14"/>
-          <rect x="1010" y="714" width="59" height="44" rx="14"/>
-          <rect x="1081" y="714" width="59" height="44" rx="14"/>
-          <rect x="1152" y="714" width="59" height="44" rx="14"/>
-          <rect x="1223" y="714" width="59" height="44" rx="14"/>
-        </g>
+          <!-- Row 2 (y=714) -->
+          <g fill="url(#g-sF)">
+            <rect x="158" y="714" width="59" height="44" rx="14" />
+            <rect x="229" y="714" width="59" height="44" rx="14" />
+            <rect x="300" y="714" width="59" height="44" rx="14" />
+            <rect x="371" y="714" width="59" height="44" rx="14" />
+            <rect x="442" y="714" width="59" height="44" rx="14" />
+            <rect x="513" y="714" width="59" height="44" rx="14" />
+            <rect x="584" y="714" width="59" height="44" rx="14" />
+            <rect x="655" y="714" width="59" height="44" rx="14" />
+            <rect x="726" y="714" width="59" height="44" rx="14" />
+            <rect x="797" y="714" width="59" height="44" rx="14" />
+            <rect x="868" y="714" width="59" height="44" rx="14" />
+            <rect x="939" y="714" width="59" height="44" rx="14" />
+            <rect x="1010" y="714" width="59" height="44" rx="14" />
+            <rect x="1081" y="714" width="59" height="44" rx="14" />
+            <rect x="1152" y="714" width="59" height="44" rx="14" />
+            <rect x="1223" y="714" width="59" height="44" rx="14" />
+          </g>
 
-        <!-- Row 3 (y=651) -->
-        <g fill="url(#g-sB)">
-          <rect x="215"  y="651" width="50" height="36" rx="12"/>
-          <rect x="275"  y="651" width="50" height="36" rx="12"/>
-          <rect x="335"  y="651" width="50" height="36" rx="12"/>
-          <rect x="395"  y="651" width="50" height="36" rx="12"/>
-          <rect x="455"  y="651" width="50" height="36" rx="12"/>
-          <rect x="515"  y="651" width="50" height="36" rx="12"/>
-          <rect x="575"  y="651" width="50" height="36" rx="12"/>
-          <rect x="635"  y="651" width="50" height="36" rx="12"/>
-          <rect x="695"  y="651" width="50" height="36" rx="12"/>
-          <rect x="755"  y="651" width="50" height="36" rx="12"/>
-          <rect x="815"  y="651" width="50" height="36" rx="12"/>
-          <rect x="875"  y="651" width="50" height="36" rx="12"/>
-          <rect x="935"  y="651" width="50" height="36" rx="12"/>
-          <rect x="995"  y="651" width="50" height="36" rx="12"/>
-          <rect x="1055" y="651" width="50" height="36" rx="12"/>
-          <rect x="1115" y="651" width="50" height="36" rx="12"/>
-          <rect x="1175" y="651" width="50" height="36" rx="12"/>
-        </g>
+          <!-- Row 3 (y=651) -->
+          <g fill="url(#g-sB)">
+            <rect x="215" y="651" width="50" height="36" rx="12" />
+            <rect x="275" y="651" width="50" height="36" rx="12" />
+            <rect x="335" y="651" width="50" height="36" rx="12" />
+            <rect x="395" y="651" width="50" height="36" rx="12" />
+            <rect x="455" y="651" width="50" height="36" rx="12" />
+            <rect x="515" y="651" width="50" height="36" rx="12" />
+            <rect x="575" y="651" width="50" height="36" rx="12" />
+            <rect x="635" y="651" width="50" height="36" rx="12" />
+            <rect x="695" y="651" width="50" height="36" rx="12" />
+            <rect x="755" y="651" width="50" height="36" rx="12" />
+            <rect x="815" y="651" width="50" height="36" rx="12" />
+            <rect x="875" y="651" width="50" height="36" rx="12" />
+            <rect x="935" y="651" width="50" height="36" rx="12" />
+            <rect x="995" y="651" width="50" height="36" rx="12" />
+            <rect x="1055" y="651" width="50" height="36" rx="12" />
+            <rect x="1115" y="651" width="50" height="36" rx="12" />
+            <rect x="1175" y="651" width="50" height="36" rx="12" />
+          </g>
 
-        <!-- Row 4 (y=597) -->
-        <g fill="url(#g-sB)">
-          <rect x="240"  y="597" width="43" height="29" rx="10"/>
-          <rect x="291"  y="597" width="43" height="29" rx="10"/>
-          <rect x="342"  y="597" width="43" height="29" rx="10"/>
-          <rect x="393"  y="597" width="43" height="29" rx="10"/>
-          <rect x="444"  y="597" width="43" height="29" rx="10"/>
-          <rect x="495"  y="597" width="43" height="29" rx="10"/>
-          <rect x="546"  y="597" width="43" height="29" rx="10"/>
-          <rect x="597"  y="597" width="43" height="29" rx="10"/>
-          <rect x="648"  y="597" width="43" height="29" rx="10"/>
-          <rect x="699"  y="597" width="43" height="29" rx="10"/>
-          <rect x="750"  y="597" width="43" height="29" rx="10"/>
-          <rect x="801"  y="597" width="43" height="29" rx="10"/>
-          <rect x="852"  y="597" width="43" height="29" rx="10"/>
-          <rect x="903"  y="597" width="43" height="29" rx="10"/>
-          <rect x="954"  y="597" width="43" height="29" rx="10"/>
-          <rect x="1005" y="597" width="43" height="29" rx="10"/>
-          <rect x="1056" y="597" width="43" height="29" rx="10"/>
-          <rect x="1107" y="597" width="43" height="29" rx="10"/>
-          <rect x="1158" y="597" width="43" height="29" rx="10"/>
-        </g>
+          <!-- Row 4 (y=597) -->
+          <g fill="url(#g-sB)">
+            <rect x="240" y="597" width="43" height="29" rx="10" />
+            <rect x="291" y="597" width="43" height="29" rx="10" />
+            <rect x="342" y="597" width="43" height="29" rx="10" />
+            <rect x="393" y="597" width="43" height="29" rx="10" />
+            <rect x="444" y="597" width="43" height="29" rx="10" />
+            <rect x="495" y="597" width="43" height="29" rx="10" />
+            <rect x="546" y="597" width="43" height="29" rx="10" />
+            <rect x="597" y="597" width="43" height="29" rx="10" />
+            <rect x="648" y="597" width="43" height="29" rx="10" />
+            <rect x="699" y="597" width="43" height="29" rx="10" />
+            <rect x="750" y="597" width="43" height="29" rx="10" />
+            <rect x="801" y="597" width="43" height="29" rx="10" />
+            <rect x="852" y="597" width="43" height="29" rx="10" />
+            <rect x="903" y="597" width="43" height="29" rx="10" />
+            <rect x="954" y="597" width="43" height="29" rx="10" />
+            <rect x="1005" y="597" width="43" height="29" rx="10" />
+            <rect x="1056" y="597" width="43" height="29" rx="10" />
+            <rect x="1107" y="597" width="43" height="29" rx="10" />
+            <rect x="1158" y="597" width="43" height="29" rx="10" />
+          </g>
 
-        <!-- Row 5 (y=551) -->
-        <g fill="url(#g-sB)">
-          <rect x="272"  y="551" width="36" height="23" rx="8"/>
-          <rect x="315"  y="551" width="36" height="23" rx="8"/>
-          <rect x="358"  y="551" width="36" height="23" rx="8"/>
-          <rect x="401"  y="551" width="36" height="23" rx="8"/>
-          <rect x="444"  y="551" width="36" height="23" rx="8"/>
-          <rect x="487"  y="551" width="36" height="23" rx="8"/>
-          <rect x="530"  y="551" width="36" height="23" rx="8"/>
-          <rect x="573"  y="551" width="36" height="23" rx="8"/>
-          <rect x="616"  y="551" width="36" height="23" rx="8"/>
-          <rect x="659"  y="551" width="36" height="23" rx="8"/>
-          <rect x="702"  y="551" width="36" height="23" rx="8"/>
-          <rect x="745"  y="551" width="36" height="23" rx="8"/>
-          <rect x="788"  y="551" width="36" height="23" rx="8"/>
-          <rect x="831"  y="551" width="36" height="23" rx="8"/>
-          <rect x="874"  y="551" width="36" height="23" rx="8"/>
-          <rect x="917"  y="551" width="36" height="23" rx="8"/>
-          <rect x="960"  y="551" width="36" height="23" rx="8"/>
-          <rect x="1003" y="551" width="36" height="23" rx="8"/>
-          <rect x="1046" y="551" width="36" height="23" rx="8"/>
-          <rect x="1089" y="551" width="36" height="23" rx="8"/>
-          <rect x="1132" y="551" width="36" height="23" rx="8"/>
-        </g>
+          <!-- Row 5 (y=551) -->
+          <g fill="url(#g-sB)">
+            <rect x="272" y="551" width="36" height="23" rx="8" />
+            <rect x="315" y="551" width="36" height="23" rx="8" />
+            <rect x="358" y="551" width="36" height="23" rx="8" />
+            <rect x="401" y="551" width="36" height="23" rx="8" />
+            <rect x="444" y="551" width="36" height="23" rx="8" />
+            <rect x="487" y="551" width="36" height="23" rx="8" />
+            <rect x="530" y="551" width="36" height="23" rx="8" />
+            <rect x="573" y="551" width="36" height="23" rx="8" />
+            <rect x="616" y="551" width="36" height="23" rx="8" />
+            <rect x="659" y="551" width="36" height="23" rx="8" />
+            <rect x="702" y="551" width="36" height="23" rx="8" />
+            <rect x="745" y="551" width="36" height="23" rx="8" />
+            <rect x="788" y="551" width="36" height="23" rx="8" />
+            <rect x="831" y="551" width="36" height="23" rx="8" />
+            <rect x="874" y="551" width="36" height="23" rx="8" />
+            <rect x="917" y="551" width="36" height="23" rx="8" />
+            <rect x="960" y="551" width="36" height="23" rx="8" />
+            <rect x="1003" y="551" width="36" height="23" rx="8" />
+            <rect x="1046" y="551" width="36" height="23" rx="8" />
+            <rect x="1089" y="551" width="36" height="23" rx="8" />
+            <rect x="1132" y="551" width="36" height="23" rx="8" />
+          </g>
 
-        <!-- Row 6 (back/smallest, y=511) -->
-        <g fill="url(#g-sB)" opacity="0.80">
-          <rect x="310"  y="511" width="29" height="17" rx="6"/>
-          <rect x="346"  y="511" width="29" height="17" rx="6"/>
-          <rect x="382"  y="511" width="29" height="17" rx="6"/>
-          <rect x="418"  y="511" width="29" height="17" rx="6"/>
-          <rect x="454"  y="511" width="29" height="17" rx="6"/>
-          <rect x="490"  y="511" width="29" height="17" rx="6"/>
-          <rect x="526"  y="511" width="29" height="17" rx="6"/>
-          <rect x="562"  y="511" width="29" height="17" rx="6"/>
-          <rect x="598"  y="511" width="29" height="17" rx="6"/>
-          <rect x="634"  y="511" width="29" height="17" rx="6"/>
-          <rect x="670"  y="511" width="29" height="17" rx="6"/>
-          <rect x="706"  y="511" width="29" height="17" rx="6"/>
-          <rect x="742"  y="511" width="29" height="17" rx="6"/>
-          <rect x="778"  y="511" width="29" height="17" rx="6"/>
-          <rect x="814"  y="511" width="29" height="17" rx="6"/>
-          <rect x="850"  y="511" width="29" height="17" rx="6"/>
-          <rect x="886"  y="511" width="29" height="17" rx="6"/>
-          <rect x="922"  y="511" width="29" height="17" rx="6"/>
-          <rect x="958"  y="511" width="29" height="17" rx="6"/>
-          <rect x="994"  y="511" width="29" height="17" rx="6"/>
-          <rect x="1030" y="511" width="29" height="17" rx="6"/>
-          <rect x="1066" y="511" width="29" height="17" rx="6"/>
-          <rect x="1102" y="511" width="29" height="17" rx="6"/>
-        </g>
+          <!-- Row 6 (back/smallest, y=511) -->
+          <g fill="url(#g-sB)" opacity="0.80">
+            <rect x="310" y="511" width="29" height="17" rx="6" />
+            <rect x="346" y="511" width="29" height="17" rx="6" />
+            <rect x="382" y="511" width="29" height="17" rx="6" />
+            <rect x="418" y="511" width="29" height="17" rx="6" />
+            <rect x="454" y="511" width="29" height="17" rx="6" />
+            <rect x="490" y="511" width="29" height="17" rx="6" />
+            <rect x="526" y="511" width="29" height="17" rx="6" />
+            <rect x="562" y="511" width="29" height="17" rx="6" />
+            <rect x="598" y="511" width="29" height="17" rx="6" />
+            <rect x="634" y="511" width="29" height="17" rx="6" />
+            <rect x="670" y="511" width="29" height="17" rx="6" />
+            <rect x="706" y="511" width="29" height="17" rx="6" />
+            <rect x="742" y="511" width="29" height="17" rx="6" />
+            <rect x="778" y="511" width="29" height="17" rx="6" />
+            <rect x="814" y="511" width="29" height="17" rx="6" />
+            <rect x="850" y="511" width="29" height="17" rx="6" />
+            <rect x="886" y="511" width="29" height="17" rx="6" />
+            <rect x="922" y="511" width="29" height="17" rx="6" />
+            <rect x="958" y="511" width="29" height="17" rx="6" />
+            <rect x="994" y="511" width="29" height="17" rx="6" />
+            <rect x="1030" y="511" width="29" height="17" rx="6" />
+            <rect x="1066" y="511" width="29" height="17" rx="6" />
+            <rect x="1102" y="511" width="29" height="17" rx="6" />
+          </g>
 
         </g> <!-- end translate group -->
 
         <!-- 10. Readability overlay (dark top & bottom, transparent middle) -->
-        <rect width="1440" height="900" fill="url(#g-over)"/>
+        <rect width="1440" height="900" fill="url(#g-over)" />
       </svg>
     </div>
 
@@ -3000,59 +3296,59 @@
     <div class="cinema-seats-legacy" style="display:none">
       <svg viewBox="0 0 1440 200" xmlns="http://www.w3.org/2000/svg">
         <g fill="#3a2f50" opacity="0">
-          <rect x="18"   y="96" width="65" height="24" rx="5"/>
-          <rect x="121"  y="96" width="65" height="24" rx="5"/>
-          <rect x="224"  y="96" width="65" height="24" rx="5"/>
-          <rect x="327"  y="96" width="65" height="24" rx="5"/>
-          <rect x="430"  y="96" width="65" height="24" rx="5"/>
-          <rect x="533"  y="96" width="65" height="24" rx="5"/>
-          <rect x="636"  y="96" width="65" height="24" rx="5"/>
-          <rect x="739"  y="96" width="65" height="24" rx="5"/>
-          <rect x="842"  y="96" width="65" height="24" rx="5"/>
-          <rect x="945"  y="96" width="65" height="24" rx="5"/>
-          <rect x="1048" y="96" width="65" height="24" rx="5"/>
-          <rect x="1151" y="96" width="65" height="24" rx="5"/>
-          <rect x="1254" y="96" width="65" height="24" rx="5"/>
-          <rect x="1357" y="96" width="65" height="24" rx="5"/>
+          <rect x="18" y="96" width="65" height="24" rx="5" />
+          <rect x="121" y="96" width="65" height="24" rx="5" />
+          <rect x="224" y="96" width="65" height="24" rx="5" />
+          <rect x="327" y="96" width="65" height="24" rx="5" />
+          <rect x="430" y="96" width="65" height="24" rx="5" />
+          <rect x="533" y="96" width="65" height="24" rx="5" />
+          <rect x="636" y="96" width="65" height="24" rx="5" />
+          <rect x="739" y="96" width="65" height="24" rx="5" />
+          <rect x="842" y="96" width="65" height="24" rx="5" />
+          <rect x="945" y="96" width="65" height="24" rx="5" />
+          <rect x="1048" y="96" width="65" height="24" rx="5" />
+          <rect x="1151" y="96" width="65" height="24" rx="5" />
+          <rect x="1254" y="96" width="65" height="24" rx="5" />
+          <rect x="1357" y="96" width="65" height="24" rx="5" />
           <!-- headrests -->
-          <rect x="31"   y="80" width="39" height="18" rx="6"/>
-          <rect x="134"  y="80" width="39" height="18" rx="6"/>
-          <rect x="237"  y="80" width="39" height="18" rx="6"/>
-          <rect x="340"  y="80" width="39" height="18" rx="6"/>
-          <rect x="443"  y="80" width="39" height="18" rx="6"/>
-          <rect x="546"  y="80" width="39" height="18" rx="6"/>
-          <rect x="649"  y="80" width="39" height="18" rx="6"/>
-          <rect x="752"  y="80" width="39" height="18" rx="6"/>
-          <rect x="855"  y="80" width="39" height="18" rx="6"/>
-          <rect x="958"  y="80" width="39" height="18" rx="6"/>
-          <rect x="1061" y="80" width="39" height="18" rx="6"/>
-          <rect x="1164" y="80" width="39" height="18" rx="6"/>
-          <rect x="1267" y="80" width="39" height="18" rx="6"/>
-          <rect x="1370" y="80" width="39" height="18" rx="6"/>
+          <rect x="31" y="80" width="39" height="18" rx="6" />
+          <rect x="134" y="80" width="39" height="18" rx="6" />
+          <rect x="237" y="80" width="39" height="18" rx="6" />
+          <rect x="340" y="80" width="39" height="18" rx="6" />
+          <rect x="443" y="80" width="39" height="18" rx="6" />
+          <rect x="546" y="80" width="39" height="18" rx="6" />
+          <rect x="649" y="80" width="39" height="18" rx="6" />
+          <rect x="752" y="80" width="39" height="18" rx="6" />
+          <rect x="855" y="80" width="39" height="18" rx="6" />
+          <rect x="958" y="80" width="39" height="18" rx="6" />
+          <rect x="1061" y="80" width="39" height="18" rx="6" />
+          <rect x="1164" y="80" width="39" height="18" rx="6" />
+          <rect x="1267" y="80" width="39" height="18" rx="6" />
+          <rect x="1370" y="80" width="39" height="18" rx="6" />
         </g>
         <!-- Front row: 10 seats, pitch=143, startX=29 -->
         <g fill="#2e2442" opacity="0.95">
-          <rect x="29"   y="140" width="95" height="38" rx="6"/>
-          <rect x="172"  y="140" width="95" height="38" rx="6"/>
-          <rect x="315"  y="140" width="95" height="38" rx="6"/>
-          <rect x="458"  y="140" width="95" height="38" rx="6"/>
-          <rect x="601"  y="140" width="95" height="38" rx="6"/>
-          <rect x="744"  y="140" width="95" height="38" rx="6"/>
-          <rect x="887"  y="140" width="95" height="38" rx="6"/>
-          <rect x="1030" y="140" width="95" height="38" rx="6"/>
-          <rect x="1173" y="140" width="95" height="38" rx="6"/>
-          <rect x="1316" y="140" width="95" height="38" rx="6"/>
+          <rect x="29" y="140" width="95" height="38" rx="6" />
+          <rect x="172" y="140" width="95" height="38" rx="6" />
+          <rect x="315" y="140" width="95" height="38" rx="6" />
+          <rect x="458" y="140" width="95" height="38" rx="6" />
+          <rect x="601" y="140" width="95" height="38" rx="6" />
+          <rect x="744" y="140" width="95" height="38" rx="6" />
+          <rect x="887" y="140" width="95" height="38" rx="6" />
+          <rect x="1030" y="140" width="95" height="38" rx="6" />
+          <rect x="1173" y="140" width="95" height="38" rx="6" />
+          <rect x="1316" y="140" width="95" height="38" rx="6" />
           <!-- headrests -->
-          <rect x="48"   y="118" width="57" height="24" rx="8"/>
-          <rect x="191"  y="118" width="57" height="24" rx="8"/>
-          <rect x="334"  y="118" width="57" height="24" rx="8"/>
-          <rect x="477"  y="118" width="57" height="24" rx="8"/>
-          <rect x="620"  y="118" width="57" height="24" rx="8"/>
-          <rect x="763"  y="118" width="57" height="24" rx="8"/>
-          <rect x="906"  y="118" width="57" height="24" rx="8"/>
-          <rect x="1049" y="118" width="57" height="24" rx="8"/>
-          <rect x="1192" y="118" width="57" height="24" rx="8"/>
-          <rect x="1335" y="118" width="57" height="24" rx="8"/>
+          <rect x="48" y="118" width="57" height="24" rx="8" />
+          <rect x="191" y="118" width="57" height="24" rx="8" />
+          <rect x="334" y="118" width="57" height="24" rx="8" />
+          <rect x="477" y="118" width="57" height="24" rx="8" />
+          <rect x="620" y="118" width="57" height="24" rx="8" />
+          <rect x="763" y="118" width="57" height="24" rx="8" />
+          <rect x="906" y="118" width="57" height="24" rx="8" />
+          <rect x="1049" y="118" width="57" height="24" rx="8" />
+          <rect x="1192" y="118" width="57" height="24" rx="8" />
+          <rect x="1335" y="118" width="57" height="24" rx="8" />
         </g>
       </svg>
     </div>
@@ -3079,7 +3375,7 @@
         <span>영화 검색...</span>
         <kbd>/</kbd>
       </button>
-      
+
       <!-- Date Selection Controller & Settings -->
       <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
         <div class="controls-wrapper">
@@ -3088,7 +3384,7 @@
           </span>
           <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
         </div>
-        
+
         <button id="cineDiaryBtn" onclick="openCineDiary()" class="diary-launch-btn" title="시네필 다이어리">
           <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i>
           <span>시네필 다이어리</span>
@@ -3100,17 +3396,22 @@
     <main>
       <!-- Main Content Mode Tabs -->
       <div class="boxoffice-tabs-container" style="margin-bottom: 1.5rem;">
-        <div class="boxoffice-tabs" style="background: rgba(255, 255, 255, 0.01); border-color: rgba(255,255,255,0.06);">
-          <button id="tabBoxOfficeBtn" class="boxoffice-filter-btn active" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="실시간 박스오피스 순위 보기">
+        <div class="boxoffice-tabs"
+          style="background: rgba(255, 255, 255, 0.01); border-color: rgba(255,255,255,0.06);">
+          <button id="tabBoxOfficeBtn" class="boxoffice-filter-btn active"
+            style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="실시간 박스오피스 순위 보기">
             <i class="fa-solid fa-chart-line"></i> 실시간 박스오피스
           </button>
-          <button id="tabWeeklyBoxOfficeBtn" class="boxoffice-filter-btn" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="주별 박스오피스 순위 보기">
+          <button id="tabWeeklyBoxOfficeBtn" class="boxoffice-filter-btn"
+            style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="주별 박스오피스 순위 보기">
             <i class="fa-solid fa-calendar-days"></i> 주별 박스오피스
           </button>
-          <button id="tabUpcomingBtn" class="boxoffice-filter-btn" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="곧 개봉할 상영 예정작 보기">
+          <button id="tabUpcomingBtn" class="boxoffice-filter-btn" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;"
+            title="곧 개봉할 상영 예정작 보기">
             <i class="fa-solid fa-hourglass-half"></i> 상영 예정작
           </button>
-          <button id="tabGlobalTrendingBtn" class="boxoffice-filter-btn" style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="실시간 글로벌 인기 트렌딩 보기">
+          <button id="tabGlobalTrendingBtn" class="boxoffice-filter-btn"
+            style="font-size: 0.9rem; padding: 0.6rem 1.35rem;" title="실시간 글로벌 인기 트렌딩 보기">
             <i class="fa-solid fa-earth-americas"></i> 글로벌 트렌딩
           </button>
         </div>
@@ -3118,7 +3419,8 @@
 
       <h2 class="section-title" id="mainSectionTitle">
         <i class="fa-solid fa-chart-line" id="mainSectionIcon"></i>
-        <span id="mainSectionText">일별 박스오피스</span> <span id="currentDateTitle" style="color: var(--color-secondary); margin-left: 4px;"></span>
+        <span id="mainSectionText">일별 박스오피스</span> <span id="currentDateTitle"
+          style="color: var(--color-secondary); margin-left: 4px;"></span>
       </h2>
 
       <!-- Movie Nationality Filter Tabs -->
@@ -3209,12 +3511,12 @@
     <div class="modal-card">
       <!-- Blur Backdrop Image -->
       <div class="modal-backdrop" id="modalBackdrop"></div>
-      
+
       <div class="modal-header">
         <button class="modal-close-btn" id="modalCloseBtn" aria-label="모달 닫기">
           <i class="fa-solid fa-xmark"></i>
         </button>
-        
+
         <!-- Floating Movie Poster -->
         <div class="modal-poster-wrap" id="modalPosterWrap">
           <img id="modalPoster" class="modal-poster-img" style="display: none;" alt="영화 포스터">
@@ -3261,10 +3563,13 @@
             <i class="fa-solid fa-ticket"></i> 원클릭 빠른 예매 (Quick Booking)
           </span>
           <div class="modal-booking-btn-wrap" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-            <a href="#" target="_blank" id="modalUnifiedBookingBtn" class="unified-booking-btn" style="flex: 1; min-width: 200px;" title="실시간 영화 예매 및 시간표 보기">
+            <a href="#" target="_blank" id="modalUnifiedBookingBtn" class="unified-booking-btn"
+              style="flex: 1; min-width: 200px;" title="실시간 영화 예매 및 시간표 보기">
               <i class="fa-solid fa-bolt"></i> 실시간 예매 및 시간표 조회
             </a>
-            <button id="modalIssueTicketBtn" class="unified-booking-btn" style="flex: 1; min-width: 200px; border-color: var(--color-secondary); cursor: pointer;" title="나만의 영화 다이어리에 디지털 티켓 발행하기">
+            <button id="modalIssueTicketBtn" class="unified-booking-btn"
+              style="flex: 1; min-width: 200px; border-color: var(--color-secondary); cursor: pointer;"
+              title="나만의 영화 다이어리에 디지털 티켓 발행하기">
               <i class="fa-solid fa-ticket"></i> 다이어리에 티켓 저장
             </button>
           </div>
@@ -3274,25 +3579,39 @@
         <div class="trailer-container" id="modalTrailerContainer" style="display: none;">
           <span class="spec-label">공식 예고편 (Official Trailer)</span>
           <div class="iframe-ratio" id="modalTrailerFrameWrap" style="display: none;">
-            <iframe id="modalTrailerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe id="modalTrailerFrame" src=""
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
           </div>
           <!-- Iframe restriction safety guide caption & bypass button to solve YouTube Error 153 (outside iframe-ratio to prevent overflow:hidden clipping) -->
-          <div class="iframe-restriction-bypass" style="margin-top: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%;">
-            <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; max-width: 480px; margin: 0 auto;">
-              <i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> 일부 예고편은 영화사 권리 정책에 의해 외부 인라인 재생이 제한될 수 있습니다. 화면이 안 나오거나 재생 오류가 발생할 경우 아래 직접보기 버튼을 클릭해 주세요.
+          <div class="iframe-restriction-bypass"
+            style="margin-top: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%;">
+            <p
+              style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; max-width: 480px; margin: 0 auto;">
+              <i class="fa-solid fa-circle-info" style="color: var(--color-primary);"></i> 일부 예고편은 영화사 권리 정책에 의해 외부 인라인
+              재생이 제한될 수 있습니다. 화면이 안 나오거나 재생 오류가 발생할 경우 아래 직접보기 버튼을 클릭해 주세요.
             </p>
-            <a href="#" target="_blank" id="modalTrailerDirectBtn" class="unified-booking-btn btn-youtube" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25); display: none; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; font-size: 0.78rem; text-decoration: none; border-radius: 8px; color: #fff; cursor: pointer; transition: var(--transition-smooth);" title="YouTube 공식 앱/사이트에서 동영상 감상">
+            <a href="#" target="_blank" id="modalTrailerDirectBtn" class="unified-booking-btn btn-youtube"
+              style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.25); display: none; align-items: center; gap: 0.35rem; padding: 0.45rem 1rem; font-size: 0.78rem; text-decoration: none; border-radius: 8px; color: #fff; cursor: pointer; transition: var(--transition-smooth);"
+              title="YouTube 공식 앱/사이트에서 동영상 감상">
               <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> YouTube에서 직접 감상하기
             </a>
           </div>
           <!-- Premium Fallback CTA Card if trailer is unavailable -->
-          <div id="modalTrailerFallback" style="display: none; background: rgba(255,255,255,0.015); border: 1px solid var(--border-glow); border-radius: 20px; padding: 2.25rem 1.5rem; text-align: center; flex-direction: column; align-items: center; justify-content: center; gap: 0.85rem; box-shadow: var(--shadow-premium);">
-            <div style="background: rgba(239, 68, 68, 0.1); width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);">
-              <i class="fa-brands fa-youtube" style="font-size: 1.75rem; color: #ef4444; animation: pulse 2.5s infinite;"></i>
+          <div id="modalTrailerFallback"
+            style="display: none; background: rgba(255,255,255,0.015); border: 1px solid var(--border-glow); border-radius: 20px; padding: 2.25rem 1.5rem; text-align: center; flex-direction: column; align-items: center; justify-content: center; gap: 0.85rem; box-shadow: var(--shadow-premium);">
+            <div
+              style="background: rgba(239, 68, 68, 0.1); width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);">
+              <i class="fa-brands fa-youtube"
+                style="font-size: 1.75rem; color: #ef4444; animation: pulse 2.5s infinite;"></i>
             </div>
-            <div style="font-family: var(--font-outfit); font-size: 0.95rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">공식 예고편 외부 관람</div>
-            <p style="font-size: 0.8rem; color: var(--color-text-muted); max-width: 320px; line-height: 1.5;">본 기기에서는 인라인 임베드 재생이 제한된 동영상입니다. 유튜브 공식 앱/웹사이트에서 편안하게 예고편을 감상해 보세요.</p>
-            <a href="#" target="_blank" id="modalTrailerYoutubeBtn" class="unified-booking-btn btn-youtube" title="유튜브에서 예고편 보기">
+            <div
+              style="font-family: var(--font-outfit); font-size: 0.95rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">
+              공식 예고편 외부 관람</div>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted); max-width: 320px; line-height: 1.5;">본 기기에서는
+              인라인 임베드 재생이 제한된 동영상입니다. 유튜브 공식 앱/웹사이트에서 편안하게 예고편을 감상해 보세요.</p>
+            <a href="#" target="_blank" id="modalTrailerYoutubeBtn" class="unified-booking-btn btn-youtube"
+              title="유튜브에서 예고편 보기">
               <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i> YouTube에서 바로보기
             </a>
           </div>
@@ -3303,8 +3622,9 @@
           <h4 class="ai-header" style="color: var(--color-text-main);">
             <i class="fa-solid fa-star"></i> 나의 시네마 로그 (My Cinema Log)
           </h4>
-          <p class="brand-subtitle" style="font-size: 0.85rem; margin-top: 0.25rem;">나의 소중한 영화 관람 소감과 별점을 직접 기록하고 영구적으로 보존할 수 있습니다.</p>
-          
+          <p class="brand-subtitle" style="font-size: 0.85rem; margin-top: 0.25rem;">나의 소중한 영화 관람 소감과 별점을 직접 기록하고 영구적으로
+            보존할 수 있습니다.</p>
+
           <!-- Interactive Star Rating Container -->
           <div class="star-rating-container">
             <span class="spec-label" style="text-transform: none; margin-bottom: 0;">나의 별점:</span>
@@ -3319,12 +3639,16 @@
           </div>
 
           <div class="review-textarea-wrapper">
-            <textarea id="userReviewInput" class="review-textarea" placeholder="이 영화에 대한 나만의 감상평 초안을 작성하여 평론가에게 코칭을 받아보세요. (최대 500자)" maxlength="500" aria-label="나만의 감상평 입력"></textarea>
+            <textarea id="userReviewInput" class="review-textarea"
+              placeholder="이 영화에 대한 나만의 감상평 초안을 작성하여 평론가에게 코칭을 받아보세요. (최대 500자)" maxlength="500"
+              aria-label="나만의 감상평 입력"></textarea>
             <span class="textarea-counter" id="charCounter">0 / 500</span>
           </div>
-          
-          <div class="review-btn-wrap" style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
-            <button id="deleteReviewBtn" class="ai-btn" style="background: var(--gradient-bronze); box-shadow: none; display: none;" title="관람 로그 삭제">
+
+          <div class="review-btn-wrap"
+            style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap;">
+            <button id="deleteReviewBtn" class="ai-btn"
+              style="background: var(--gradient-bronze); box-shadow: none; display: none;" title="관람 로그 삭제">
               <i class="fa-solid fa-trash"></i> 기록 삭제
             </button>
             <button id="saveReviewBtn" class="ai-btn" title="관람 로그 저장">
@@ -3338,14 +3662,17 @@
   <!-- CineDiary Modal -->
   <div id="cineDiaryModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cineDiaryModalTitle">
     <div class="modal-card cinediary-card">
-      <div class="modal-header" style="min-height: auto; padding: 2rem 2rem 0.5rem 2rem; background: transparent; border-bottom: none; display: flex; align-items: center; justify-content: space-between; z-index: 5;">
+      <div class="modal-header"
+        style="min-height: auto; padding: 2rem 2rem 0.5rem 2rem; background: transparent; border-bottom: none; display: flex; align-items: center; justify-content: space-between; z-index: 5;">
         <div class="modal-title-wrap" style="padding: 0;">
-          <h3 class="modal-title" id="cineDiaryModalTitle" style="font-size: 1.65rem; display: flex; align-items: center; gap: 0.5rem;">
+          <h3 class="modal-title" id="cineDiaryModalTitle"
+            style="font-size: 1.65rem; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i> 시네필 다이어리
           </h3>
           <p class="modal-subtitle" style="font-size: 0.8rem;">티켓북, 다이어리, 버킷리스트로 소중한 영화적 일상을 기록해 보세요.</p>
         </div>
-        <button class="modal-close-btn" id="spaceCloseBtn" onclick="closeCineDiary()" style="position: static; transform: none; width: 34px; height: 34px;" aria-label="다이어리 닫기">
+        <button class="modal-close-btn" id="spaceCloseBtn" onclick="closeCineDiary()"
+          style="position: static; transform: none; width: 34px; height: 34px;" aria-label="다이어리 닫기">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -3365,7 +3692,7 @@
 
       <!-- Tab Content Area -->
       <div class="modal-body" style="padding: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-        
+
         <!-- Tab 1: Ticket Stub Collector -->
         <div id="tabTicket" class="space-tab-content active">
           <div class="space-split-layout">
@@ -3386,7 +3713,9 @@
                   <select id="ticketPresetSelect" class="space-input" style="flex: 1;">
                     <!-- JavaScript에서 동적으로 로드 -->
                   </select>
-                  <button type="button" id="savePresetBtn" class="ai-btn" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.25rem;" title="현재 입력값을 새 프리셋으로 저장">
+                  <button type="button" id="savePresetBtn" class="ai-btn"
+                    style="padding: 0.5rem 0.85rem; font-size: 0.75rem; flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.25rem;"
+                    title="현재 입력값을 새 프리셋으로 저장">
                     <i class="fa-solid fa-floppy-disk"></i> 프리셋 저장
                   </button>
                 </div>
@@ -3443,7 +3772,9 @@
                 <!-- Premium Film Poster Hybrid Area -->
                 <div class="ticket-poster" id="previewPosterSection">
                   <!-- Ambient Blurred Backdrop -->
-                  <div id="previewPosterBlur" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.35); transform: scale(1.1); pointer-events: none; display: none;"></div>
+                  <div id="previewPosterBlur"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(12px) brightness(0.35); transform: scale(1.1); pointer-events: none; display: none;">
+                  </div>
                   <i class="fa-solid fa-film ticket-poster-placeholder-icon"></i>
                   <img id="previewPosterImg" class="ticket-poster-img" style="display: none;" alt="티켓 영화 포스터">
                   <div class="ticket-poster-overlay"></div>
@@ -3451,7 +3782,7 @@
                 <div class="ticket-body">
                   <span class="ticket-meta-label">MOVIE TITLE</span>
                   <h4 class="ticket-title" id="previewTitle">영화를 입력해 주세요</h4>
-                  
+
                   <div class="ticket-meta-grid" style="margin-top: 0.5rem;">
                     <div class="ticket-meta-item">
                       <span class="ticket-meta-label">DATE</span>
@@ -3472,9 +3803,12 @@
                       <span class="ticket-meta-val" id="previewSnack">선택 안 함</span>
                     </div>
                   </div>
-                  <div class="ticket-meta-item" style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.25rem;">
+                  <div class="ticket-meta-item"
+                    style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.5rem; margin-top: 0.25rem;">
                     <span class="ticket-meta-label">REVIEW MEMO</span>
-                    <span class="ticket-meta-val" id="previewMemo" style="font-weight: 500; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">나만의 특별한 관람 한 줄 평 메모 영역입니다.</span>
+                    <span class="ticket-meta-val" id="previewMemo"
+                      style="font-weight: 500; font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">나만의
+                      특별한 관람 한 줄 평 메모 영역입니다.</span>
                   </div>
 
                   <!-- Custom Barcode CSS -->
@@ -3498,7 +3832,8 @@
           </div>
 
           <!-- Bottom: Saved Tickets Carousel List -->
-          <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; width: 100%;">
+          <div
+            style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; width: 100%;">
             <span class="space-list-title">
               <i class="fa-solid fa-box-open"></i> 나의 티켓북 보관함 (<span id="savedTicketCount">0</span>)
             </span>
@@ -3577,13 +3912,16 @@
               </div>
 
               <div class="space-input-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                   <label for="diaryContent" class="spec-label">일기장 글쓰기</label>
-                  <span class="spec-label" style="text-transform: none; color: var(--color-secondary); font-size: 0.7rem; margin-bottom: 0;">
+                  <span class="spec-label"
+                    style="text-transform: none; color: var(--color-secondary); font-size: 0.7rem; margin-bottom: 0;">
                     <i class="fa-regular fa-lightbulb"></i> 글쓰기가 막막할 땐 가이드를 탭해 보세요!
                   </span>
                 </div>
-                <div class="diary-template-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; width: 100%;">
+                <div class="diary-template-row"
+                  style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; width: 100%;">
                   <button type="button" class="template-guide-btn" data-template="best-minute">
                     <i class="fa-solid fa-video" style="color: var(--color-primary);"></i> 최고의 1분
                   </button>
@@ -3594,11 +3932,15 @@
                     <i class="fa-solid fa-heart" style="color: var(--color-accent);"></i> 소중한 이에게
                   </button>
                 </div>
-                <textarea id="diaryContent" class="review-textarea" placeholder="영화를 보며 느꼈던 감정이나 OST, 명대사, 그날의 감상을 솔직하게 일기처럼 적어보세요..." style="min-height: 140px;"></textarea>
+                <textarea id="diaryContent" class="review-textarea"
+                  placeholder="영화를 보며 느꼈던 감정이나 OST, 명대사, 그날의 감상을 솔직하게 일기처럼 적어보세요..."
+                  style="min-height: 140px;"></textarea>
               </div>
 
-              <div class="review-btn-wrap" style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap; margin-top: 0.5rem;">
-                <button type="button" id="coachDiaryBtn" class="ai-coach-trigger-btn" title="AI 영화 평론가 & 작문 교육자에게 일기 코칭 및 첨삭 받기">
+              <div class="review-btn-wrap"
+                style="display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; flex-wrap: wrap; margin-top: 0.5rem;">
+                <button type="button" id="coachDiaryBtn" class="ai-coach-trigger-btn"
+                  title="AI 영화 평론가 & 작문 교육자에게 일기 코칭 및 첨삭 받기">
                   <i class="fa-solid fa-graduation-cap"></i> AI 비평 & 글쓰기 코칭
                 </button>
                 <button id="saveDiaryBtn" class="ai-btn" title="다이어리 일기 저장">
@@ -3608,13 +3950,18 @@
 
               <!-- Diary Dynamic AI Coach Area -->
               <div id="diaryAiCoachLoading" style="display: none; margin-top: 1rem; width: 100%;">
-                <div class="projector-loader" style="background: rgba(255, 255, 255, 0.01); border: 1px dashed var(--border-glow); border-radius: 20px;">
+                <div class="projector-loader"
+                  style="background: rgba(255, 255, 255, 0.01); border: 1px dashed var(--border-glow); border-radius: 20px;">
                   <div class="projector-icon-wrap">
                     <i class="fa-solid fa-video projector-light-beam"></i>
                     <div class="projector-spinner"></div>
                   </div>
-                  <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 700; color: var(--color-primary); margin-top: 0.5rem; letter-spacing: 0.05em;">AI CRITIC & WRITING COACH ANALYZING...</div>
-                  <p style="font-size: 0.78rem; color: var(--color-text-muted); max-width: 380px; line-height: 1.4; margin: 0 auto;">수석 평론가이자 작문 교육자가 리뷰어님의 문학적 문장을 정밀 분석하며 첨삭 에세이를 창조하는 중입니다. 잠시만 대기해 주세요.</p>
+                  <div
+                    style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 700; color: var(--color-primary); margin-top: 0.5rem; letter-spacing: 0.05em;">
+                    AI CRITIC & WRITING COACH ANALYZING...</div>
+                  <p
+                    style="font-size: 0.78rem; color: var(--color-text-muted); max-width: 380px; line-height: 1.4; margin: 0 auto;">
+                    수석 평론가이자 작문 교육자가 리뷰어님의 문학적 문장을 정밀 분석하며 첨삭 에세이를 창조하는 중입니다. 잠시만 대기해 주세요.</p>
                 </div>
               </div>
               <div id="diaryAiCoachResultPanel" style="display: none; margin-top: 1rem; width: 100%;">
@@ -3639,12 +3986,14 @@
 
         <!-- Tab 3: Bucket List Planner -->
         <div id="tabBucket" class="space-tab-content">
-          <div style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); padding: 1.5rem; border-radius: 20px; display: flex; flex-direction: column; gap: 1rem; width: 100%; margin-bottom: 2rem;">
+          <div
+            style="background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); padding: 1.5rem; border-radius: 20px; display: flex; flex-direction: column; gap: 1rem; width: 100%; margin-bottom: 2rem;">
             <span class="space-form-title">
               <i class="fa-solid fa-circle-plus" style="color: var(--color-secondary);"></i> 새로운 영화 챌린지 생성
             </span>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
-              <input type="text" id="bucketListTitle" class="space-input" placeholder="예: '방학 동안 격파할 거장 감독 컬렉션', '죽기 전에 소장할 명작들'" style="flex: 1; min-width: 250px;">
+              <input type="text" id="bucketListTitle" class="space-input"
+                placeholder="예: '방학 동안 격파할 거장 감독 컬렉션', '죽기 전에 소장할 명작들'" style="flex: 1; min-width: 250px;">
               <button id="createBucketBtn" class="ai-btn" style="padding: 0.7rem 1.5rem; height: 100%;">
                 <i class="fa-solid fa-plus"></i> 리스트 보드 생성
               </button>
@@ -3652,13 +4001,17 @@
           </div>
 
           <!-- Excel import/export toolbar -->
-          <div style="display:flex;gap:0.6rem;align-items:center;justify-content:flex-end;margin-bottom:1.5rem;flex-wrap:wrap;">
-            <button onclick="downloadBucketTemplate()" class="diary-launch-btn" style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;" title="엑셀 양식 파일 다운로드">
+          <div
+            style="display:flex;gap:0.6rem;align-items:center;justify-content:flex-end;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <button onclick="downloadBucketTemplate()" class="diary-launch-btn"
+              style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;" title="엑셀 양식 파일 다운로드">
               <i class="fa-solid fa-file-arrow-down"></i> 양식 다운로드
             </button>
-            <label class="diary-launch-btn" style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;cursor:pointer;" title="엑셀 파일로 버킷 리스트 가져오기">
+            <label class="diary-launch-btn" style="font-size:0.78rem;padding:0.45rem 0.95rem;gap:0.4rem;cursor:pointer;"
+              title="엑셀 파일로 버킷 리스트 가져오기">
               <i class="fa-solid fa-file-arrow-up"></i> 엑셀 업로드
-              <input type="file" id="bucketExcelInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="uploadBucketExcel(event)">
+              <input type="file" id="bucketExcelInput" accept=".xlsx,.xls,.csv" style="display:none"
+                onchange="uploadBucketExcel(event)">
             </label>
           </div>
 
@@ -3669,7 +4022,8 @@
           <div class="bucket-lists-container" id="bucketListsGrid">
             <!-- Dynamically populated bucket lists -->
             <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
-              <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: rgba(255,255,255,0.15);"></i>
+              <i class="fa-regular fa-folder-open"
+                style="font-size: 3rem; margin-bottom: 1rem; display: block; color: rgba(255,255,255,0.15);"></i>
               <p>아직 생성된 챌린지 맵이 존재하지 않습니다. 나만의 버킷 리스트를 생성해 보세요!</p>
             </div>
           </div>
@@ -3682,14 +4036,17 @@
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
     <div class="modal-card" style="max-width: 480px; border-radius: 24px;">
-      <div class="modal-header" style="min-height: auto; padding: 2rem 2rem 1rem 2rem; background: transparent; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
+      <div class="modal-header"
+        style="min-height: auto; padding: 2rem 2rem 1rem 2rem; background: transparent; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between;">
         <div class="modal-title-wrap" style="padding: 0;">
-          <h3 class="modal-title" id="settingsModalTitle" style="font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <h3 class="modal-title" id="settingsModalTitle"
+            style="font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fa-solid fa-sliders" style="color: var(--color-primary);"></i> 서버 설정
           </h3>
           <p class="modal-subtitle" style="font-size: 0.8rem;">API 서버 주소를 수동으로 등록합니다.</p>
         </div>
-        <button class="modal-close-btn" id="settingsCloseBtn" style="position: static; transform: none; width: 32px; height: 32px;" aria-label="설정 닫기">
+        <button class="modal-close-btn" id="settingsCloseBtn"
+          style="position: static; transform: none; width: 32px; height: 32px;" aria-label="설정 닫기">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -3697,18 +4054,25 @@
         <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5;">
           GitHub Pages와 같은 정적 호스팅 환경에서 구동 중일 때, 배포하신 Node.js 백엔드 서버(Express)의 주소를 설정해 주세요.
         </p>
-        
+
         <div class="spec-item full-width" style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <label for="backendUrlInput" class="spec-label" style="font-size: 0.8rem; color: var(--color-secondary);">Express API 서버 URL</label>
-          <input type="url" id="backendUrlInput" placeholder="예: https://cinediary-backend.onrender.com" style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); border-radius: 12px; padding: 0.75rem 1rem; color: #fff; font-family: var(--font-inter); font-size: 0.9rem; outline: none; transition: var(--transition-smooth);" />
+          <label for="backendUrlInput" class="spec-label"
+            style="font-size: 0.8rem; color: var(--color-secondary);">Express API 서버 URL</label>
+          <input type="url" id="backendUrlInput" placeholder="예: https://cinediary-backend.onrender.com"
+            style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); border-radius: 12px; padding: 0.75rem 1rem; color: #fff; font-family: var(--font-inter); font-size: 0.9rem; outline: none; transition: var(--transition-smooth);" />
         </div>
-        
+
         <button id="saveSettingsBtn" class="ai-btn" style="width: 100%; justify-content: center; padding: 0.75rem;">
           <i class="fa-solid fa-floppy-disk"></i> 설정 저장 및 리로드
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Floating Home Button -->
+  <button id="floatingHomeBtn" class="floating-home-btn" onclick="goHome()" title="홈으로 이동" aria-label="홈으로 이동">
+    <i class="fa-solid fa-house"></i>
+  </button>
 
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
@@ -3718,8 +4082,8 @@
     <div class="spotlight-modal" role="dialog" aria-modal="true" aria-label="영화 검색">
       <div class="spotlight-input-wrap">
         <i class="fa-solid fa-magnifying-glass spotlight-icon"></i>
-        <input type="text" id="spotlightInput" class="spotlight-input"
-               placeholder="보고 싶은 영화, 혹은 봤던 영화 검색..." autocomplete="off" spellcheck="false">
+        <input type="text" id="spotlightInput" class="spotlight-input" placeholder="보고 싶은 영화, 혹은 봤던 영화 검색..."
+          autocomplete="off" spellcheck="false">
         <button id="spotlightClearBtn" class="spotlight-clear-btn" style="display:none" aria-label="지우기">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -3737,4 +4101,5 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="app.js?v=20260601_4"></script>
 </body>
+
 </html>

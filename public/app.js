@@ -3122,8 +3122,37 @@ function uploadBucketExcel(event) {
   reader.readAsArrayBuffer(file);
 }
 
+function goHome() {
+  // 1. Close any open modals/overlays
+  if (typeof closeCineDiary === 'function') {
+    closeCineDiary();
+  }
+  if (typeof closeModal === 'function') {
+    closeModal();
+  }
+  if (typeof closeSpotlight === 'function') {
+    closeSpotlight();
+  }
+  
+  // 2. Click the default Box Office tab to switch back to home state
+  const tabBoxOfficeBtn = document.getElementById('tabBoxOfficeBtn');
+  if (tabBoxOfficeBtn) {
+    tabBoxOfficeBtn.click();
+  }
+  
+  // 3. Reset the nationality filter to 'ALL'
+  const allNationBtn = document.querySelector('#nationTabsContainer button[data-nation="ALL"]');
+  if (allNationBtn) {
+    allNationBtn.click();
+  }
+  
+  // 4. Scroll smoothly to the top of the page
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 window.downloadBucketTemplate = downloadBucketTemplate;
 window.uploadBucketExcel      = uploadBucketExcel;
+window.goHome                 = goHome;
 
 // ---- Modal accessibility: focus trap, ESC-to-close, and focus restoration ----
 (function initModalA11y() {
