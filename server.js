@@ -826,6 +826,18 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
     });
   }
 
+  // Region language mapping to prevent foreign/Indian movies dominance in non-native charts
+  const regionLanguages = {
+    'US': ['en'],
+    'GB': ['en'],
+    'JP': ['ja', 'en'],
+    'FR': ['fr', 'en'],
+    'DE': ['de', 'en'],
+    'ES': ['es', 'en'],
+    'KR': ['ko', 'en'],
+    'IN': ['hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa', 'gu', 'en']
+  };
+
   try {
     const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
     let url = '';
@@ -851,8 +863,10 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       10752: '전쟁', 37: '서부'
     };
 
+    const allowedLangs = regionLanguages[regionKey];
     const formattedList = rawList
       .filter(movie => movie.title && movie.poster_path)
+      .filter(movie => !allowedLangs || allowedLangs.includes(movie.original_language))
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
         const genre = genreMap[primaryGenreId] || '영화';
