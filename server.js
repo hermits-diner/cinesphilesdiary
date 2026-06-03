@@ -609,7 +609,7 @@ function sanitizeInput(text) {
     .replace(/"/g, '\\"')
     .replace(/\n/g, ' ')
     .replace(/\r/g, ' ')
-    .slice(0, 150); // limit strictly to 150 chars
+    .slice(0, 300); // limit strictly to 300 chars
 }
 
 // 2.5. GET /api/search-poster?movieNm=XXXXX
@@ -642,9 +642,9 @@ app.post('/api/review', checkAuth, reviewLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Missing movieNm or userComment parameters.' });
   }
 
-  // Strictly enforce 150 character limit on user comment
-  if (userComment.length > 150) {
-    return res.status(400).json({ error: '한 줄 평은 최대 150자까지 입력 가능합니다.' });
+  // Strictly enforce 300 character limit on user comment
+  if (userComment.length > 300) {
+    return res.status(400).json({ error: '한 줄 평은 최대 300자까지 입력 가능합니다.' });
   }
 
   const safeComment = sanitizeInput(userComment);
@@ -987,9 +987,9 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
     return res.status(400).json({ error: '영화 제목 혹은 일기 내용이 유효하지 않습니다.' });
   }
 
-  // Extend character limit to 1000 for descriptive diary entries
-  if (diaryContent.length > 1000) {
-    return res.status(400).json({ error: '일기장 코칭용 본문은 최대 1000자까지 입력 가능합니다.' });
+  // Extend character limit to 2000 for descriptive diary entries
+  if (diaryContent.length > 2000) {
+    return res.status(400).json({ error: '일기장 코칭용 본문은 최대 2000자까지 입력 가능합니다.' });
   }
 
   const safeMovieNm = sanitizeInput(movieNm);

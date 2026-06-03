@@ -2027,7 +2027,7 @@ function closeModal() {
 function handleReviewInput(e) {
   const text = e.target.value;
   const length = text.length;
-  charCounter.textContent = `${length} / 500`;
+  charCounter.textContent = `${length} / 1000`;
 }
 
 // Star Rating Setup & Interactive Hover / Selection Logic
@@ -2082,7 +2082,7 @@ function loadCinemaLog(movieCd) {
   highlightStars(0);
   ratingScoreText.textContent = '0.0 / 5.0';
   userReviewInput.value = '';
-  charCounter.textContent = '0 / 500';
+  charCounter.textContent = '0 / 1000';
   
   if (deleteReviewBtn) deleteReviewBtn.style.display = 'none';
   
@@ -2152,7 +2152,7 @@ function deleteCinemaLog() {
     highlightStars(0);
     ratingScoreText.textContent = '0.0 / 5.0';
     userReviewInput.value = '';
-    charCounter.textContent = '0 / 500';
+    charCounter.textContent = '0 / 1000';
     
     if (deleteReviewBtn) deleteReviewBtn.style.display = 'none';
   } catch (e) {
