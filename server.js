@@ -806,12 +806,12 @@ app.get('/api/search', checkAuth, async (req, res) => {
   }
 });
 
-// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR
+// 4.5. GET /api/global-trending?region=ALL|US|JP|GB|FR|KR|IN|DE|ES
 app.get('/api/global-trending', checkAuth, async (req, res) => {
   const startTime = Date.now();
   const { region } = req.query;
 
-  const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR'];
+  const validRegions = ['ALL', 'US', 'JP', 'GB', 'FR', 'KR', 'IN', 'DE', 'ES'];
   const regionKey = validRegions.includes(region) ? region : 'ALL';
   const cacheKey = `global_trending_${regionKey}`;
   const cachedData = apiCache.get(cacheKey);
@@ -837,8 +837,8 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     } else {
-      // 2. Region specific popular movies
-      url = `https://api.themoviedb.org/3/movie/popular?api_key=${tmdbKey}&language=ko-KR&region=${regionKey}`;
+      // 2. Region specific popular movies (by production country)
+      url = `https://api.themoviedb.org/3/discover/movie?api_key=${tmdbKey}&language=ko-KR&sort_by=popularity.desc&with_origin_country=${regionKey}`;
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     }
