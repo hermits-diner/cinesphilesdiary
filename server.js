@@ -837,8 +837,8 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     } else {
-      // 2. Region specific popular movies (by production country)
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${tmdbKey}&language=ko-KR&sort_by=popularity.desc&with_origin_country=${regionKey}`;
+      // 2. Region specific currently playing movies in theaters
+      url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${tmdbKey}&language=ko-KR&region=${regionKey}`;
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     }
