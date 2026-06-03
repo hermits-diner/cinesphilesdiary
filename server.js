@@ -13,6 +13,20 @@ const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN || 'DEFAULT_CINEDIARY_AUTH_TOK
 const KOBIS_API_KEY = process.env.KOBIS_API_KEY || '5a852c691ced334dd9ffadc9ac8637c5';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+const TMDB_API_KEY = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+
+const GENRE_MAP = {
+  28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
+  99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
+  36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
+  10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
+  10752: '전쟁', 37: '서부'
+};
+
+function isGeminiConfigured() {
+  return !!(GEMINI_API_KEY && GEMINI_API_KEY.startsWith('AIzaSy'));
+}
+
 // In-Memory Caching System
 class MemoryCache {
   constructor(cleanupIntervalMs = 10 * 60 * 1000) {
@@ -317,9 +331,8 @@ app.get('/api/upcoming', checkAuth, async (req, res) => {
   }
 
   try {
-    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
     // Fetch South Korea upcoming movies from TMDB
-    const url = `https://api.themoviedb.org/3/movie/upcoming?api_key=${tmdbKey}&language=ko-KR&region=KR`;
+    const url = `https://api.themoviedb.org/3/movie/upcoming?api_key=${TMDB_API_KEY}&language=ko-KR&region=KR`;
     const response = await axios.get(url, { timeout: 4500 });
     const rawList = response.data?.results || [];
 
@@ -328,16 +341,8 @@ app.get('/api/upcoming', checkAuth, async (req, res) => {
     const formattedList = rawList
       .filter(movie => movie.release_date && movie.poster_path)
       .map(movie => {
-        // Map primary genre ID to string
-        const genreMap = {
-          28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
-          99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
-          36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
-          10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
-          10752: '전쟁', 37: '서부'
-        };
         const primaryGenreId = movie.genre_ids?.[0];
-        const genre = genreMap[primaryGenreId] || '영화';
+        const genre = GENRE_MAP[primaryGenreId] || '영화';
 
         return {
           movieCd: `TMDB_${movie.id}`, // synthetic code prefix
@@ -372,9 +377,7 @@ app.get('/api/upcoming', checkAuth, async (req, res) => {
 
 // Helper function to search TMDB for posters, backdrops, and descriptions
 async function getTmdbAssets(movieNm, openDt) {
-  // Use user's TMDB API key if set, or fall back to a public key to ensure instant premium workability!
-  const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
-  if (!tmdbKey || tmdbKey.includes('YourActualTMDBApiKey')) {
+  if (!TMDB_API_KEY || TMDB_API_KEY.includes('YourActualTMDBApiKey')) {
     return { poster: null, backdrop: null, rating: null, overview: null, trailerKey: null, genre: null };
   }
 
@@ -385,7 +388,7 @@ async function getTmdbAssets(movieNm, openDt) {
 
   try {
     // 1. Search for movie matching name and release year
-    let url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${encodeURIComponent(movieNm)}&language=ko-KR`;
+    let url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movieNm)}&language=ko-KR`;
     if (year) {
       url += `&year=${year}`;
     }
@@ -399,13 +402,13 @@ async function getTmdbAssets(movieNm, openDt) {
       
       // Fetch precise trailer video key from TMDB
       try {
-        const videoUrl = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdbKey}&language=ko-KR`;
+        const videoUrl = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${TMDB_API_KEY}&language=ko-KR`;
         const videoRes = await axios.get(videoUrl, { timeout: 2000 });
         let videos = videoRes.data?.results || [];
         
         // Fallback to English metadata if Korean video resources are missing
         if (videos.length === 0) {
-          const videoUrlEn = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${tmdbKey}&language=en-US`;
+          const videoUrlEn = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${TMDB_API_KEY}&language=en-US`;
           const videoResEn = await axios.get(videoUrlEn, { timeout: 2000 });
           videos = videoResEn.data?.results || [];
         }
@@ -419,16 +422,8 @@ async function getTmdbAssets(movieNm, openDt) {
         console.error(`Failed to fetch TMDB videos for ${movieNm}:`, videoErr.message);
       }
 
-      // Map first genre_id to string representation for dynamic illustrations
-      const genreMap = {
-        28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
-        99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
-        36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
-        10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
-        10752: '전쟁', 37: '서부'
-      };
       const primaryGenreId = movie.genre_ids?.[0];
-      const genre = genreMap[primaryGenreId] || null;
+      const genre = GENRE_MAP[primaryGenreId] || null;
 
       const data = {
         poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
@@ -474,8 +469,7 @@ app.get('/api/movie', checkAuth, async (req, res) => {
   if (movieCd.startsWith('TMDB_')) {
     const tmdbId = movieCd.substring('TMDB_'.length);
     try {
-      const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
-      const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${tmdbKey}&language=ko-KR&append_to_response=videos,credits`;
+      const url = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}&language=ko-KR&append_to_response=videos,credits`;
       const response = await axios.get(url, { timeout: 4000 });
       const movie = response.data;
       
@@ -653,9 +647,7 @@ app.post('/api/review', checkAuth, reviewLimiter, async (req, res) => {
   const cleanGenres = sanitizeInput(genres || '정보 없음');
 
   // Check if Gemini API Key is missing or default placeholder
-  const isPlaceholderKey = !GEMINI_API_KEY || GEMINI_API_KEY.includes('YourActualGeminiApiKeyGoesHere');
-
-  if (isPlaceholderKey) {
+  if (!isGeminiConfigured()) {
     // Generate an incredibly beautiful, dynamic cinematic review simulated locally as a fallback
     // This ensures a 100% functional, premium experience even with a placeholder key.
     console.log('Gemini API key is placeholder or missing. Providing dynamic premium mock review.');
@@ -758,8 +750,7 @@ app.get('/api/search', checkAuth, async (req, res) => {
   }
 
   try {
-    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbKey}&query=${encodeURIComponent(cleanQuery)}&language=ko-KR&page=1`;
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=ko-KR&page=1`;
     const response = await axios.get(url, { timeout: 4500 });
     const rawList = response.data?.results || [];
 
@@ -767,16 +758,8 @@ app.get('/api/search', checkAuth, async (req, res) => {
     const formattedList = rawList
       .filter(movie => movie.title && movie.poster_path)
       .map(movie => {
-        // Map first genre ID to string representation
-        const genreMap = {
-          28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
-          99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
-          36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
-          10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
-          10752: '전쟁', 37: '서부'
-        };
         const primaryGenreId = movie.genre_ids?.[0];
-        const genre = genreMap[primaryGenreId] || '영화';
+        const genre = GENRE_MAP[primaryGenreId] || '영화';
 
         return {
           movieCd: `TMDB_${movie.id}`,
@@ -808,7 +791,6 @@ app.get('/api/search', checkAuth, async (req, res) => {
 
 const countryMultipliers = {
   'US': 1.5,
-  'KR': 1.0,
   'JP': 0.8,
   'IN': 2.5,
   'GB': 0.6,
@@ -893,29 +875,20 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
   };
 
   try {
-    const tmdbKey = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
     let url = '';
     let rawList = [];
 
     if (regionKey === 'ALL') {
       // 1. Worldwide trending movies
-      url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${tmdbKey}&language=ko-KR`;
+      url = `https://api.themoviedb.org/3/trending/movie/day?api_key=${TMDB_API_KEY}&language=ko-KR`;
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     } else {
       // 2. Region specific currently playing movies in theaters
-      url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${tmdbKey}&language=ko-KR&region=${regionKey}`;
+      url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${TMDB_API_KEY}&language=ko-KR&region=${regionKey}`;
       const response = await axios.get(url, { timeout: 5000 });
       rawList = response.data?.results || [];
     }
-
-    const genreMap = {
-      28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
-      99: '다큐멘터리', 18: '드라마', 10751: '가족', 14: '판타지',
-      36: '역사', 27: '공포', 10402: '음악', 9648: '미스터리',
-      10749: '로맨스', 878: 'SF', 10770: 'TV 영화', 53: '스릴러',
-      10752: '전쟁', 37: '서부'
-    };
 
     const allowedLangs = regionLanguages[regionKey];
     const formattedList = rawList
@@ -939,7 +912,7 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
       })
       .map((movie, index) => {
         const primaryGenreId = movie.genre_ids?.[0];
-        const genre = genreMap[primaryGenreId] || '영화';
+        const genre = GENRE_MAP[primaryGenreId] || '영화';
         const boxOffice = generateBoxOffice(movie.id, targetDt, regionKey, index, movie.release_date);
 
         return {
@@ -1008,10 +981,8 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
     console.error('Failed to pre-fetch RAG assets for coach-review:', tmdbErr.message);
   }
 
-  const isPlaceholderKey = !GEMINI_API_KEY || GEMINI_API_KEY.includes('YourActualGeminiApiKeyGoesHere');
-
   // Fallback simulator for AI Coaching Evaluation when GEMINI_API_KEY is not configured
-  if (isPlaceholderKey) {
+  if (!isGeminiConfigured()) {
     console.log('Gemini API key is placeholder or missing for coaching. Operating dynamic premium mock coach evaluator.');
 
     // Dynamic mock evaluation score calculator based on review content length & some random variances
