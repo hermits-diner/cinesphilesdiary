@@ -3243,40 +3243,57 @@ window.goHome                 = goHome;
 // ── Diary Hub: Main page preview card updater ──
 function updateDiaryHub() {
   // --- Ticket Card ---
-  const hubTicketTitle = document.getElementById('hubTicketTitle');
-  const hubTicketBody = document.getElementById('hubTicketBody');
-  const hubTicketMeta = document.getElementById('hubTicketMeta');
-  
+  const hubTicketCard = document.getElementById('hubTicketCard');
   let tickets = [];
   try { tickets = JSON.parse(localStorage.getItem('CINEDIARY_TICKETS') || '[]'); } catch (_) {}
   if (!Array.isArray(tickets)) tickets = [];
 
-  if (tickets.length > 0 && hubTicketTitle && hubTicketBody) {
-    const t = tickets[0];
-    hubTicketTitle.textContent = t.movieNm || '제목 없음';
-    hubTicketBody.innerHTML = `
-      <p class="diary-hub-card-excerpt">${escapeHtml(t.review || '한 줄 평 없음')}</p>
-    `;
-    if (hubTicketMeta) {
-      hubTicketMeta.innerHTML = `
-        <span><i class="fa-regular fa-calendar"></i> ${t.watchDate || '—'}</span>
-        <span>·</span>
-        <span>${escapeHtml(t.theater || 'CGV')}</span>
-        <span>·</span>
-        <span>총 ${tickets.length}장 보관</span>
+  if (hubTicketCard) {
+    if (tickets.length > 0) {
+      const t = tickets[0];
+      const posterHtml = t.poster 
+        ? `<div class="diary-hub-card-poster-wrapper">
+             <img src="${escapeHtml(t.poster)}" class="diary-hub-card-poster-img" alt="${escapeHtml(t.movieNm)}">
+           </div>`
+        : `<div class="diary-hub-card-poster-wrapper">
+             <div class="diary-hub-card-poster-placeholder">
+               <i class="fa-solid fa-film"></i>
+             </div>
+           </div>`;
+
+      hubTicketCard.innerHTML = `
+        ${posterHtml}
+        <div class="diary-hub-card-right">
+          <div class="diary-hub-card-header" style="margin-bottom: 0;">
+            <div class="diary-hub-card-icon">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <span class="diary-hub-card-label">최근 관람 티켓</span>
+          </div>
+          <div class="diary-hub-card-title" title="${escapeHtml(t.movieNm || '제목 없음')}">${escapeHtml(t.movieNm || '제목 없음')}</div>
+          <div id="hubTicketBody">
+            <p class="diary-hub-card-excerpt">${escapeHtml(t.review || '한 줄 평 없음')}</p>
+          </div>
+          <div class="diary-hub-card-meta">
+            <span><i class="fa-regular fa-calendar"></i> ${t.watchDate || '—'}</span>
+            <span>·</span>
+            <span>${escapeHtml(t.theater || 'CGV')}</span>
+            <span>·</span>
+            <span>총 ${tickets.length}장</span>
+          </div>
+        </div>
       `;
-    }
-  } else if (hubTicketTitle) {
-    hubTicketTitle.textContent = '—';
-    if (hubTicketBody) {
-      hubTicketBody.innerHTML = `
-        <div class="diary-hub-card-empty">
-          <i class="fa-solid fa-ticket"></i>
-          <span>아직 발행된 티켓이 없습니다</span>
+    } else {
+      hubTicketCard.innerHTML = `
+        <div class="diary-hub-card-empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; text-align: center; padding: 0.5rem 0;">
+          <div class="diary-hub-card-icon" style="margin: 0 auto; width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="fa-solid fa-ticket"></i>
+          </div>
+          <span class="diary-hub-card-label" style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">최근 관람 티켓</span>
+          <span style="font-size: 0.75rem; color: var(--color-text-muted);">아직 발행된 티켓이 없습니다</span>
         </div>
       `;
     }
-    if (hubTicketMeta) hubTicketMeta.innerHTML = '';
   }
 
   // --- Diary Card ---

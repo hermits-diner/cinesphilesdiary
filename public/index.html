@@ -3285,6 +3285,74 @@
       opacity: 0.3;
     }
 
+    /* Ticket Card horizontal layout adjustments */
+    .diary-hub-card--ticket {
+      display: flex;
+      flex-direction: row !important;
+      gap: 1.1rem;
+      align-items: stretch;
+      padding: 1.25rem !important;
+    }
+
+    .diary-hub-card-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+      min-width: 0;
+      justify-content: space-between;
+    }
+
+    .diary-hub-card-poster-wrapper {
+      position: relative;
+      width: 76px;
+      height: 114px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .diary-hub-card-poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .diary-hub-card-poster-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(229, 169, 169, 0.15) 0%, rgba(212, 175, 55, 0.15) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 1.5rem;
+    }
+
+    .diary-hub-card--ticket .diary-hub-card-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 0.15rem;
+    }
+
+    .diary-hub-card--ticket .diary-hub-card-excerpt {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
+    }
+
     /* Bucket progress in hub */
     .diary-hub-progress {
       display: flex;
@@ -4636,7 +4704,7 @@
 
   <!-- Application Logic JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="app.js?v=20260601_4"></script>
+  <script src="app.js?v=20260604_1"></script>
 </body>
 
 </html>
