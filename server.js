@@ -10,7 +10,10 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.set('trust proxy', 1); // Trust Render's reverse proxy for correct rate-limiting and health checks
 const PORT = process.env.PORT || 5000;
-const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN || 'DEFAULT_CINEDIARY_AUTH_TOKEN';
+const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN;
+if (!APP_AUTH_TOKEN) {
+  console.warn('[Security] APP_AUTH_TOKEN is not set. Configure it in your .env or environment variables.');
+}
 const KOBIS_API_KEY = process.env.KOBIS_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;

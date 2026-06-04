@@ -3786,6 +3786,9 @@ function updateDiaryHub() {
           </div>
           <span class="diary-hub-card-label" style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">최근 관람 티켓</span>
           <span style="font-size: 0.75rem; color: var(--color-text-muted);">아직 발행된 티켓이 없습니다</span>
+          <button type="button" class="hub-empty-cta">
+            <i class="fa-solid fa-plus"></i> 첫 티켓 발급하기
+          </button>
         </div>
       `;
     }
@@ -3823,6 +3826,9 @@ function updateDiaryHub() {
         <div class="diary-hub-card-empty">
           <i class="fa-solid fa-pen-nib"></i>
           <span>아직 작성된 일기가 없습니다</span>
+          <button type="button" class="hub-empty-cta">
+            <i class="fa-solid fa-plus"></i> 첫 일기 작성하기
+          </button>
         </div>
       `;
     }
@@ -3866,6 +3872,9 @@ function updateDiaryHub() {
         <div class="diary-hub-card-empty">
           <i class="fa-solid fa-circle-check"></i>
           <span>아직 생성된 챌린지가 없습니다</span>
+          <button type="button" class="hub-empty-cta">
+            <i class="fa-solid fa-plus"></i> 첫 챌린지 만들기
+          </button>
         </div>
       `;
     }

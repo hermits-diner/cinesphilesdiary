@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# TODO: 프로덕션 도메인으로 교체하세요
+Sitemap: https://cinephiles-diary.vercel.app/sitemap.xml
