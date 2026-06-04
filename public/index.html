@@ -3133,18 +3133,20 @@
         justify-content: center !important;
         align-items: center !important;
         border-radius: 10px !important;
-        /* 영사 빛이 중앙에 모이는 프로젝션 그라디언트 */
-        background: radial-gradient(ellipse 85% 75% at 50% 42%, rgba(28, 12, 22, 0.94) 0%, rgba(5, 2, 4, 0.99) 100%) !important;
+        /* 쿨톤 프로젝션: 은빛 스크린 표면 + 청흑 암부 */
+        background:
+          radial-gradient(ellipse 52% 42% at 50% 36%, rgba(165, 178, 210, 0.055) 0%, transparent 65%),
+          radial-gradient(ellipse 85% 75% at 50% 42%, rgba(12, 14, 28, 0.93) 0%, rgba(3, 4, 12, 0.99) 100%) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        /* 스크린 테두리 – 안쪽 발광 + 바깥 깊은 그림자 + 비네트 */
-        border: 1px solid rgba(160, 100, 90, 0.22) !important;
+        /* 스크린 프레임 – 쿨 실버 내부 발광 + 비네트 + 깊은 그림자 */
+        border: 1px solid rgba(120, 135, 168, 0.26) !important;
         box-shadow:
-          inset 0 0 0 1px rgba(255, 200, 160, 0.07),
-          inset 0 0 120px rgba(0, 0, 0, 0.55),
-          0 0 0 2px rgba(8, 4, 6, 0.9),
+          inset 0 0 0 1px rgba(180, 192, 225, 0.07),
+          inset 0 0 120px rgba(0, 2, 8, 0.6),
+          0 0 0 2px rgba(3, 4, 10, 0.92),
           0 70px 140px -20px rgba(0, 0, 0, 0.97),
-          0 0 90px -10px rgba(229, 169, 169, 0.09) !important;
+          0 0 90px -10px rgba(130, 150, 210, 0.08) !important;
       }
       .screen-stage.diary-hub-section .brand {
         margin-bottom: 0.1rem !important;
@@ -3159,7 +3161,7 @@
         font-size: 0.88rem !important;
         margin-top: -0.2rem !important;
         letter-spacing: 0.03em !important;
-        color: rgba(220, 200, 195, 0.45) !important;
+        color: rgba(195, 205, 225, 0.42) !important;
       }
       .screen-stage.diary-hub-section .diary-hub-grid {
         height: auto !important;
@@ -3171,8 +3173,8 @@
         height: 160px !important;
         padding: 1.05rem 1.3rem !important;
         box-sizing: border-box !important;
-        background: rgba(12, 6, 10, 0.7) !important;
-        border-color: rgba(255, 255, 255, 0.055) !important;
+        background: rgba(6, 8, 18, 0.72) !important;
+        border-color: rgba(140, 155, 195, 0.08) !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card-poster-wrapper {
         width: 80px !important;
