@@ -3068,6 +3068,29 @@
       overflow: hidden;
     }
 
+    /* Screen Stage styling when acting as Diary Hub */
+    .screen-stage.diary-hub-section {
+      width: min(920px, 92vw);
+      margin-bottom: 2.5rem;
+      gap: 1.5rem;
+      border-radius: 14px; /* Cinematic screen shape */
+      background: linear-gradient(145deg, rgba(8, 2, 4, 0.45) 0%, rgba(22, 10, 18, 0.35) 100%);
+      border: 1px solid rgba(229, 169, 169, 0.15);
+      box-shadow: 0 35px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(229, 169, 169, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .screen-stage.diary-hub-section .brand {
+      margin-bottom: -0.4rem;
+    }
+
+    @media (max-width: 768px) {
+      .screen-stage.diary-hub-section {
+        width: 96vw;
+        padding: 1.8rem 1rem;
+        gap: 1.2rem;
+      }
+    }
+
     .diary-hub-section::before {
       content: '';
       position: absolute;
@@ -3797,8 +3820,8 @@
   <div class="container">
     <!-- Header Area -->
     <header>
-      <!-- Brand on screen -->
-      <div class="screen-stage">
+      <!-- Brand on screen (combined with Diary Hub) -->
+      <div class="screen-stage diary-hub-section" id="diaryHubSection">
         <div class="brand">
           <h1 class="brand-title">
             <span class="brand-clip"><em class="brand-cinephile">Cinephile's</em></span>
@@ -3806,43 +3829,6 @@
           </h1>
         </div>
         <p class="brand-subtitle">스크린이 꺼진 후에도, 영화는 당신 안에 계속된다.</p>
-      </div>
-
-      <!-- Spotlight Search Trigger -->
-      <button class="spotlight-trigger" onclick="openSpotlight()" title="영화 검색">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>영화 검색...</span>
-        <kbd>/</kbd>
-      </button>
-
-      <!-- Date Selection Controller & Settings -->
-      <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
-        <div class="controls-wrapper">
-          <span class="date-label">
-            <i class="fa-regular fa-calendar-days"></i> Boxoffice Date
-          </span>
-          <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
-        </div>
-
-        <button id="cineDiaryBtn" onclick="openCineDiary()" class="diary-launch-btn diary-launch-btn--compact" title="시네필 다이어리">
-          <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i>
-          <span>다이어리</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Content Section -->
-    <main>
-      <!-- ── Diary Hub Section: 시네필 다이어리 독립 섹션 (상단 배치) ── -->
-      <section class="diary-hub-section" id="diaryHubSection">
-        <div class="diary-hub-header">
-          <div>
-            <h2 class="diary-hub-title">
-              <i class="fa-solid fa-book-open"></i> 시네필 다이어리
-            </h2>
-            <p class="diary-hub-subtitle">스크린이 꺼진 후에도, 영화는 당신 안에 계속된다.</p>
-          </div>
-        </div>
 
         <div class="diary-hub-grid">
           <!-- Card 1: Latest Ticket -->
@@ -3911,7 +3897,33 @@
           다이어리 전체 열기
           <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem; margin-left: 0.25rem;"></i>
         </button>
-      </section>
+      </div>
+
+      <!-- Spotlight Search Trigger -->
+      <button class="spotlight-trigger" onclick="openSpotlight()" title="영화 검색">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>영화 검색...</span>
+        <kbd>/</kbd>
+      </button>
+
+      <!-- Date Selection Controller & Settings -->
+      <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <div class="controls-wrapper">
+          <span class="date-label">
+            <i class="fa-regular fa-calendar-days"></i> Boxoffice Date
+          </span>
+          <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
+        </div>
+
+        <button id="cineDiaryBtn" onclick="openCineDiary()" class="diary-launch-btn diary-launch-btn--compact" title="시네필 다이어리">
+          <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i>
+          <span>다이어리</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
 
       <!-- Divider between Diary Hub and Box Office -->
       <div class="diary-hub-divider" aria-hidden="true">
