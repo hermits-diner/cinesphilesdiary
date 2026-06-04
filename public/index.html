@@ -3719,6 +3719,18 @@
     }
     .auth-skip-note button:hover { color: var(--color-primary); }
 
+    /* 모달 활성 시 플로팅 버튼 자동 숨김 */
+    .modal-overlay.active ~ #floatingHomeBtn,
+    .modal-overlay.active ~ #authFloatingBtn,
+    .modal-overlay.active ~ #authDropdown {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #floatingHomeBtn, #authFloatingBtn {
+      transition: opacity 0.2s ease;
+    }
+
     /* ── Auth Dropdown ── */
     .auth-dropdown {
       position: fixed;
