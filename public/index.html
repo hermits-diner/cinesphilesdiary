@@ -3110,10 +3110,10 @@
     /* Desktop layout for Diary Hub dashboard (Optimized to match massive cinema screen width and prevent card clutter) */
     @media (min-width: 901px) {
       .screen-stage.diary-hub-section {
-        width: 1160px !important; /* expanded to match massive cinema screen width */
+        width: 1240px !important; /* expanded for an ultra-wide cinematic screen presentation */
         height: auto !important;
-        padding: 2.5rem 3rem !important;
-        gap: 1.5rem !important;
+        padding: 1.4rem 2.5rem !important; /* reduced vertical padding to slim down heights */
+        gap: 0.7rem !important; /* reduced gap between elements for compact structure */
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
@@ -3126,41 +3126,42 @@
         box-shadow: 0 45px 100px rgba(0, 0, 0, 0.9), 0 0 50px rgba(229, 169, 169, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
       }
       .screen-stage.diary-hub-section .brand {
-        margin-bottom: 0.15rem !important;
+        margin-bottom: 0px !important;
       }
       .screen-stage.diary-hub-section .brand-cinephile {
-        font-size: 2.8rem !important;
+        font-size: 2.4rem !important; /* slightly balanced to fit slim layout */
       }
       .screen-stage.diary-hub-section .brand-diary {
-        font-size: 3.6rem !important;
+        font-size: 3.2rem !important;
       }
       .screen-stage.diary-hub-section .brand-subtitle {
-        font-size: 0.95rem !important;
-        margin-top: -0.2rem !important;
+        font-size: 0.85rem !important;
+        margin-top: -0.3rem !important;
       }
       .screen-stage.diary-hub-section .diary-hub-grid {
         height: auto !important;
-        margin-bottom: 0.4rem !important;
+        margin-bottom: 0.1rem !important;
         width: 100% !important;
-        gap: 1.4rem !important;
+        gap: 1.1rem !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card {
-        height: 160px !important; /* increased to give poster 120px and text ample breathing room */
-        padding: 1.15rem 1.4rem !important;
+        height: 136px !important; /* slimmed down from 160px for elegant aspect ratio */
+        padding: 0.8rem 1.15rem !important; /* reduced padding for better vertical fit */
         box-sizing: border-box !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card-poster-wrapper {
-        width: 80px !important;
-        height: 120px !important;
-        border-radius: 8px !important;
+        width: 72px !important; /* adjusted to fit 136px card height */
+        height: 104px !important;
+        border-radius: 6px !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-title {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-excerpt {
-        font-size: 0.85rem !important;
+        font-size: 0.78rem !important;
         -webkit-line-clamp: 2 !important;
-        margin-top: 0.15rem !important;
+        margin-top: 0.1rem !important;
+        line-height: 1.3 !important;
       }
     }
 
