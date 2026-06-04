@@ -1591,6 +1591,22 @@ function formatOpenDate(dateStr) {
   return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
 }
 
+// 개봉일이 오늘 기준 2달(60일) 이내인지 확인. 날짜 정보 없으면 필터하지 않음.
+function isRecentRelease(openDt) {
+  if (!openDt || openDt === '개봉연도 불명' || openDt === '개봉 정보 없음') return true;
+  // YYYYMMDD (KOBIS) → YYYY-MM-DD 변환
+  let dateStr = String(openDt);
+  if (dateStr.length === 8 && !dateStr.includes('-')) {
+    dateStr = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+  }
+  const releaseDate = new Date(dateStr);
+  if (isNaN(releaseDate.getTime())) return true;
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 2);
+  cutoff.setHours(0, 0, 0, 0);
+  return releaseDate >= cutoff;
+}
+
 // 2. Fetch and Render Daily Box Office Top 10
 async function loadBoxOfficeData(dateStr, nation = currentNation) {
   if (!dateStr) return;
@@ -1700,19 +1716,20 @@ function renderSkeletons() {
 
 // Render actual Box Office Card List
 function renderBoxOfficeList(moviesList) {
-  if (!moviesList || moviesList.length === 0) {
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
         <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-        <p>선택하신 날짜에 조회된 박스오피스 데이터가 존재하지 않습니다.</p>
+        <p>선택하신 날짜에 개봉 2달 이내 박스오피스 영화가 없습니다.</p>
       </div>
     `;
     return;
   }
-  
+
   movieGrid.innerHTML = '';
-  
-  moviesList.forEach((movie, index) => {
+
+  filtered.forEach((movie, index) => {
     const rank = parseInt(movie.rank, 10);
     const isTopThree = rank <= 3;
     const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
@@ -1807,19 +1824,20 @@ function renderBoxOfficeList(moviesList) {
 
 // Render actual Weekly Box Office Card List
 function renderWeeklyBoxOfficeList(moviesList) {
-  if (!moviesList || moviesList.length === 0) {
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
         <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-        <p>선택하신 주간에 조회된 주별 박스오피스 데이터가 존재하지 않습니다.</p>
+        <p>선택하신 주간에 개봉 2달 이내 박스오피스 영화가 없습니다.</p>
       </div>
     `;
     return;
   }
-  
+
   movieGrid.innerHTML = '';
-  
-  moviesList.forEach((movie, index) => {
+
+  filtered.forEach((movie, index) => {
     const rank = parseInt(movie.rank, 10);
     const isTopThree = rank <= 3;
     const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
@@ -1978,19 +1996,20 @@ async function loadGlobalTrendingData(region = currentGlobalRegion) {
 
 // Render actual Global Trending Card List
 function renderGlobalTrendingList(moviesList) {
-  if (!moviesList || moviesList.length === 0) {
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
         <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-        <p>조회된 글로벌 인기 영화 데이터가 존재하지 않습니다.</p>
+        <p>개봉 2달 이내 글로벌 인기 영화 데이터가 없습니다.</p>
       </div>
     `;
     return;
   }
-  
+
   movieGrid.innerHTML = '';
-  
-  moviesList.forEach((movie, index) => {
+
+  filtered.forEach((movie, index) => {
     const rank = parseInt(movie.rank, 10);
     const isTopThree = rank <= 3;
     const badgeClass = isTopThree ? `rank-${rank}` : 'rank-other';
