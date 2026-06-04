@@ -65,6 +65,7 @@ function updateAuthUI() {
   const textEl = document.getElementById('authFloatingBtnText');
   if (!btn) return;
 
+  const diaryBtn = document.getElementById('floatingDiaryBtn');
   if (supabaseUser) {
     const name = supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || '시네필';
     const avatar = supabaseUser.user_metadata?.avatar_url;
@@ -73,10 +74,12 @@ function updateAuthUI() {
       : `<i class="fa-solid fa-circle-user"></i>`;
     textEl.textContent = name.length > 12 ? name.slice(0, 11) + '…' : name;
     btn.onclick = showUserMenu;
+    if (diaryBtn) diaryBtn.style.display = 'flex';
   } else {
     iconEl.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i>`;
     textEl.textContent = '로그인';
     btn.onclick = openAuthModal;
+    if (diaryBtn) diaryBtn.style.display = 'none';
   }
 
   // AI 코칭 버튼 로그인 상태 반영
