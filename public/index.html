@@ -3718,6 +3718,73 @@
       padding: 0;
     }
     .auth-skip-note button:hover { color: var(--color-primary); }
+
+    /* ── Auth Dropdown ── */
+    .auth-dropdown {
+      position: fixed;
+      top: 4.2rem;
+      right: 1.5rem;
+      z-index: 9998;
+      background: rgba(18, 14, 26, 0.97);
+      border: 1px solid rgba(229, 169, 169, 0.2);
+      border-radius: 0.9rem;
+      padding: 0.75rem;
+      min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      animation: dropdownFadeIn 0.15s ease;
+    }
+    @keyframes dropdownFadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .auth-dropdown.open { display: block; }
+    .auth-dropdown-user {
+      padding: 0.5rem 0.6rem 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 0.5rem;
+    }
+    .auth-dropdown-name {
+      display: block;
+      font-family: var(--font-outfit);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      margin-bottom: 0.15rem;
+    }
+    .auth-dropdown-email {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      word-break: break-all;
+    }
+    .auth-dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: none;
+      border: none;
+      border-radius: 0.5rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-inter);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .auth-dropdown-btn:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--color-text-main);
+    }
+    .auth-dropdown-btn.logout { color: rgba(239,68,68,0.8); }
+    .auth-dropdown-btn.logout:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
+    @media (max-width: 768px) {
+      .auth-dropdown { top: 3.5rem; right: 1rem; min-width: 180px; }
+    }
   </style>
 </head>
 
@@ -4898,6 +4965,17 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Auth Dropdown Menu -->
+  <div id="authDropdown" class="auth-dropdown">
+    <div class="auth-dropdown-user">
+      <span class="auth-dropdown-name" id="authDropdownName"></span>
+      <span class="auth-dropdown-email" id="authDropdownEmail"></span>
+    </div>
+    <button class="auth-dropdown-btn logout" onclick="doSignOut()">
+      <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+    </button>
   </div>
 
   <!-- Auth Floating Button (top-right) -->

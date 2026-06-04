@@ -114,17 +114,46 @@ async function signUpWithEmail() {
   else { showToast('이메일 인증 필요', '가입 확인 이메일을 발송했습니다. 받은 편지함을 확인해 주세요.', 'success'); closeAuthModal(); }
 }
 
-async function showUserMenu() {
-  const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email || '사용자';
-  if (confirm(`${name}으로 로그인 중\n\n로그아웃 하시겠습니까?`)) {
-    const sb = getSupabase();
-    if (sb) {
-      await sb.auth.signOut();
-      supabaseUser = null;
-      updateAuthUI();
-    }
+function showUserMenu() {
+  const dropdown = document.getElementById('authDropdown');
+  if (!dropdown) return;
+
+  if (dropdown.classList.contains('open')) {
+    dropdown.classList.remove('open');
+    return;
+  }
+
+  const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email?.split('@')[0] || '시네필';
+  const email = supabaseUser?.email || '';
+  const nameEl = document.getElementById('authDropdownName');
+  const emailEl = document.getElementById('authDropdownEmail');
+  if (nameEl) nameEl.textContent = name;
+  if (emailEl) emailEl.textContent = email;
+
+  dropdown.classList.add('open');
+
+  // 외부 클릭 시 닫기
+  setTimeout(() => {
+    document.addEventListener('click', function closeDropdown(e) {
+      if (!dropdown.contains(e.target) && e.target.id !== 'authFloatingBtn') {
+        dropdown.classList.remove('open');
+        document.removeEventListener('click', closeDropdown);
+      }
+    });
+  }, 0);
+}
+
+async function doSignOut() {
+  const dropdown = document.getElementById('authDropdown');
+  if (dropdown) dropdown.classList.remove('open');
+  const sb = getSupabase();
+  if (sb) {
+    await sb.auth.signOut();
+    supabaseUser = null;
+    updateAuthUI();
   }
 }
+window.doSignOut = doSignOut;
 
 // Load all cloud data into localStorage then re-render UI
 async function loadUserDataFromSupabase() {
