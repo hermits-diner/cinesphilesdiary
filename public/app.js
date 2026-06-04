@@ -267,8 +267,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         loadBoxOfficeData(e.target.value, currentNation);
       } else if (currentViewMode === 'WEEKLYBOXOFFICE') {
         loadWeeklyBoxOfficeData(e.target.value, currentNation);
-      } else if (currentViewMode === 'GLOBALTRENDING') {
-        loadGlobalTrendingData(currentGlobalRegion, e.target.value);
       }
     });
   }
@@ -338,6 +336,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       if (nationTabsContainer) nationTabsContainer.style.display = '';
       if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
+      const controlsWrapper = document.querySelector('.controls-wrapper');
+      if (controlsWrapper) controlsWrapper.style.display = 'flex';
       if (currentDateTitle) currentDateTitle.style.display = '';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-chart-line';
@@ -363,6 +363,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       if (nationTabsContainer) nationTabsContainer.style.display = '';
       if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
+      const controlsWrapper = document.querySelector('.controls-wrapper');
+      if (controlsWrapper) controlsWrapper.style.display = 'flex';
       if (currentDateTitle) currentDateTitle.style.display = '';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-calendar-days';
@@ -391,6 +393,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       if (nationTabsContainer) nationTabsContainer.style.display = 'none';
       if (globalNationTabsContainer) globalNationTabsContainer.style.display = 'none';
+      const controlsWrapper = document.querySelector('.controls-wrapper');
+      if (controlsWrapper) controlsWrapper.style.display = 'none';
       if (currentDateTitle) currentDateTitle.style.display = 'none';
       if (mainSectionIcon) {
         mainSectionIcon.className = 'fa-solid fa-hourglass-half';
@@ -414,9 +418,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         if (nationTabsContainer) nationTabsContainer.style.display = 'none';
         if (globalNationTabsContainer) globalNationTabsContainer.style.display = '';
+        const controlsWrapper = document.querySelector('.controls-wrapper');
+        if (controlsWrapper) controlsWrapper.style.display = 'none';
         if (currentDateTitle) {
           currentDateTitle.style.display = '';
-          currentDateTitle.textContent = formatKoreanDate(dateInput.value);
+          currentDateTitle.textContent = formatKoreanDate(getYesterdayDateString());
         }
         if (mainSectionIcon) {
           mainSectionIcon.className = 'fa-solid fa-earth-americas';
@@ -425,7 +431,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           mainSectionText.textContent = '글로벌 인기 영화';
         }
 
-        loadGlobalTrendingData(currentGlobalRegion, dateInput.value);
+        loadGlobalTrendingData(currentGlobalRegion);
       });
     }
   }
@@ -1542,9 +1548,9 @@ async function loadUpcomingMovies() {
   }
 }
 
-// 2.7. Fetch and Render Global Trending & Popular Charts
-async function loadGlobalTrendingData(region = currentGlobalRegion, dateStr = dateInput ? dateInput.value : getYesterdayDateString()) {
-  if (!dateStr) return;
+// 2.7. Fetch and Render Centralized Global Trending Charts (Always query yesterday's date for fresh TMDB data)
+async function loadGlobalTrendingData(region = currentGlobalRegion) {
+  const dateStr = getYesterdayDateString();
   
   if (currentViewMode === 'GLOBALTRENDING') {
     const formattedTitleDate = formatKoreanDate(dateStr);
