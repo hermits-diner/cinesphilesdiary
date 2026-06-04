@@ -3083,13 +3083,27 @@
       margin-bottom: -0.4rem;
     }
 
+    /* Spotlight trigger when inside screen stage */
+    .screen-stage.diary-hub-section .spotlight-trigger {
+      width: min(340px, 80vw);
+      padding: 0.45rem 1.1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(229, 169, 169, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .screen-stage.diary-hub-section .spotlight-trigger:hover {
+      border-color: rgba(229, 169, 169, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 20px rgba(229, 169, 169, 0.08);
+    }
+
     /* Desktop screen-matching constraint to align perfectly with SVG background screen (880x328) */
     @media (min-width: 901px) {
       .screen-stage.diary-hub-section {
         width: 880px !important;
         height: 328px !important;
-        padding: 1.25rem 2.5rem !important;
-        gap: 0.65rem !important;
+        padding: 1rem 2.5rem !important; /* more compact padding */
+        gap: 0.5rem !important; /* more compact gap to fit 5 items */
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
@@ -3947,6 +3961,13 @@
         </div>
         <p class="brand-subtitle">스크린이 꺼진 후에도, 영화는 당신 안에 계속된다.</p>
 
+        <!-- Spotlight Search Trigger (Integrated inside Movie Screen Stage) -->
+        <button class="spotlight-trigger" onclick="openSpotlight()" title="영화 검색">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>영화 검색...</span>
+          <kbd>/</kbd>
+        </button>
+
         <div class="diary-hub-grid">
           <!-- Card 1: Latest Ticket -->
           <div class="diary-hub-card diary-hub-card--ticket" id="hubTicketCard" onclick="openCineDiary(); setTimeout(()=>{ const btn=document.querySelector('.space-tab-btn[data-tab=tabTicket]'); if(btn) btn.click(); }, 200);">
@@ -4015,13 +4036,6 @@
           <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem; margin-left: 0.25rem;"></i>
         </button>
       </div>
-
-      <!-- Spotlight Search Trigger -->
-      <button class="spotlight-trigger" onclick="openSpotlight()" title="영화 검색">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>영화 검색...</span>
-        <kbd>/</kbd>
-      </button>
 
       <!-- Date Selection Controller & Settings -->
       <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
