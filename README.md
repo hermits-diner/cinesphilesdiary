@@ -1,176 +1,168 @@
 # 🎬 Cinephile's Diary
 
-> **시네마틱 AI 영화 비평 트레이너** — "스크린이 꺼진 후에도, 영화는 당신 안에 계속된다." 시네필 다이어리 & 작문 훈련 공간
+> **시네마틱 AI 영화 비평 트레이너** — "스크린이 꺼진 후에도, 영화는 당신 안에 계속된다."
 
 ---
 
 ## 📖 프로젝트 소개
 
-Cinephile's Diary는 한국영화진흥위원회(KOBIS) Open API의 실시간 데이터와 TMDB(The Movie Database)의 풍부한 시각적 자산(포스터, 백드롭 이미지, 평점, 줄거리)을 유기적으로 결합하여 사용자에게 몰입감 넘치는 영화 탐색 경험을 선사합니다. 
+Cinephile's Diary는 한국영화진흥위원회(KOBIS) Open API의 실시간 데이터와 TMDB의 고화질 비주얼 자산을 결합한 시네필 전용 영화 다이어리 앱입니다.
 
-특히, 단순한 기록장을 넘어 사용자의 영화 작문 능력을 키워주는 **AI 영화 비평 트레이너**를 장착했습니다. 사용자가 감상평(최대 300자) 혹은 다이어리 초안(최대 2000자)을 작성하면, 5차원 평가 지표로 채점하고 저명한 일간지 평론가 수준의 우아하고 세련된 **Before & After 첨삭 완성본**을 제공합니다. 
-
-아날로그 폴라로이드 사진 엽서 감성의 다이어리 꾸미기('다꾸') 디자인과 전체 화면을 가득 채우는 몽환적인 풀스크린 캔버스가 결합된 초프리미엄 웹 애플리케이션입니다.
+**Supabase 기반 로그인 및 클라우드 동기화**를 지원하여, 어떤 기기에서도 본인의 다이어리·티켓·버킷리스트를 이어서 사용할 수 있습니다. 단순한 기록장을 넘어, 사용자의 영화 작문 능력을 키워주는 **AI 영화 비평 트레이너(Gemini 연동)** 를 탑재한 초프리미엄 웹앱입니다.
 
 ---
 
 ## ✨ 주요 기능
 
-| 기능 분류 | 세부 기능 및 설명 |
+| 기능 | 설명 |
 |------|------|
-| 📊 **실시간 박스오피스** | KOBIS API 기반 일별/주별 박스오피스 TOP 10 순위 및 개봉 예정작 정보를 실시간 제공 |
-| 🖼️ **TMDB 비주얼 연동** | 영화별 고화질 포스터, 모달 배경용 와이드 백드롭 이미지, 실시간 평점 및 줄거리 자동 매핑 |
-| 🔍 **글로벌 실시간 검색** | 헤더에 탑재된 오로라 아우라 검색창을 통해 과거 명작이나 해외 영화까지 실시간 검색하여 즉시 디지털 티켓 발행 및 AI 훈련 모달 연동 |
-| 🤖 **AI 비평 코칭 트레이너** | 사용자가 작성한 초안(감상평 최대 300자, 다이어리 최대 2000자)에 대해 **[표현력, 구조적 전개, 연출 분석, 어휘력, 잠재지수]** 5대 영역을 날카롭게 평가하고, 글쓰기 꿀팁 조언 및 평론가 톤 첨삭 교정본을 제공 (Gemini 1.5 Flash 연동 및 오프라인 Fallback 샌드박스 탑재) |
-| 🌸 **풀스크린 캔버스** | 모달의 920px 갇힌 크기 장벽을 완전히 헐고 화면 전체(`100vw x 100vh`)를 가득 메우는 광활한 가상 캔버스를 구현하여, 몽환적인 영화 스틸컷 백드롭 블러(`blur(40px)`)를 배경으로 쾌적한 작문 환경 제공 |
-| 🎨 **로즈골드 다꾸 테마** | 차가운 네온 빛 대신 미드나잇 벨벳 밤하늘(`#0c0b11`)을 기조로 **소프트 로즈골드 핑크**, **은은한 모브 라벤더**, **앤틱 리얼 골드**, **크림 페이퍼 화이트** 색상 토큰을 정교하게 조합한 낭만적 비주얼 튜닝 |
-| 🏷️ **폴라로이드 피드** | 다이어리 피드 카드들을 감성적인 화이트 보더와 부드러운 입체 그림자를 지닌 **아날로그 폴라로이드 사진 엽서** 형태로 튜닝하고, 마우스 호버 시 살짝 떠오르며 비스듬하게 회전하는(1.2도) 다이나믹 모션 적용 |
-| ✍️ **서정적 세리프 서체** | 감상문 기록 텍스트에 문학적 사색의 향기를 풍겨주는 **'Noto Serif KR' (나눔명조/이탤릭 세리프)체**를 결합하여 종이 일기장을 넘겨 읽는 듯한 사색의 질감 제공 |
-| 🎞️ **영사기 셔터 빔 펄스** | AI 비평 분석이 진행되는 동안, 영화 영사기 광선이 허공을 향해 은은하게 맥박치며 깜빡이는(Pulse) 감성적인 CSS 키프레임 스켈레톤 로더 탑재 |
-| 🏠 **플로팅 홈 버튼** | 화면 좌측 하단에 상시 노출되는 반투명 글래스모피즘 홈 버튼을 통해, 어떤 화면에서든 한 번의 클릭으로 모든 모달을 닫고 메인 화면으로 돌아갈 수 있는 원클릭 내비게이션 기능 제공 |
-| 💸 **비용 제어 & 캐싱 샌드박스** | 일일 AI 코칭 횟수를 3회로 제어하고 한도 초과 시 가상 보상형 영화 광고 시청을 통해 충전하는 샌드박스 연동. 동일 문장 재요청 시 로컬 해시 비교를 통해 캐시 데이터를 즉시 렌더링하여 무분별한 API 낭비 방지 |
-| 🔐 **보안 환경 구축** | Bearer 인증 토큰 런타임 동적 획득 방식 채택, 프롬프트 인젝션 이스케이프 및 강력한 XSS 방지 필터 적용 |
+| 🔐 **로그인 & 클라우드 동기화** | Google OAuth / 이메일 로그인 지원. 다이어리·티켓·버킷리스트·한줄평이 Supabase DB에 저장되어 기기간 자동 동기화 |
+| 📊 **실시간 박스오피스** | KOBIS API 기반 일별/주별 박스오피스 TOP 10, 개봉 예정작, 글로벌 트렌딩(8개국) |
+| 🖼️ **TMDB 비주얼 연동** | 고화질 포스터, 와이드 백드롭, 실시간 평점, 줄거리, 예고편 자동 매핑 |
+| 🔍 **글로벌 실시간 검색** | 오로라 아우라 검색창으로 과거 명작·해외 영화까지 실시간 검색 |
+| 🤖 **AI 비평 코칭 트레이너** | 감상문 초안(최대 2000자)을 5개 영역 채점 + 평론가 톤 첨삭 교정본 제공 (Gemini 연동, 일 3회 서버사이드 제한) |
+| 🎟️ **디지털 티켓 발행** | 관람 정보를 폴라로이드 감성 티켓으로 발행·보관 |
+| ✍️ **영화 다이어리** | 감성 에디터로 영화 일기 작성, 이모지·컨텍스트 기록 |
+| 📋 **버킷리스트 보드** | 보고 싶은 영화 체크리스트, Excel 가져오기/내보내기 |
+| 🌸 **로즈골드 다꾸 테마** | 미드나잇 벨벳 배경 + 소프트 로즈골드 / 모브 라벤더 / 앤틱 골드 디자인 토큰 |
 
 ---
 
 ## 🛠️ 기술 스택
 
 ### Backend
-- **Node.js** + **Express.js** — 고성능 웹 서버 및 API 라우팅
-- **axios** — 비동기 외부 API 오케스트레이션 (KOBIS, TMDB, Gemini API)
-- **dotenv** — 환경변수 관리 및 크레덴셜 격리
-- **express-rate-limit** — 서비스 남용 및 API 과부하 방지를 위한 IP별 요청 제한 알고리즘
+- **Node.js + Express.js** — API 서버
+- **Supabase (PostgreSQL)** — 사용자 인증 + 클라우드 DB
+- **@supabase/supabase-js** — Supabase Admin SDK (서버사이드 JWT 검증)
+- **axios** — 외부 API 오케스트레이션
+- **helmet / cors / express-rate-limit** — 보안 레이어
 
 ### Frontend
-- **Vanilla HTML5 / CSS3 / ES6+ JavaScript** (`public/` 디렉터리)
-- **Aesthetics & UI**: 로즈골드 감성 파스텔 테마, CSS Glassmorphism, 셔터 빔 펄스 로딩, Polaroid Note Cards, Staggered Fade-in 모션 적용
-- **Google Fonts** (`Outfit`, `Inter`, `Noto Serif KR`), **FontAwesome Icons**
+- **Vanilla HTML5 / CSS3 / ES6+** — 프레임워크 없음
+- **Supabase JS Client (CDN)** — Auth + DB 직접 연동
+- **Google Fonts** (Outfit, Inter, Noto Serif KR), **FontAwesome 6**
 
-### 외부 연동 API
-- **KOBIS Open API** (영화진흥위원회) — 박스오피스 실시간 통계 및 영화 명세
-- **TMDB API** (The Movie Database) — 고화질 포스터, 백드롭 미디어 및 해외 평점, 줄거리 검색
-- **Google Gemini 1.5 Flash API** — AI 비평 코칭 리포트 및 세련된 첨삭 비평 작성을 위한 거대 언어 모델
+### 외부 API
+- **KOBIS Open API** — 박스오피스 실시간 통계
+- **TMDB API** — 포스터, 백드롭, 평점, 예고편
+- **Google Gemini API** — AI 비평 코칭
+
+### 인프라
+- **Vercel** — 배포 (Express 서버리스)
+- **Supabase** — Auth + PostgreSQL DB
 
 ---
 
 ## 📁 프로젝트 구조
 
 ```
-cinephile-s-diary/
-├── server.js               # 백엔드 코어 (API 라우팅, 검색/AI 코칭 API 신설, 캐싱, TMDB/Gemini 연동, 보안)
-├── verify.js               # KOBIS/Gemini/TMDB 백엔드 API 기능 무결성 검증용 통합 테스트 슈트
-├── test_console_errors.js  # 크롬 헤드리스 모드 기반 브라우저 콘솔 런타임 예외 정밀 추적 검증기
-├── test_ticket_poster.js   # 디지털 티켓북 TMDB 포스터 검색 및 카러셀 보관함 로컬 영속화 통합 검증기
-├── test_movie_to_ticket.js # 영화 상세 모달 ➡️ 다이어리 티켓북 자동 완성 연계 흐름 시나리오 검증기
-├── package.json            # 프로젝트 메타데이터 및 스크립트, 의존 패키지 목록 명세
-├── .env                    # 보안 크레덴셜 환경변수 (⚠️ 절대 Git 저장소에 커밋하지 마십시오)
-├── .gitignore              # 민감 설정 및 의존 라이브러리 자동 업로드 방지 쉴드
-├── scratch/
-│   └── test_coach.js       # [신설] 영화 검색 및 AI 비평 코칭 API 동작 정밀 분석/검증용 통합 스크립트
-└── public/
-    ├── index.html          # 글로벌 검색 바 및 풀스크린 감성 다꾸 캔버스 템플릿 탑재 포털 뷰
-    └── app.js              # 프론트엔드 통합 비즈니스 로직 (실시간 디바운스 검색, AI 코칭 연동, 광고 충전 샌드박스)
+cinesphilesdiary/
+├── server.js               # Express 백엔드 (API 라우팅, Supabase Admin, 캐싱, 보안)
+├── vercel.json             # Vercel 배포 설정
+├── package.json
+├── .env                    # 환경변수 (⚠️ Git 커밋 금지)
+├── supabase/
+│   └── schema.sql          # DB 테이블 정의 + RLS 정책 (Supabase SQL Editor에서 실행)
+├── public/
+│   ├── index.html          # UI 템플릿 (CSS 포함)
+│   └── app.js              # 프론트엔드 로직 (Auth 모듈 + 데이터 동기화 포함)
+└── docs/                   # Jekyll 문서 포털
 ```
+
+---
+
+## 🗄️ DB 스키마 (Supabase)
+
+| 테이블 | 설명 | 비고 |
+|--------|------|------|
+| `profiles` | 사용자 프로필 | 가입 시 자동 생성 |
+| `cinema_logs` | 영화별 한줄평 + 별점 | unique(user_id, movie_cd) |
+| `diary_entries` | 다이어리 전문 | unique(user_id, local_id) |
+| `tickets` | 디지털 티켓 | unique(user_id, local_id) |
+| `buckets` | 버킷리스트 보드 | items: jsonb |
+| `coach_usage` | AI 코칭 일일 횟수 | 서버사이드 제한 |
+
+모든 테이블에 **RLS(Row Level Security)** 가 적용되어 있습니다.
 
 ---
 
 ## 🚀 시작하기
 
-### 설치
+### 1. 저장소 클론 & 설치
 
 ```bash
-# 저장소 복사
-git clone <repository-url>
-cd cinediary-app
-
-# 의존 패키지 설치
+git clone https://github.com/hermits-diner/cinesphilesdiary.git
+cd cinesphilesdiary
 npm install
 ```
 
-### 실행 명령어
+### 2. 환경변수 설정
 
-```bash
-npm start         # 프로덕션 서버 구동 (포트: 5001)
-npm run dev       # 개발자 서버 구동 (서버 코드 변경 시 실시간 오토-리로드 제공)
-npm test          # API 및 응답 스펙 무결성 자율 테스트
+`.env` 파일 생성:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+KOBIS_API_KEY=your_kobis_key
+TMDB_API_KEY=your_tmdb_key
+GEMINI_API_KEY=your_gemini_key
+APP_AUTH_TOKEN=your_secret_token
+ALLOWED_ORIGINS=http://localhost:5000
 ```
 
-서버 구동 후 브라우저에서 **`http://localhost:5001`** 으로 접속하여 사용해보실 수 있습니다.
+### 3. Supabase 테이블 생성
+
+Supabase Dashboard → SQL Editor → `supabase/schema.sql` 내용 실행
+
+### 4. 로컬 실행
+
+```bash
+npm run dev   # 개발 서버 (포트 5000, 자동 리로드)
+npm start     # 프로덕션 서버
+```
 
 ---
 
-## 📡 API 엔드포인트 명세
+## 📡 API 엔드포인트
 
-Cinephile's Diary의 내부 보호 API들을 호출하려면 `Authorization: Bearer <토큰>` 헤더를 주입해야 합니다. 프론트엔드는 시작 시 `/api/init`를 통해 안전하게 토큰을 받아 메모리에 소유합니다.
+| Method | Path | 인증 | 설명 |
+|--------|------|------|------|
+| GET | `/api/init` | — | 앱 인증 토큰 발급 |
+| GET | `/api/boxoffice` | Bearer | 일별 박스오피스 |
+| GET | `/api/weeklyboxoffice` | Bearer | 주별 박스오피스 |
+| GET | `/api/upcoming` | Bearer | 개봉 예정작 |
+| GET | `/api/movie` | Bearer | 영화 상세정보 |
+| GET | `/api/search` | Bearer | 글로벌 영화 검색 |
+| GET | `/api/global-trending` | Bearer | 지역별 트렌딩 |
+| POST | `/api/review` | Bearer | AI 한줄평 생성 |
+| POST | `/api/coach-review` | **Supabase JWT** | AI 다이어리 코칭 (로그인 필수) |
 
-### 1. 글로벌 영화 실시간 통합 검색 [NEW]
-* **HTTP Method**: `GET`
-* **Path**: `/api/search?query=XXXXXXXX`
-* **파라미터**: `query` (검색할 영화 제목 키워드)
-* **설명**: 전 세계 및 과거 명작 영화의 국문 상세 프로필과 TMDB 고화질 포스터, 평점을 즉시 도출합니다.
-* **응답 예시**:
-  ```json
-  {
-    "success": true,
-    "fromCache": false,
-    "data": [
-      {
-        "movieCd": "TMDB_496243",
-        "movieNm": "기생충",
-        "openDt": "2019-05-30",
-        "poster": "https://image.tmdb.org/t/p/w300/q7Sk7kZu68LYZIQrA4IOgIU37fT.jpg",
-        "rating": "8.5",
-        "genre": "코미디",
-        "overview": "전원백수로 살 길 막막하지만 사이는 좋은 기택 가족..."
-      }
-    ]
-  }
-  ```
-
-### 2. AI 평론가 영화 다이어리 비평 코칭 [NEW]
-* **HTTP Method**: `POST`
-* **Path**: `/api/coach-review`
-* **요청 바디 (JSON)**:
-  ```json
-  {
-    "movieNm": "기생충",
-    "diaryTitle": "계단 아래의 미장센",
-    "diaryContent": "가난한 자와 부자의 대비가 계단이라는 시각적 미장센을 통해 잘 드러나 전율을 느꼈다.",
-    "diaryContext": "영화관에서 혼자",
-    "emotion": "🍿"
-  }
-  ```
-* **설명**: 작성한 영화 일기 초안을 기반으로 5대 작문 성취 항목을 채점하고 피드백 가이드라인 및 평론가 톤 첨삭 교정본을 리턴합니다.
-* **응답 예시**:
-  ```json
-  {
-    "success": true,
-    "scores": {
-      "expression": 82,
-      "structure": 75,
-      "analysis": 75,
-      "vocabulary": 74,
-      "coachability": 80
-    },
-    "feedback": "작성해주신 영화 일기 《계단 아래의 미장센》은 영화 《기생충》이 품고 있는 드라마, 스릴러 장르 특유의 짙은 매력을 훌륭히 건져 올리고 있습니다...",
-    "corrected": "《기생충》을 보고 적어 내려간 리뷰어의 다이어리 《계단 아래의 미장센》는 드라마, 스릴러 장르가 스크린 너머로 전달하는 정서적 깊이를 가감 없이 포착해 낸다...",
-    "simulated": false
-  }
-  ```
+> `/api/coach-review`는 Supabase JWT로 사용자를 인증하며, 일 3회 한도를 서버에서 관리합니다.
 
 ---
 
-## ⚙️ 캐싱 레이어 맵
+## ⚙️ 캐싱 레이어
 
-레이턴시 극대화와 외부 API 콜 세이버를 위해 엄격한 타임아웃(TTL)이 내재화된 캐싱 시스템을 도입하였습니다:
-
-| 데이터 분류 | 캐시 유효 시간 (TTL) | 주요 특징 |
-|------|------|------|
-| **영화 실시간 통합 검색** | 15분 (900초) | 타이핑 실시간 입력에 의한 중복 쿼리 과도 청구 차단 |
-| **박스오피스 리스트** | 6시간 (21,600초) | 동일 날짜에 대한 빈번한 순위 갱신 요청 완화 |
-| **영화 상세 프로필** | 24시간 (86,400초) | 정적 정보로 한 번 로드 시 최적 속도로 런타임 캐싱 처리 |
-| **TMDB 이미지 자산** | 24시간 (86,400초) | 영화명 검색에 수반되는 네트워크 비용 최소화 |
+| 데이터 | TTL |
+|--------|-----|
+| 검색 결과 | 15분 |
+| 박스오피스 | 6시간 |
+| 영화 상세 | 24시간 |
+| TMDB 이미지 | 24시간 |
 
 ---
 
-<p align="center">Premium Engineered with 🌸 Rosegold Vibe & Noto Serif Aesthetics</p>
+## 🔐 인증 흐름
+
+```
+1. 사용자 → Google OAuth 또는 이메일 로그인
+2. Supabase Auth → JWT 발급
+3. 프론트엔드 → JWT로 Supabase DB 직접 읽기/쓰기 (RLS 적용)
+4. AI 코칭 요청 시 → JWT를 서버로 전송
+5. 서버 → Service Role로 JWT 검증 + 일일 사용량 체크
+```
+
+---
+
+<p align="center">Premium Engineered with 🌸 Rosegold Vibe & Cinephile Soul</p>
