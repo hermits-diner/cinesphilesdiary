@@ -3125,6 +3125,7 @@
       .screen-stage.diary-hub-section {
         width: min(1240px, 96vw) !important;
         height: auto !important;
+        position: relative !important;
         padding: 3rem 2.8rem 2.8rem !important;
         gap: 1.25rem !important;
         display: flex !important;
@@ -3311,6 +3312,80 @@
       opacity: 1;
       transform: translateX(0);
       color: rgba(229, 169, 169, 0.85);
+    }
+
+    /* ── Rolling Credits Background ── */
+    .diary-hub-roll {
+      position: absolute;
+      inset: 0;
+      display: none;
+      overflow: hidden;
+      pointer-events: none;
+      border-radius: inherit;
+      z-index: -1;
+      padding: 0 2.5rem;
+      justify-content: space-around;
+      align-items: flex-start;
+    }
+    .screen-stage.diary-hub-section .diary-hub-roll {
+      display: flex;
+    }
+    .diary-hub-roll-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      animation: diary-roll var(--roll-speed, 40s) linear infinite;
+      will-change: transform;
+    }
+    .diary-hub-roll-col:nth-child(2) { animation-delay: -12s; }
+    .diary-hub-roll-col:nth-child(3) { animation-delay: -24s; }
+    @keyframes diary-roll {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-50%); }
+    }
+    .diary-hub-roll-col span {
+      display: block;
+      font-family: var(--font-outfit);
+      font-size: 0.68rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      color: rgba(235, 200, 180, 0.07);
+      white-space: nowrap;
+      text-transform: uppercase;
+      line-height: 1;
+      user-select: none;
+    }
+    .diary-hub-roll-col:nth-child(2) span {
+      color: rgba(212, 175, 55, 0.055);
+    }
+
+    /* ── Film Grain Overlay ── */
+    .screen-stage.diary-hub-section::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      opacity: 0.042;
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 10px;
+      animation: film-grain 0.7s steps(1) infinite;
+      will-change: background-position;
+    }
+    @keyframes film-grain {
+      0%   { background-position:   0px   0px; }
+      14%  { background-position:  55px -38px; }
+      28%  { background-position: -38px  65px; }
+      43%  { background-position:  72px  22px; }
+      57%  { background-position: -52px -28px; }
+      71%  { background-position:  28px  52px; }
+      85%  { background-position: -42px -62px; }
+      100% { background-position:   0px   0px; }
+    }
+    @media (max-width: 900px) {
+      .diary-hub-roll  { display: none !important; }
+      .screen-stage.diary-hub-section::after { display: none !important; }
     }
 
     .diary-hub-card--ticket::before {
@@ -4238,6 +4313,59 @@
     <header>
       <!-- Brand on screen (combined with Diary Hub) -->
       <div class="screen-stage diary-hub-section" id="diaryHubSection">
+
+        <!-- Rolling credits background (aria-hidden: decorative only) -->
+        <div class="diary-hub-roll" aria-hidden="true">
+          <!-- Col 1: Directors -->
+          <div class="diary-hub-roll-col" style="--roll-speed:38s">
+            <span>Akira Kurosawa</span><span>Stanley Kubrick</span><span>Federico Fellini</span>
+            <span>Ingmar Bergman</span><span>Andrei Tarkovsky</span><span>Jean-Luc Godard</span>
+            <span>Alfred Hitchcock</span><span>Orson Welles</span><span>Martin Scorsese</span>
+            <span>Wong Kar-wai</span><span>Park Chan-wook</span><span>Bong Joon-ho</span>
+            <span>Sergio Leone</span><span>David Lynch</span><span>Christopher Nolan</span>
+            <span>Michelangelo Antonioni</span>
+            <!-- duplicate for seamless loop -->
+            <span>Akira Kurosawa</span><span>Stanley Kubrick</span><span>Federico Fellini</span>
+            <span>Ingmar Bergman</span><span>Andrei Tarkovsky</span><span>Jean-Luc Godard</span>
+            <span>Alfred Hitchcock</span><span>Orson Welles</span><span>Martin Scorsese</span>
+            <span>Wong Kar-wai</span><span>Park Chan-wook</span><span>Bong Joon-ho</span>
+            <span>Sergio Leone</span><span>David Lynch</span><span>Christopher Nolan</span>
+            <span>Michelangelo Antonioni</span>
+          </div>
+          <!-- Col 2: Cinephile Terms (gold tint) -->
+          <div class="diary-hub-roll-col" style="--roll-speed:52s">
+            <span>Cinematography</span><span>Mise en Scène</span><span>Montage</span>
+            <span>Long Take</span><span>Deep Focus</span><span>Film Noir</span>
+            <span>Nouvelle Vague</span><span>Cinema Vérité</span><span>Auteur Theory</span>
+            <span>Jump Cut</span><span>Tracking Shot</span><span>Dolly Zoom</span>
+            <span>Chiaroscuro</span><span>Neo-Realism</span><span>Dutch Angle</span>
+            <span>Fade to Black</span>
+            <!-- duplicate -->
+            <span>Cinematography</span><span>Mise en Scène</span><span>Montage</span>
+            <span>Long Take</span><span>Deep Focus</span><span>Film Noir</span>
+            <span>Nouvelle Vague</span><span>Cinema Vérité</span><span>Auteur Theory</span>
+            <span>Jump Cut</span><span>Tracking Shot</span><span>Dolly Zoom</span>
+            <span>Chiaroscuro</span><span>Neo-Realism</span><span>Dutch Angle</span>
+            <span>Fade to Black</span>
+          </div>
+          <!-- Col 3: Film Titles -->
+          <div class="diary-hub-roll-col" style="--roll-speed:44s">
+            <span>2001: A Space Odyssey</span><span>La Dolce Vita</span><span>Rashomon</span>
+            <span>Persona</span><span>Breathless</span><span>Bicycle Thieves</span>
+            <span>8½</span><span>The Godfather</span><span>In the Mood for Love</span>
+            <span>기생충</span><span>올드보이</span><span>봄 여름 가을 겨울</span>
+            <span>Vertigo</span><span>Taxi Driver</span><span>Mulholland Drive</span>
+            <span>The Apartment</span>
+            <!-- duplicate -->
+            <span>2001: A Space Odyssey</span><span>La Dolce Vita</span><span>Rashomon</span>
+            <span>Persona</span><span>Breathless</span><span>Bicycle Thieves</span>
+            <span>8½</span><span>The Godfather</span><span>In the Mood for Love</span>
+            <span>기생충</span><span>올드보이</span><span>봄 여름 가을 겨울</span>
+            <span>Vertigo</span><span>Taxi Driver</span><span>Mulholland Drive</span>
+            <span>The Apartment</span>
+          </div>
+        </div>
+
         <div class="brand">
           <h1 class="brand-title">
             <span class="brand-clip"><em class="brand-cinephile">Cinephile's</em></span>
