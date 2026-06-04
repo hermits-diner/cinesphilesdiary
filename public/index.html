@@ -239,6 +239,67 @@
       }
     }
 
+    /* Cinematic Screen Bokeh & Light Leaks */
+    .bokeh-light {
+      mix-blend-mode: color-dodge;
+      will-change: transform;
+    }
+
+    .bokeh-1 {
+      animation: floatBokeh1 25s infinite ease-in-out;
+    }
+    .bokeh-2 {
+      animation: floatBokeh2 35s infinite ease-in-out;
+    }
+    .bokeh-3 {
+      animation: floatBokeh3 42s infinite ease-in-out;
+    }
+    .bokeh-4 {
+      animation: floatBokeh4 29s infinite ease-in-out;
+    }
+
+    @keyframes floatBokeh1 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(120px, 40px) scale(1.20);
+      }
+    }
+
+    @keyframes floatBokeh2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1.10);
+      }
+      50% {
+        transform: translate(-90px, -30px) scale(0.90);
+      }
+    }
+
+    @keyframes floatBokeh3 {
+      0%, 100% {
+        transform: translate(0, 0) scale(0.95);
+      }
+      50% {
+        transform: translate(80px, -50px) scale(1.15);
+      }
+    }
+
+    @keyframes floatBokeh4 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1.05);
+      }
+      50% {
+        transform: translate(-110px, 50px) scale(1.25);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bokeh-light {
+        animation: none !important;
+      }
+    }
+
     /* Layout & Header */
     .container {
       max-width: 1200px;
@@ -2999,16 +3060,37 @@
             <stop offset="60%" stop-color="#e5a9a9" stop-opacity="0.4" />
             <stop offset="100%" stop-color="#e5a9a9" stop-opacity="0" />
           </radialGradient>
-          <!-- Seats: dark wine red -->
+          <!-- Bokeh Gradients (smooth radial fades for premium GPU-friendly lighting) -->
+          <radialGradient id="g-b1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#d4af37" stop-opacity="0.30" />
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="g-b2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#e5a9a9" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#e5a9a9" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="g-b3" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#b38cb4" stop-opacity="0.30" />
+            <stop offset="100%" stop-color="#b38cb4" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="g-b4" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+          </radialGradient>
+          <!-- Clip path for screen bounds -->
+          <clipPath id="c-scrn">
+            <rect x="280" y="55" width="880" height="328" rx="2" />
+          </clipPath>
+          <!-- Seats: dark wine red (darkened to fit cinematic theater atmosphere) -->
           <linearGradient id="g-sF" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#8c1822" />
-            <stop offset="50%" stop-color="#540a10" />
-            <stop offset="100%" stop-color="#240205" />
+            <stop offset="0%" stop-color="#3c080d" />
+            <stop offset="50%" stop-color="#210306" />
+            <stop offset="100%" stop-color="#0b0001" />
           </linearGradient>
           <linearGradient id="g-sB" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#6a0f16" />
-            <stop offset="50%" stop-color="#3c060a" />
-            <stop offset="100%" stop-color="#180103" />
+            <stop offset="0%" stop-color="#2d050a" />
+            <stop offset="50%" stop-color="#190204" />
+            <stop offset="100%" stop-color="#080001" />
           </linearGradient>
           <!-- Dark burgundy overlay for maximum readability -->
           <linearGradient id="g-over" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
@@ -3124,8 +3206,14 @@
           <circle cx="1040" cy="48" r="8" fill="#ffd899" opacity="0.4" />
         </g>
 
-        <!-- 5. Screen (warm glow) -->
-        <rect x="280" y="55" width="880" height="328" fill="url(#g-scrn)" rx="2" />
+        <!-- 5. Screen (warm glow & dynamic cinematic bokeh light leaks) -->
+        <g clip-path="url(#c-scrn)">
+          <rect x="280" y="55" width="880" height="328" fill="url(#g-scrn)" />
+          <circle class="bokeh-light bokeh-1" cx="450" cy="180" r="220" fill="url(#g-b1)" />
+          <circle class="bokeh-light bokeh-2" cx="950" cy="240" r="280" fill="url(#g-b2)" />
+          <circle class="bokeh-light bokeh-3" cx="620" cy="120" r="240" fill="url(#g-b3)" />
+          <circle class="bokeh-light bokeh-4" cx="800" cy="280" r="260" fill="url(#g-b4)" />
+        </g>
 
 
 
@@ -3135,11 +3223,11 @@
         <!-- 8+9. Seats shifted up 50px to close gap with screen -->
         <g transform="translate(0,-50)">
 
-          <!-- 8. Screen light warm wash on front rows -->
-          <rect x="0" y="750" width="1440" height="140" fill="#d4a840" fill-opacity="0.07" />
+          <!-- 8. Screen light warm wash on front rows (dimmed slightly) -->
+          <rect x="0" y="750" width="1440" height="140" fill="#d4a840" fill-opacity="0.03" />
 
-          <!-- 9. SEAT ROWS — Row 1 (front/largest, y=785) -->
-          <g fill="url(#g-sF)">
+          <!-- 9. SEAT ROWS — Row 1 (front/largest, y=785) (added opacity for theater darkness) -->
+          <g fill="url(#g-sF)" opacity="0.55">
             <rect x="90" y="785" width="70" height="52" rx="16" />
             <rect x="174" y="785" width="70" height="52" rx="16" />
             <rect x="258" y="785" width="70" height="52" rx="16" />
@@ -3158,7 +3246,7 @@
           </g>
 
           <!-- Row 2 (y=714) -->
-          <g fill="url(#g-sF)">
+          <g fill="url(#g-sF)" opacity="0.50">
             <rect x="158" y="714" width="59" height="44" rx="14" />
             <rect x="229" y="714" width="59" height="44" rx="14" />
             <rect x="300" y="714" width="59" height="44" rx="14" />
@@ -3178,7 +3266,7 @@
           </g>
 
           <!-- Row 3 (y=651) -->
-          <g fill="url(#g-sB)">
+          <g fill="url(#g-sB)" opacity="0.45">
             <rect x="215" y="651" width="50" height="36" rx="12" />
             <rect x="275" y="651" width="50" height="36" rx="12" />
             <rect x="335" y="651" width="50" height="36" rx="12" />
@@ -3199,7 +3287,7 @@
           </g>
 
           <!-- Row 4 (y=597) -->
-          <g fill="url(#g-sB)">
+          <g fill="url(#g-sB)" opacity="0.40">
             <rect x="240" y="597" width="43" height="29" rx="10" />
             <rect x="291" y="597" width="43" height="29" rx="10" />
             <rect x="342" y="597" width="43" height="29" rx="10" />
@@ -3222,7 +3310,7 @@
           </g>
 
           <!-- Row 5 (y=551) -->
-          <g fill="url(#g-sB)">
+          <g fill="url(#g-sB)" opacity="0.35">
             <rect x="272" y="551" width="36" height="23" rx="8" />
             <rect x="315" y="551" width="36" height="23" rx="8" />
             <rect x="358" y="551" width="36" height="23" rx="8" />
@@ -3247,7 +3335,7 @@
           </g>
 
           <!-- Row 6 (back/smallest, y=511) -->
-          <g fill="url(#g-sB)" opacity="0.80">
+          <g fill="url(#g-sB)" opacity="0.30">
             <rect x="310" y="511" width="29" height="17" rx="6" />
             <rect x="346" y="511" width="29" height="17" rx="6" />
             <rect x="382" y="511" width="29" height="17" rx="6" />
