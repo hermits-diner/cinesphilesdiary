@@ -114,10 +114,15 @@ async function signUpWithEmail() {
   else { showToast('이메일 인증 필요', '가입 확인 이메일을 발송했습니다. 받은 편지함을 확인해 주세요.', 'success'); closeAuthModal(); }
 }
 
-function showUserMenu() {
+async function showUserMenu() {
   const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email || '사용자';
   if (confirm(`${name}으로 로그인 중\n\n로그아웃 하시겠습니까?`)) {
-    getSupabase()?.auth.signOut();
+    const sb = getSupabase();
+    if (sb) {
+      await sb.auth.signOut();
+      supabaseUser = null;
+      updateAuthUI();
+    }
   }
 }
 
