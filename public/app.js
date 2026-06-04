@@ -14,6 +14,7 @@ const _SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 
 let _supabaseClient = null;
 let supabaseUser = null; // Currently authenticated user (null = guest)
+let _dropdownCloseHandler = null; // Stored reference — prevents listener accumulation
 
 function getSupabase() {
   if (!_supabaseClient && window.supabase) {
@@ -32,6 +33,7 @@ function initSupabaseAuth() {
     updateAuthUI();
 
     if (event === 'SIGNED_IN' && !wasLoggedIn) {
+      closeAuthModal();
       const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email?.split('@')[0] || '시네필';
       showToast('로그인 성공', `${name}님, 시네필 다이어리에 오신 것을 환영합니다!`, 'success');
       await loadUserDataFromSupabase();
@@ -41,10 +43,16 @@ function initSupabaseAuth() {
     }
   });
 
-  // 페이지 로드 시 세션 복원 — 서버에서 유효성 재확인
+  // 페이지 로드 시 세션 복원 — 복원 중 auth 버튼에 로딩 표시
+  const _initIconEl = document.getElementById('authFloatingBtnIcon');
+  const _initTextEl = document.getElementById('authFloatingBtnText');
+  if (_initIconEl) _initIconEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:0.9rem;opacity:0.55;"></i>';
+  if (_initTextEl) _initTextEl.textContent = '';
+
   sb.auth.getSession().then(async ({ data: { session }, error }) => {
     if (error || !session?.user) {
       // 세션 없음 또는 오류 → localStorage 잔여 키 정리
+      const hadSession = Object.keys(localStorage).some(k => k.startsWith('sb-'));
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('sb-') || key === 'supabase.auth.token') {
           localStorage.removeItem(key);
@@ -52,6 +60,9 @@ function initSupabaseAuth() {
       });
       supabaseUser = null;
       updateAuthUI();
+      if (error && hadSession) {
+        showToast('세션 만료', '이전 로그인 세션이 만료되었습니다. 다시 로그인해 주세요.', 'info');
+      }
       return;
     }
     supabaseUser = session.user;
@@ -107,23 +118,48 @@ function closeAuthModal() {
   if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
 }
 
+// Auth 버튼 로딩 상태 토글 — 네트워크 요청 중 중복 클릭 방지
+function setAuthLoading(loading) {
+  const googleBtn  = document.querySelector('.auth-google-btn');
+  const emailBtns  = document.querySelectorAll('.auth-email-btn');
+  const inputs     = document.querySelectorAll('#authEmailInput, #authPasswordInput');
+  [googleBtn, ...emailBtns].forEach(el => {
+    if (!el) return;
+    el.disabled = loading;
+    el.style.opacity = loading ? '0.55' : '';
+    el.style.cursor  = loading ? 'not-allowed' : '';
+  });
+  inputs.forEach(el => { if (el) el.disabled = loading; });
+}
+
 async function signInWithGoogle() {
   const sb = getSupabase();
   if (!sb) return;
+  setAuthLoading(true);
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin }
   });
-  if (error) showToast('로그인 실패', error.message, 'error');
+  // 성공 시 페이지가 Google로 이동하므로 reset 불필요
+  if (error) { setAuthLoading(false); showToast('로그인 실패', error.message, 'error'); }
 }
 
 async function signInWithEmail() {
   const sb = getSupabase();
   if (!sb) return;
-  const email = document.getElementById('authEmailInput')?.value?.trim();
+  const email    = document.getElementById('authEmailInput')?.value?.trim();
   const password = document.getElementById('authPasswordInput')?.value;
   if (!email || !password) { showToast('입력 오류', '이메일과 비밀번호를 입력해 주세요.', 'error'); return; }
+
+  const loginBtn = document.querySelector('.auth-email-btn--primary');
+  const origText = loginBtn?.textContent;
+  if (loginBtn) loginBtn.textContent = '로그인 중…';
+  setAuthLoading(true);
+
   const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  setAuthLoading(false);
+  if (loginBtn) loginBtn.textContent = origText || '로그인';
   if (error) { showToast('로그인 실패', error.message, 'error'); }
   else { closeAuthModal(); }
 }
@@ -131,13 +167,25 @@ async function signInWithEmail() {
 async function signUpWithEmail() {
   const sb = getSupabase();
   if (!sb) return;
-  const email = document.getElementById('authEmailInput')?.value?.trim();
+  const email    = document.getElementById('authEmailInput')?.value?.trim();
   const password = document.getElementById('authPasswordInput')?.value;
   if (!email || !password) { showToast('입력 오류', '이메일과 비밀번호를 입력해 주세요.', 'error'); return; }
   if (password.length < 6) { showToast('비밀번호 오류', '비밀번호는 최소 6자 이상이어야 합니다.', 'error'); return; }
+
+  const signupBtn = document.querySelector('.auth-email-btn--secondary');
+  const origText  = signupBtn?.textContent;
+  if (signupBtn) signupBtn.textContent = '가입 중…';
+  setAuthLoading(true);
+
   const { error } = await sb.auth.signUp({ email, password });
+
+  setAuthLoading(false);
+  if (signupBtn) signupBtn.textContent = origText || '회원가입';
   if (error) { showToast('회원가입 실패', error.message, 'error'); }
-  else { showToast('이메일 인증 필요', '가입 확인 이메일을 발송했습니다. 받은 편지함을 확인해 주세요.', 'success'); closeAuthModal(); }
+  else {
+    showToast('이메일 인증 필요', '가입 확인 이메일을 발송했습니다. 받은 편지함을 확인해 주세요.', 'success');
+    setTimeout(() => closeAuthModal(), 2200); // 토스트 확인 후 닫힘
+  }
 }
 
 function showUserMenu() {
@@ -158,14 +206,20 @@ function showUserMenu() {
 
   dropdown.classList.add('open');
 
-  // 외부 클릭 시 닫기
+  // 외부 클릭 시 닫기 — 기존 핸들러 제거 후 새 핸들러 등록 (누적 방지)
+  if (_dropdownCloseHandler) {
+    document.removeEventListener('click', _dropdownCloseHandler);
+    _dropdownCloseHandler = null;
+  }
   setTimeout(() => {
-    document.addEventListener('click', function closeDropdown(e) {
+    _dropdownCloseHandler = function(e) {
       if (!dropdown.contains(e.target) && e.target.id !== 'authFloatingBtn') {
         dropdown.classList.remove('open');
-        document.removeEventListener('click', closeDropdown);
+        document.removeEventListener('click', _dropdownCloseHandler);
+        _dropdownCloseHandler = null;
       }
-    });
+    };
+    document.addEventListener('click', _dropdownCloseHandler);
   }, 0);
 }
 
@@ -2518,8 +2572,17 @@ function openCineDiary() {
   // 1. OPEN IMMEDIATELY BEFORE ANY OTHER LOGIC
   cinesparkSpaceModal.classList.add('active');
   document.body.style.overflow = 'hidden';
-  console.log('[CineDiary] 모달 active 클래스 추가 완료.');
-  
+
+  // 데이터 로드 전 로딩 표시 (로그인 상태일 때만)
+  if (supabaseUser) {
+    ['hubTicketBody', 'hubDiaryBody', 'hubBucketBody'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.loaded) {
+        el.innerHTML = '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;opacity:0.4;font-size:0.8rem;"><i class="fa-solid fa-spinner fa-spin"></i> 불러오는 중…</div>';
+      }
+    });
+  }
+
   try {
     // 2. Set date inputs default to today's date if empty
     const todayStr = new Date().toISOString().split('T')[0];
