@@ -1218,7 +1218,11 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start Express server
-app.listen(PORT, () => {
-  console.log(`Cinephile's Diary server running on port ${PORT}`);
-});
+// Start Express server (local dev only — Vercel uses module.exports)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Cinephile's Diary server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
