@@ -1221,7 +1221,7 @@ app.get('*', (req, res) => {
 // Start Express server (local dev only — Vercel uses module.exports)
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`Cinephile's Diary server running on port ${PORT}`);
+    console.log(`씨네필 다이어리 server running on port ${PORT}`);
   });
 }
 

@@ -1667,7 +1667,7 @@ function renderBoxOfficeList(moviesList) {
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
           
           <!-- Fine Aesthetic Label -->
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">Cinephile's Diary</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">씨네필 다이어리</div>
         </div>
       `;
     }
@@ -1764,7 +1764,7 @@ function renderWeeklyBoxOfficeList(moviesList) {
           <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
           <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">Cinephile's Diary</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">씨네필 다이어리</div>
         </div>
       `;
     }
@@ -1930,7 +1930,7 @@ function renderGlobalTrendingList(moviesList) {
           <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
           <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">Cinephile's Diary</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">씨네필 다이어리</div>
         </div>
       `;
     }
@@ -2030,7 +2030,7 @@ function renderUpcomingList(moviesList) {
           <i class="${spec.iconClass} placeholder-icon" style="font-size: 3.25rem; text-shadow: 0 0 25px rgba(255,255,255,0.25); filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35)); color: rgba(255,255,255,0.9);"></i>
           <div style="width: 32px; height: 1.5px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin: 0.25rem 0;"></div>
           <div class="placeholder-title" style="font-family: var(--font-outfit); font-size: 1.15rem; font-weight: 800; line-height: 1.4; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.65); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-height: 4.2em;">${escapeHtml(movie.movieNm)}</div>
-          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">Cinephile's Diary</div>
+          <div style="font-family: var(--font-outfit); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); margin-top: 0.15rem;">씨네필 다이어리</div>
         </div>
       `;
     }
@@ -2140,7 +2140,7 @@ async function openMovieDetails(movieCd, movieNm) {
     <i class="${spec.iconClass}" style="font-size: 2.25rem; color: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));"></i>
     <div style="width: 25px; height: 1.5px; background: rgba(255, 255, 255, 0.25); margin: 0.15rem 0;"></div>
     <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(movieNm)}</div>
-    <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">Cinephile's Diary</div>
+    <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">씨네필 다이어리</div>
   `;
   
   const overviewContainer = document.getElementById('modalOverview');
@@ -2237,7 +2237,7 @@ async function openMovieDetails(movieCd, movieNm) {
         <i class="${specRefined.iconClass}" style="font-size: 2.25rem; color: rgba(255,255,255,0.9); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));"></i>
         <div style="width: 25px; height: 1.5px; background: rgba(255, 255, 255, 0.25); margin: 0.15rem 0;"></div>
         <div style="font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(data.movieNm)}</div>
-        <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">Cinephile's Diary</div>
+        <div style="font-family: var(--font-outfit); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255, 255, 255, 0.35);">씨네필 다이어리</div>
       `;
       poster.style.display = 'none';
       posterPlaceholder.style.display = 'flex';
@@ -2934,7 +2934,7 @@ function deleteTicketStub(e, id) {
   }
 }
 
-// --- Tab 2: Cinephile's Daily Journal Logic ---
+// --- Tab 2: 씨네필 다이어리 Logic ---
 function saveDiaryEntry() {
   const diaryTitleEl = document.getElementById('diaryTitle');
   const diaryDateEl = document.getElementById('diaryDate');
