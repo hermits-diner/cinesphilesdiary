@@ -239,7 +239,8 @@ app.get('/api/boxoffice', checkAuth, async (req, res) => {
         poster: tmdb.poster,
         backdrop: tmdb.backdrop,
         rating: tmdb.rating,
-        genre: tmdb.genre
+        genre: tmdb.genre,
+        tmdbYear: tmdb.releaseYear
       };
     }));
 
@@ -329,7 +330,8 @@ app.get('/api/weeklyboxoffice', checkAuth, async (req, res) => {
         poster: tmdb.poster,
         backdrop: tmdb.backdrop,
         rating: tmdb.rating,
-        genre: tmdb.genre
+        genre: tmdb.genre,
+        tmdbYear: tmdb.releaseYear
       };
     }));
 
@@ -468,7 +470,8 @@ async function getTmdbAssets(movieNm, openDt) {
         rating: movie.vote_average ? movie.vote_average.toFixed(1) : null,
         overview: movie.overview || null,
         trailerKey: trailerKey,
-        genre: genre
+        genre: genre,
+        releaseYear: movie.release_date ? parseInt(movie.release_date.slice(0, 4), 10) : null
       };
       
       apiCache.set(cacheKey, data, 86400); // Cache for 24 hours

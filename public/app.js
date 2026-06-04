@@ -1591,10 +1591,19 @@ function formatOpenDate(dateStr) {
   return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
 }
 
-// 개봉일이 오늘 기준 2달(60일) 이내인지 확인. 날짜 정보 없으면 필터하지 않음.
-function isRecentRelease(openDt) {
+// 개봉 2달 이내 작품인지 확인. movie 객체를 받아 openDt + tmdbYear 이중 검사.
+function isRecentRelease(movie) {
+  const openDt = movie.openDt;
+  const tmdbYear = movie.tmdbYear;
+
+  // TMDB 원작 연도가 있으면 1차 관문: 전년도 이전 작품은 재개봉이어도 제외
+  if (tmdbYear) {
+    const thisYear = new Date().getFullYear();
+    if (tmdbYear < thisYear - 1) return false;
+  }
+
+  // KOBIS openDt 2달 이내 체크
   if (!openDt || openDt === '개봉연도 불명' || openDt === '개봉 정보 없음') return true;
-  // YYYYMMDD (KOBIS) → YYYY-MM-DD 변환
   let dateStr = String(openDt);
   if (dateStr.length === 8 && !dateStr.includes('-')) {
     dateStr = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
@@ -1716,7 +1725,7 @@ function renderSkeletons() {
 
 // Render actual Box Office Card List
 function renderBoxOfficeList(moviesList) {
-  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m));
   if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
@@ -1824,7 +1833,7 @@ function renderBoxOfficeList(moviesList) {
 
 // Render actual Weekly Box Office Card List
 function renderWeeklyBoxOfficeList(moviesList) {
-  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m));
   if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
@@ -1996,7 +2005,7 @@ async function loadGlobalTrendingData(region = currentGlobalRegion) {
 
 // Render actual Global Trending Card List
 function renderGlobalTrendingList(moviesList) {
-  const filtered = (moviesList || []).filter(m => isRecentRelease(m.openDt));
+  const filtered = (moviesList || []).filter(m => isRecentRelease(m));
   if (filtered.length === 0) {
     movieGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--color-text-muted);">
