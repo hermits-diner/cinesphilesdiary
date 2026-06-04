@@ -3263,21 +3263,25 @@ function updateDiaryHub() {
 
       hubTicketCard.innerHTML = `
         ${posterHtml}
-        <div class="diary-hub-card-right">
-          <div class="diary-hub-card-header" style="margin-bottom: 0;">
-            <div class="diary-hub-card-icon">
-              <i class="fa-solid fa-ticket"></i>
+        <div class="diary-hub-card-right" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-width: 0;">
+          <div>
+            <div class="diary-hub-card-header-compact" style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.15rem;">
+              <i class="fa-solid fa-ticket" style="color: var(--color-primary); font-size: 0.75rem;"></i>
+              <span class="diary-hub-card-label" style="font-size: 0.65rem; white-space: nowrap;">최근 관람 티켓</span>
             </div>
-            <span class="diary-hub-card-label">최근 관람 티켓</span>
+            <div class="diary-hub-card-title" style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.2rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(t.movieNm || '제목 없음')}">
+              ${escapeHtml(t.movieNm || '제목 없음')}
+            </div>
+            <div id="hubTicketBody">
+              <p class="diary-hub-card-excerpt" style="margin: 0; font-size: 0.78rem; line-height: 1.35; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;">
+                ${escapeHtml(t.review || '한 줄 평 없음')}
+              </p>
+            </div>
           </div>
-          <div class="diary-hub-card-title" title="${escapeHtml(t.movieNm || '제목 없음')}">${escapeHtml(t.movieNm || '제목 없음')}</div>
-          <div id="hubTicketBody">
-            <p class="diary-hub-card-excerpt">${escapeHtml(t.review || '한 줄 평 없음')}</p>
-          </div>
-          <div class="diary-hub-card-meta">
-            <span><i class="fa-regular fa-calendar"></i> ${t.watchDate || '—'}</span>
+          <div class="diary-hub-card-meta" style="margin-top: 0.2rem; font-size: 0.7rem; color: rgba(255,255,255,0.35); display: flex; gap: 0.4rem;">
+            <span><i class="fa-regular fa-calendar" style="font-size: 0.65rem;"></i> ${t.watchDate || '—'}</span>
             <span>·</span>
-            <span>${escapeHtml(t.theater || 'CGV')}</span>
+            <span style="max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.theater || 'CGV')}</span>
             <span>·</span>
             <span>총 ${tickets.length}장</span>
           </div>

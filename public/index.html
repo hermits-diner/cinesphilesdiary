@@ -3107,10 +3107,10 @@
       box-shadow: 0 0 20px rgba(229, 169, 169, 0.08);
     }
 
-    /* Desktop layout for Diary Hub dashboard (Removed exact SVG 880x328 constraints) */
+    /* Desktop layout for Diary Hub dashboard (Optimized to match full cinema screen width and prevent card clutter) */
     @media (min-width: 901px) {
       .screen-stage.diary-hub-section {
-        width: 960px !important;
+        width: 1020px !important; /* expanded to full theater screen width space */
         height: auto !important;
         padding: 2.2rem 2.5rem !important;
         gap: 1.4rem !important;
@@ -3140,24 +3140,27 @@
       }
       .screen-stage.diary-hub-section .diary-hub-grid {
         height: auto !important;
-        margin-bottom: 0.4rem !important;
+        margin-bottom: 0.2rem !important;
         width: 100% !important;
+        gap: 1.2rem !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card {
-        height: 126px !important;
-        padding: 0.85rem 1.1rem !important;
+        height: 154px !important; /* increased to give poster 114px and text ample breathing room */
+        padding: 1.1rem 1.35rem !important;
         box-sizing: border-box !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card-poster-wrapper {
-        width: 66px !important;
-        height: 98px !important;
+        width: 76px !important;
+        height: 114px !important;
+        border-radius: 8px !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-title {
-        font-size: 1rem !important;
+        font-size: 1.05rem !important;
       }
       .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-excerpt {
-        font-size: 0.8rem !important;
+        font-size: 0.82rem !important;
         -webkit-line-clamp: 2 !important;
+        margin-top: 0.15rem !important;
       }
     }
 
@@ -3313,6 +3316,7 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--color-text-muted);
+      white-space: nowrap;
     }
 
     .diary-hub-card-title {
