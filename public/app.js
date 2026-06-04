@@ -1546,23 +1546,25 @@ function renderDiaryCoachResult(data, originalContentText) {
 }
 
 // Centralized Ticket Booking Link Generator (Supports Affiliate Wrappers easily!)
-function getBookingUrl(movieNm) {
-  if (!movieNm) return '#';
-  
-  const cleanMovieNm = movieNm.trim();
-  
-  // NOTE: CGV, Lotte Cinema, and Megabox websites use dynamic Client-Side Rendering (SPA)
-  // or cookie-dependent redirection mechanisms that prevent direct GET parameter searches from loading
-  // (e.g., Lotte Cinema drops search state and displays an empty page when linking directly).
-  //
-  // To resolve this and maximize booking conversion, we route users to Naver's unified Search Ticketing Widget.
-  // This automatically displays a combined view of real-time theater timetables near the user's location on both Mobile and PC,
-  // letting them choose CGV, Lotte, or Megabox under a single unified interface.
-  //
-  // If you integrate an affiliate link later (like LinkPrice or Partner APIs), wrap the URL here:
-  // Example: return `https://tracking.linkprice.com/gogogo.php?u=YOUR_AFFILIATE_ID&url=${encodeURIComponent(directUrl)}`;
-  
-  return `https://search.naver.com/search.naver?query=${encodeURIComponent(cleanMovieNm + ' 예매')}`;
+function getBookingLinks(movieNm) {
+  if (!movieNm) return null;
+  const q = encodeURIComponent(movieNm.trim());
+  return {
+    cgv:   `https://www.cgv.co.kr/movies/?searchStr=${q}`,
+    lotte: `https://www.lottecinema.co.kr/LCMW/Contents/Movie/Movie-List.aspx?searchText=${q}`,
+    mega:  `https://www.megabox.co.kr/movie?searchYn=Y&searchText=${q}`
+  };
+}
+
+function renderBookingBtnsHtml(movieNm) {
+  const links = getBookingLinks(movieNm);
+  if (!links) return '';
+  return `
+    <div class="booking-btns-row">
+      <a href="${links.cgv}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="CGV 예매">CGV</a>
+      <a href="${links.lotte}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="롯데시네마 예매">롯데</a>
+      <a href="${links.mega}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="메가박스 예매">메가</a>
+    </div>`;
 }
 
 // Helper: Calculate yesterday's date string (YYYY-MM-DD) dynamically
@@ -1793,8 +1795,6 @@ function renderBoxOfficeList(moviesList) {
       ? `<div class="rating-badge"><i class="fa-solid fa-star"></i> ${movie.rating}</div>`
       : '';
     
-    const bookingUrl = getBookingUrl(movie.movieNm);
-
     movieCard.innerHTML = `
       <div class="rank-badge ${badgeClass}">${movie.rank}</div>
       <div class="poster-container">
@@ -1818,11 +1818,7 @@ function renderBoxOfficeList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        <div class="unified-booking-container">
-          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
-            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
-          </a>
-        </div>
+        ${renderBookingBtnsHtml(movie.movieNm)}
       </div>
     `;
     
@@ -1891,8 +1887,6 @@ function renderWeeklyBoxOfficeList(moviesList) {
       ? `<div class="rating-badge"><i class="fa-solid fa-star"></i> ${movie.rating}</div>`
       : '';
     
-    const bookingUrl = getBookingUrl(movie.movieNm);
-
     movieCard.innerHTML = `
       <div class="rank-badge ${badgeClass}">${movie.rank}</div>
       <div class="poster-container">
@@ -1916,11 +1910,7 @@ function renderWeeklyBoxOfficeList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        <div class="unified-booking-container">
-          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
-            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
-          </a>
-        </div>
+        ${renderBookingBtnsHtml(movie.movieNm)}
       </div>
     `;
     
@@ -2086,11 +2076,7 @@ function renderGlobalTrendingList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        <div class="unified-booking-container">
-          <a href="${bookingUrl}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
-            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
-          </a>
-        </div>
+        ${renderBookingBtnsHtml(movie.movieNm)}
       </div>
     `;
     
@@ -2232,9 +2218,16 @@ async function openMovieDetails(movieCd, movieNm) {
   // Reset and load saved Cinema Log immediately (latency-free)
   loadCinemaLog(movieCd);
   
-  // Pre-populate ticket booking link immediately
-  const modalUnifiedBookingBtn = document.getElementById('modalUnifiedBookingBtn');
-  if (modalUnifiedBookingBtn) modalUnifiedBookingBtn.href = getBookingUrl(movieNm);
+  // Pre-populate cinema booking links immediately
+  const bookingLinks = getBookingLinks(movieNm);
+  if (bookingLinks) {
+    const cgvBtn   = document.getElementById('modalBookingCgv');
+    const lotteBtn = document.getElementById('modalBookingLotte');
+    const megaBtn  = document.getElementById('modalBookingMega');
+    if (cgvBtn)   cgvBtn.href   = bookingLinks.cgv;
+    if (lotteBtn) lotteBtn.href = bookingLinks.lotte;
+    if (megaBtn)  megaBtn.href  = bookingLinks.mega;
+  }
   
   // Reset modal visuals
   const backdrop = document.getElementById('modalBackdrop');

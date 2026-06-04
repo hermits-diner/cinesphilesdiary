@@ -3952,3 +3952,37 @@
   html.data-saver .screen-stage.diary-hub-section::after {
     display: none;
   }
+
+  /* ── 영화 카드 예매 3버튼 ── */
+  .booking-btns-row {
+    display: flex;
+    gap: 0.35rem;
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .booking-btn-site {
+    flex: 1;
+    padding: 0.4rem 0.3rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glow);
+    border-radius: 10px;
+    color: var(--color-text-muted);
+    font-family: var(--font-outfit);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .booking-btn-site:hover {
+    background: rgba(229, 169, 169, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-1px);
+  }
