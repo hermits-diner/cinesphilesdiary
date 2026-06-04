@@ -3019,6 +3019,357 @@
       transform: scale(0.95) translateY(0);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
+
+    /* ── Diary Hub Section ── */
+    .diary-hub-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      margin: 2.5rem 0 2rem 0;
+      position: relative;
+    }
+
+    .diary-hub-divider::before,
+    .diary-hub-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(229, 169, 169, 0.35) 50%, transparent 100%);
+    }
+
+    .diary-hub-divider-icon {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-outfit);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(229, 169, 169, 0.65);
+      white-space: nowrap;
+    }
+
+    .diary-hub-divider-icon i {
+      font-size: 0.55rem;
+      animation: pulse 3s infinite;
+    }
+
+    .diary-hub-section {
+      position: relative;
+      padding: 2.5rem 2rem;
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(229, 169, 169, 0.04) 0%, rgba(212, 175, 55, 0.03) 50%, rgba(179, 140, 180, 0.04) 100%);
+      border: 1px solid rgba(229, 169, 169, 0.12);
+      box-shadow: 0 15px 40px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+
+    .diary-hub-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+    }
+
+    .diary-hub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .diary-hub-title {
+      font-family: var(--font-outfit);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .diary-hub-title i {
+      color: var(--color-secondary);
+      font-size: 1.2rem;
+    }
+
+    .diary-hub-subtitle {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .diary-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .diary-hub-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .diary-hub-card {
+      background: rgba(18, 20, 32, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 22px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      transition: var(--transition-spring);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .diary-hub-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      border-radius: 22px 22px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .diary-hub-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: rgba(229, 169, 169, 0.25);
+      box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(229, 169, 169, 0.08);
+    }
+
+    .diary-hub-card:hover::before {
+      opacity: 1;
+    }
+
+    .diary-hub-card--ticket::before {
+      background: var(--gradient-neon);
+    }
+
+    .diary-hub-card--diary::before {
+      background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+    }
+
+    .diary-hub-card--bucket::before {
+      background: linear-gradient(90deg, var(--color-secondary), #f59e0b);
+    }
+
+    .diary-hub-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .diary-hub-card--ticket .diary-hub-card-icon {
+      background: rgba(229, 169, 169, 0.1);
+      border: 1px solid rgba(229, 169, 169, 0.2);
+      color: var(--color-primary);
+    }
+
+    .diary-hub-card--diary .diary-hub-card-icon {
+      background: rgba(179, 140, 180, 0.1);
+      border: 1px solid rgba(179, 140, 180, 0.2);
+      color: var(--color-accent);
+    }
+
+    .diary-hub-card--bucket .diary-hub-card-icon {
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      color: var(--color-secondary);
+    }
+
+    .diary-hub-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .diary-hub-card-label {
+      font-family: var(--font-outfit);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+    }
+
+    .diary-hub-card-title {
+      font-family: var(--font-outfit);
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .diary-hub-card-excerpt {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .diary-hub-card-meta {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.3);
+      font-family: var(--font-outfit);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .diary-hub-card-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem 0;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 0.8rem;
+    }
+
+    .diary-hub-card-empty i {
+      font-size: 1.8rem;
+      opacity: 0.3;
+    }
+
+    /* Bucket progress in hub */
+    .diary-hub-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .diary-hub-progress-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .diary-hub-progress-number {
+      font-family: var(--font-outfit);
+      font-size: 2rem;
+      font-weight: 900;
+      background: var(--gradient-neon);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .diary-hub-progress-label {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .diary-hub-progress-bar-bg {
+      background: rgba(255, 255, 255, 0.06);
+      height: 8px;
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .diary-hub-progress-bar-fg {
+      background: var(--gradient-neon);
+      height: 100%;
+      border-radius: 50px;
+      transition: width 1s cubic-bezier(0.1, 0.8, 0.25, 1);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+
+    /* CTA Button */
+    .diary-hub-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 1rem 2rem;
+      border-radius: 18px;
+      font-family: var(--font-outfit);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(229, 169, 169, 0.15) 0%, rgba(212, 175, 55, 0.12) 100%);
+      border: 1px solid rgba(229, 169, 169, 0.3);
+      cursor: pointer;
+      transition: var(--transition-spring);
+      box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diary-hub-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .diary-hub-cta:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary);
+      box-shadow: 0 12px 30px -8px rgba(229, 169, 169, 0.25), 0 0 20px rgba(229, 169, 169, 0.1);
+      background: linear-gradient(135deg, rgba(229, 169, 169, 0.22) 0%, rgba(212, 175, 55, 0.18) 100%);
+    }
+
+    .diary-hub-cta:hover::before {
+      left: 100%;
+    }
+
+    .diary-hub-cta i {
+      font-size: 1.1rem;
+      color: var(--color-secondary);
+    }
+
+    /* Header diary button - compact secondary style */
+    .diary-launch-btn--compact {
+      padding: 0.5rem 1rem;
+      font-size: 0.82rem;
+      gap: 0.4rem;
+      border-radius: 50px;
+      opacity: 0.85;
+    }
+
+    .diary-launch-btn--compact:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -3473,15 +3824,102 @@
           <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
         </div>
 
-        <button id="cineDiaryBtn" onclick="openCineDiary()" class="diary-launch-btn" title="시네필 다이어리">
+        <button id="cineDiaryBtn" onclick="openCineDiary()" class="diary-launch-btn diary-launch-btn--compact" title="시네필 다이어리">
           <i class="fa-solid fa-book" style="color: var(--color-secondary);"></i>
-          <span>시네필 다이어리</span>
+          <span>다이어리</span>
         </button>
       </div>
     </header>
 
     <!-- Main Content Section -->
     <main>
+      <!-- ── Diary Hub Section: 시네필 다이어리 독립 섹션 (상단 배치) ── -->
+      <section class="diary-hub-section" id="diaryHubSection">
+        <div class="diary-hub-header">
+          <div>
+            <h2 class="diary-hub-title">
+              <i class="fa-solid fa-book-open"></i> 시네필 다이어리
+            </h2>
+            <p class="diary-hub-subtitle">스크린이 꺼진 후에도, 영화는 당신 안에 계속된다.</p>
+          </div>
+        </div>
+
+        <div class="diary-hub-grid">
+          <!-- Card 1: Latest Ticket -->
+          <div class="diary-hub-card diary-hub-card--ticket" id="hubTicketCard" onclick="openCineDiary(); setTimeout(()=>{ const btn=document.querySelector('.space-tab-btn[data-tab=tabTicket]'); if(btn) btn.click(); }, 200);">
+            <div class="diary-hub-card-header">
+              <div class="diary-hub-card-icon">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <div>
+                <span class="diary-hub-card-label">최근 관람 티켓</span>
+                <div class="diary-hub-card-title" id="hubTicketTitle">—</div>
+              </div>
+            </div>
+            <div id="hubTicketBody">
+              <div class="diary-hub-card-empty">
+                <i class="fa-solid fa-ticket"></i>
+                <span>아직 발행된 티켓이 없습니다</span>
+              </div>
+            </div>
+            <div class="diary-hub-card-meta" id="hubTicketMeta"></div>
+          </div>
+
+          <!-- Card 2: Latest Diary -->
+          <div class="diary-hub-card diary-hub-card--diary" id="hubDiaryCard" onclick="openCineDiary(); setTimeout(()=>{ const btn=document.querySelector('.space-tab-btn[data-tab=tabDiary]'); if(btn) btn.click(); }, 200);">
+            <div class="diary-hub-card-header">
+              <div class="diary-hub-card-icon">
+                <i class="fa-solid fa-pen-nib"></i>
+              </div>
+              <div>
+                <span class="diary-hub-card-label">최근 영화 일기</span>
+                <div class="diary-hub-card-title" id="hubDiaryTitle">—</div>
+              </div>
+            </div>
+            <div id="hubDiaryBody">
+              <div class="diary-hub-card-empty">
+                <i class="fa-solid fa-pen-nib"></i>
+                <span>아직 작성된 일기가 없습니다</span>
+              </div>
+            </div>
+            <div class="diary-hub-card-meta" id="hubDiaryMeta"></div>
+          </div>
+
+          <!-- Card 3: Bucket List Progress -->
+          <div class="diary-hub-card diary-hub-card--bucket" id="hubBucketCard" onclick="openCineDiary(); setTimeout(()=>{ const btn=document.querySelector('.space-tab-btn[data-tab=tabBucket]'); if(btn) btn.click(); }, 200);">
+            <div class="diary-hub-card-header">
+              <div class="diary-hub-card-icon">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div>
+                <span class="diary-hub-card-label">버킷리스트 진행률</span>
+                <div class="diary-hub-card-title" id="hubBucketTitle">영화 정복 현황</div>
+              </div>
+            </div>
+            <div id="hubBucketBody">
+              <div class="diary-hub-card-empty">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>아직 생성된 챌린지가 없습니다</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <button class="diary-hub-cta" onclick="openCineDiary()">
+          <i class="fa-solid fa-book"></i>
+          다이어리 전체 열기
+          <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem; margin-left: 0.25rem;"></i>
+        </button>
+      </section>
+
+      <!-- Divider between Diary Hub and Box Office -->
+      <div class="diary-hub-divider" aria-hidden="true">
+        <span class="diary-hub-divider-icon">
+          <i class="fa-solid fa-circle"></i> Box Office <i class="fa-solid fa-circle"></i>
+        </span>
+      </div>
+
       <!-- Main Content Mode Tabs -->
       <div class="boxoffice-tabs-container" style="margin-bottom: 1.5rem;">
         <div class="boxoffice-tabs"

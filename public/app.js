@@ -797,6 +797,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   console.log('[CineDiary] ✅ DOMContentLoaded initialization COMPLETE. All event listeners registered.');
+
+  // --- Diary Hub: Initial render on main page ---
+  updateDiaryHub();
 });
 
 // Global Movie Search: Select movie item and open its detail modal
@@ -2462,6 +2465,7 @@ async function saveTicketStub() {
     
     updateLiveTicketPreview();
     loadSavedTickets();
+    updateDiaryHub();
   } catch (e) {
     console.error('Failed to save ticket:', e);
     showToast('저장 실패', '로컬 저장 공간이 부족합니다.', 'error');
@@ -2619,6 +2623,7 @@ function deleteTicketStub(e, id) {
     localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 삭제 완료', '디지털 티켓이 보관함에서 제거되었습니다.', 'success');
     loadSavedTickets();
+    updateDiaryHub();
   } catch (err) {
     console.error(err);
     showToast('삭제 실패', '기록을 삭제하는 중 오류가 발생했습니다.', 'error');
@@ -2694,6 +2699,7 @@ function saveDiaryEntry() {
     if (diaryDateEl) diaryDateEl.value = new Date().toISOString().split('T')[0];
     
     loadSavedDiaries();
+    updateDiaryHub();
   } catch (e) {
     console.error(e);
     showToast('저장 실패', '로컬 저장 공간이 부족합니다.', 'error');
@@ -2773,6 +2779,7 @@ function deleteDiaryEntry(e, id) {
     localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 삭제 완료', '일기 기록이 보관함에서 삭제되었습니다.', 'success');
     loadSavedDiaries();
+    updateDiaryHub();
   } catch (err) {
     console.error(err);
     showToast('삭제 실패', '기록을 삭제하는 중 오류가 발생했습니다.', 'error');
@@ -2811,6 +2818,7 @@ function createBucketBoard() {
     
     if (bucketListTitleEl) bucketListTitleEl.value = '';
     loadSavedBuckets();
+    updateDiaryHub();
   } catch (e) {
     console.error(e);
     showToast('저장 실패', '로컬 저장 공간이 부족합니다.', 'error');
@@ -3232,3 +3240,122 @@ window.goHome                 = goHome;
   });
 })();
 
+// ── Diary Hub: Main page preview card updater ──
+function updateDiaryHub() {
+  // --- Ticket Card ---
+  const hubTicketTitle = document.getElementById('hubTicketTitle');
+  const hubTicketBody = document.getElementById('hubTicketBody');
+  const hubTicketMeta = document.getElementById('hubTicketMeta');
+  
+  let tickets = [];
+  try { tickets = JSON.parse(localStorage.getItem('CINEDIARY_TICKETS') || '[]'); } catch (_) {}
+  if (!Array.isArray(tickets)) tickets = [];
+
+  if (tickets.length > 0 && hubTicketTitle && hubTicketBody) {
+    const t = tickets[0];
+    hubTicketTitle.textContent = t.movieNm || '제목 없음';
+    hubTicketBody.innerHTML = `
+      <p class="diary-hub-card-excerpt">${escapeHtml(t.review || '한 줄 평 없음')}</p>
+    `;
+    if (hubTicketMeta) {
+      hubTicketMeta.innerHTML = `
+        <span><i class="fa-regular fa-calendar"></i> ${t.watchDate || '—'}</span>
+        <span>·</span>
+        <span>${escapeHtml(t.theater || 'CGV')}</span>
+        <span>·</span>
+        <span>총 ${tickets.length}장 보관</span>
+      `;
+    }
+  } else if (hubTicketTitle) {
+    hubTicketTitle.textContent = '—';
+    if (hubTicketBody) {
+      hubTicketBody.innerHTML = `
+        <div class="diary-hub-card-empty">
+          <i class="fa-solid fa-ticket"></i>
+          <span>아직 발행된 티켓이 없습니다</span>
+        </div>
+      `;
+    }
+    if (hubTicketMeta) hubTicketMeta.innerHTML = '';
+  }
+
+  // --- Diary Card ---
+  const hubDiaryTitle = document.getElementById('hubDiaryTitle');
+  const hubDiaryBody = document.getElementById('hubDiaryBody');
+  const hubDiaryMeta = document.getElementById('hubDiaryMeta');
+  
+  let diaries = [];
+  try { diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]'); } catch (_) {}
+  if (!Array.isArray(diaries)) diaries = [];
+
+  if (diaries.length > 0 && hubDiaryTitle && hubDiaryBody) {
+    const d = diaries[0];
+    hubDiaryTitle.textContent = `${d.emotion || '🍿'} ${d.title || '제목 없음'}`;
+    const excerpt = (d.content || '').substring(0, 80);
+    hubDiaryBody.innerHTML = `
+      <p class="diary-hub-card-excerpt">${escapeHtml(excerpt)}${d.content && d.content.length > 80 ? '...' : ''}</p>
+    `;
+    if (hubDiaryMeta) {
+      hubDiaryMeta.innerHTML = `
+        <span><i class="fa-regular fa-calendar"></i> ${d.watchDate || '—'}</span>
+        <span>·</span>
+        <span>${escapeHtml(d.context || '')}</span>
+        <span>·</span>
+        <span>총 ${diaries.length}건 기록</span>
+      `;
+    }
+  } else if (hubDiaryTitle) {
+    hubDiaryTitle.textContent = '—';
+    if (hubDiaryBody) {
+      hubDiaryBody.innerHTML = `
+        <div class="diary-hub-card-empty">
+          <i class="fa-solid fa-pen-nib"></i>
+          <span>아직 작성된 일기가 없습니다</span>
+        </div>
+      `;
+    }
+    if (hubDiaryMeta) hubDiaryMeta.innerHTML = '';
+  }
+
+  // --- Bucket List Card ---
+  const hubBucketTitle = document.getElementById('hubBucketTitle');
+  const hubBucketBody = document.getElementById('hubBucketBody');
+  
+  let boards = [];
+  try { boards = JSON.parse(localStorage.getItem('CINEDIARY_BUCKETS') || '[]'); } catch (_) {}
+  if (!Array.isArray(boards)) boards = [];
+
+  if (boards.length > 0 && hubBucketTitle && hubBucketBody) {
+    let totalItems = 0;
+    let checkedItems = 0;
+    boards.forEach(b => {
+      if (b.items && Array.isArray(b.items)) {
+        totalItems += b.items.length;
+        checkedItems += b.items.filter(item => item.checked).length;
+      }
+    });
+    const pct = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+    hubBucketTitle.textContent = `${boards.length}개 챌린지 진행 중`;
+    hubBucketBody.innerHTML = `
+      <div class="diary-hub-progress">
+        <div class="diary-hub-progress-stats">
+          <span class="diary-hub-progress-number">${pct}%</span>
+          <span class="diary-hub-progress-label">${checkedItems} / ${totalItems} 완료</span>
+        </div>
+        <div class="diary-hub-progress-bar-bg">
+          <div class="diary-hub-progress-bar-fg" style="width: ${pct}%"></div>
+        </div>
+      </div>
+    `;
+  } else if (hubBucketTitle) {
+    hubBucketTitle.textContent = '영화 정복 현황';
+    if (hubBucketBody) {
+      hubBucketBody.innerHTML = `
+        <div class="diary-hub-card-empty">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>아직 생성된 챌린지가 없습니다</span>
+        </div>
+      `;
+    }
+  }
+}
