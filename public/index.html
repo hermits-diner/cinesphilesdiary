@@ -41,9 +41,9 @@
   <style>
     /* Design Tokens & Variables */
     :root {
-      --bg-dark: #0c0b11;
-      --bg-card: rgba(24, 20, 29, 0.65);
-      --bg-modal: rgba(16, 14, 21, 0.88);
+      --bg-dark: #080a0f;
+      --bg-card: rgba(16, 19, 26, 0.65);
+      --bg-modal: rgba(10, 12, 18, 0.92);
       --border-glow: rgba(229, 169, 169, 0.18);
       --border-glow-hover: rgba(229, 169, 169, 0.38);
 
@@ -3946,10 +3946,10 @@
             <stop offset="65%" stop-color="#605c7a" />
             <stop offset="100%" stop-color="#1c1628" />
           </radialGradient>
-          <!-- Ambient: warm red spill on ceiling -->
+          <!-- Ambient: cool-neutral screen spill on ceiling -->
           <radialGradient id="g-amb" cx="50%" cy="0%" r="75%" gradientUnits="userSpaceOnUse" fx="720" fy="44">
-            <stop offset="0%" stop-color="#801018" stop-opacity="0.25" />
-            <stop offset="100%" stop-color="#801018" stop-opacity="0" />
+            <stop offset="0%" stop-color="#1a2035" stop-opacity="0.30" />
+            <stop offset="100%" stop-color="#1a2035" stop-opacity="0" />
           </radialGradient>
           <!-- Beam: warm rosegold — 유일한 난색 포인트 -->
           <linearGradient id="g-beam" x1="0" y1="1" x2="0" y2="0">
@@ -4000,13 +4000,13 @@
             <stop offset="50%" stop-color="#190204" />
             <stop offset="100%" stop-color="#080001" />
           </linearGradient>
-          <!-- Dark burgundy overlay for maximum readability -->
+          <!-- Dark neutral overlay for maximum readability -->
           <linearGradient id="g-over" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#080204" stop-opacity="0.95" />
-            <stop offset="30%" stop-color="#080204" stop-opacity="0.80" />
-            <stop offset="50%" stop-color="#080204" stop-opacity="0.45" />
-            <stop offset="70%" stop-color="#080204" stop-opacity="0.18" />
-            <stop offset="100%" stop-color="#080204" stop-opacity="0.55" />
+            <stop offset="0%" stop-color="#060810" stop-opacity="0.95" />
+            <stop offset="30%" stop-color="#060810" stop-opacity="0.80" />
+            <stop offset="50%" stop-color="#060810" stop-opacity="0.45" />
+            <stop offset="70%" stop-color="#060810" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#060810" stop-opacity="0.55" />
           </linearGradient>
           <!-- Clip paths: bound acoustic panels within wall shapes -->
           <clipPath id="c-lw">
@@ -4018,7 +4018,7 @@
         </defs>
 
         <!-- 1. Base dark background -->
-        <rect width="1440" height="900" fill="#0c0406" />
+        <rect width="1440" height="900" fill="#07090d" />
 
         <!-- 2. Ceiling glow from screen -->
         <rect width="1440" height="520" fill="url(#g-amb)" />
@@ -4026,71 +4026,71 @@
         <!-- 3. Side walls + acoustic panels -->
 
         <!-- Left wall base -->
-        <polygon points="0,0 268,44 268,396 0,900" fill="#1f0508" />
+        <polygon points="0,0 268,44 268,396 0,900" fill="#0e1018" />
 
         <!-- Left wall: acoustic panels (3 cols × 3 rows, clipped to wall) -->
         <g clip-path="url(#c-lw)">
           <!-- Structural column dividers -->
-          <line x1="90" y1="44" x2="90" y2="396" stroke="#0e0204" stroke-width="4" />
-          <line x1="180" y1="44" x2="180" y2="396" stroke="#0e0204" stroke-width="4" />
+          <line x1="90" y1="44" x2="90" y2="396" stroke="#0a0c11" stroke-width="4" />
+          <line x1="180" y1="44" x2="180" y2="396" stroke="#0a0c11" stroke-width="4" />
 
           <!-- Col A (inner, x=192) — shadow then panel -->
-          <rect x="194" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="192" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="194" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="192" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="194" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="192" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="194" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="192" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="194" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="192" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="194" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="192" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
 
           <!-- Col B (mid, x=102) -->
-          <rect x="104" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="102" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="104" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="102" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="104" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="102" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="104" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="102" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="104" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="102" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="104" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="102" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
 
           <!-- Col C (outer, x=12) -->
-          <rect x="14" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="12" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="14" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="12" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="14" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="12" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="14" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="12" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="14" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="12" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="14" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="12" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
         </g>
 
         <!-- Right wall base -->
-        <polygon points="1440,0 1172,44 1172,396 1440,900" fill="#1f0508" />
+        <polygon points="1440,0 1172,44 1172,396 1440,900" fill="#0e1018" />
 
         <!-- Right wall: acoustic panels (mirrored) -->
         <g clip-path="url(#c-rw)">
           <!-- Structural column dividers -->
-          <line x1="1350" y1="44" x2="1350" y2="396" stroke="#0e0204" stroke-width="4" />
-          <line x1="1260" y1="44" x2="1260" y2="396" stroke="#0e0204" stroke-width="4" />
+          <line x1="1350" y1="44" x2="1350" y2="396" stroke="#0a0c11" stroke-width="4" />
+          <line x1="1260" y1="44" x2="1260" y2="396" stroke="#0a0c11" stroke-width="4" />
 
           <!-- Col A (inner, x=1190) -->
-          <rect x="1188" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1186" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1188" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1186" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1188" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1186" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1188" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1186" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1188" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1186" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1188" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1186" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
 
           <!-- Col B (mid, x=1280) -->
-          <rect x="1278" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1276" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1278" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1276" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1278" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1276" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1278" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1276" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1278" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1276" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1278" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1276" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
 
           <!-- Col C (outer, x=1370) -->
-          <rect x="1368" y="60" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1366" y="58" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1368" y="162" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1366" y="160" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
-          <rect x="1368" y="264" width="58" height="88" fill="#090102" rx="2" />
-          <rect x="1366" y="262" width="58" height="88" fill="#330d12" stroke="#4a151b" stroke-width="1" rx="2" />
+          <rect x="1368" y="60" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1366" y="58" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1368" y="162" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1366" y="160" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
+          <rect x="1368" y="264" width="58" height="88" fill="#090b0f" rx="2" />
+          <rect x="1366" y="262" width="58" height="88" fill="#1c2028" stroke="#272d3a" stroke-width="1" rx="2" />
         </g>
 
         <!-- 4. Screen elements removed (frame, spotlights, screen canvas) -->
@@ -4099,7 +4099,7 @@
 
 
         <!-- 7. Floor between screen and first seats (reduced gap) -->
-        <rect x="0" y="396" width="1440" height="65" fill="#09070e" />
+        <rect x="0" y="396" width="1440" height="65" fill="#08090d" />
 
         <!-- 8+9. Seats shifted up 50px to close gap with screen -->
         <g transform="translate(0,-50)">
