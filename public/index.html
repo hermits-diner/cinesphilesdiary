@@ -4025,15 +4025,7 @@
         </button>
       </div>
 
-      <!-- Date Selection Controller & Settings -->
-      <div style="display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap;">
-        <div class="controls-wrapper">
-          <span class="date-label">
-            <i class="fa-regular fa-calendar-days"></i> Boxoffice Date
-          </span>
-          <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
-        </div>
-      </div>
+
     </header>
 
     <!-- Main Content Section -->
@@ -4069,11 +4061,20 @@
         </div>
       </div>
 
-      <h2 class="section-title" id="mainSectionTitle">
-        <i class="fa-solid fa-chart-line" id="mainSectionIcon"></i>
-        <span id="mainSectionText">일별 박스오피스</span> <span id="currentDateTitle"
-          style="color: var(--color-secondary); margin-left: 4px;"></span>
-      </h2>
+      <div class="boxoffice-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="section-title" id="mainSectionTitle" style="margin-bottom: 0;">
+          <i class="fa-solid fa-chart-line" id="mainSectionIcon"></i>
+          <span id="mainSectionText">일별 박스오피스</span> <span id="currentDateTitle"
+            style="color: var(--color-secondary); margin-left: 4px;"></span>
+        </h2>
+        <!-- Date Selection Controller & Settings (Moved to Boxoffice Sector) -->
+        <div class="controls-wrapper">
+          <span class="date-label">
+            <i class="fa-regular fa-calendar-days"></i> Boxoffice Date
+          </span>
+          <input type="date" id="boxOfficeDate" class="date-picker-input" title="조회 날짜 선택">
+        </div>
+      </div>
 
       <!-- Movie Nationality Filter Tabs -->
       <div class="boxoffice-tabs-container" id="nationTabsContainer">
