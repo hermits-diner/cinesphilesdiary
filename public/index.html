@@ -913,8 +913,8 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-glow);
       color: var(--color-text-muted);
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -2999,8 +2999,8 @@
     }
 
     .floating-home-btn {
-      width: 2.6rem;
-      height: 2.6rem;
+      width: 2.75rem;
+      height: 2.75rem;
       border-radius: 50%;
       background: rgba(24, 20, 29, 0.82);
       backdrop-filter: blur(12px);
@@ -3039,8 +3039,8 @@
     }
 
     @media (max-width: 768px) {
-      .floating-top-right { top: 1rem; right: 1rem; gap: 0.4rem; }
-      .floating-home-btn { width: 2.2rem; height: 2.2rem; font-size: 0.95rem; }
+      .floating-top-right { top: 0.75rem; right: 0.75rem; gap: 0.4rem; }
+      .floating-home-btn { width: 2.75rem; height: 2.75rem; font-size: 1rem; }
     }
 
     /* ── Diary Hub Section ── */
@@ -3096,7 +3096,7 @@
       width: min(920px, 92vw);
       margin-bottom: 2.5rem;
       gap: 1.5rem;
-      border-radius: 14px; /* Cinematic screen shape */
+      border-radius: 4px; /* 모바일: 미세하게만 둥글게 */
       background: linear-gradient(145deg, rgba(8, 2, 4, 0.45) 0%, rgba(22, 10, 18, 0.35) 100%);
       border: 1px solid rgba(229, 169, 169, 0.15);
       box-shadow: 0 35px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(229, 169, 169, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -3126,13 +3126,13 @@
         width: min(1240px, 96vw) !important;
         height: auto !important;
         position: relative !important;
-        padding: 3rem 2.8rem 2.8rem !important;
-        gap: 1.25rem !important;
+        padding: 2rem 2.8rem 1.8rem !important;
+        gap: 1rem !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        border-radius: 10px !important;
+        border-radius: 0 !important;
         /* 쿨톤 프로젝션: 은빛 스크린 표면 + 청흑 암부 */
         background:
           radial-gradient(ellipse 52% 42% at 50% 36%, rgba(165, 178, 210, 0.055) 0%, transparent 65%),
@@ -3371,7 +3371,7 @@
       opacity: 0.042;
       pointer-events: none;
       z-index: 2;
-      border-radius: 10px;
+      border-radius: 0;
       animation: film-grain 0.7s steps(1) infinite;
       will-change: background-position;
     }
@@ -3385,7 +3385,7 @@
       85%  { background-position: -42px -62px; }
       100% { background-position:   0px   0px; }
     }
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       .diary-hub-roll  { display: none !important; }
       .screen-stage.diary-hub-section::after { display: none !important; }
     }
@@ -3701,14 +3701,14 @@
     .auth-floating-btn-icon { font-size: 1rem; flex-shrink: 0; }
     .auth-floating-btn-text { overflow: hidden; text-overflow: ellipsis; }
     .auth-avatar-img {
-      width: 1.6rem;
-      height: 1.6rem;
+      width: 1.9rem;
+      height: 1.9rem;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid rgba(229,169,169,0.4);
     }
     @media (max-width: 768px) {
-      .auth-floating-btn { top: 1rem; right: 1rem; padding: 0.45rem 0.75rem; font-size: 0.8rem; }
+      .auth-floating-btn { padding: 0.5rem 0.9rem; font-size: 0.82rem; min-height: 2.75rem; }
     }
 
     /* ── Auth Modal ── */
@@ -3801,6 +3801,20 @@
     }
     .auth-input:focus { border-color: rgba(229,169,169,0.5); }
     .auth-input::placeholder { color: rgba(255,255,255,0.25); }
+
+    /* ── iOS auto-zoom prevention: inputs must be ≥16px on mobile ── */
+    @media (max-width: 768px) {
+      .space-input,
+      .auth-input,
+      .review-textarea,
+      #globalMovieSearch {
+        font-size: 1rem;
+      }
+      /* 폰트 키운 만큼 패딩 미세 조정 — 시각적 높이 유지 */
+      .space-input       { padding: 0.55rem 0.85rem; }
+      .auth-input        { padding: 0.65rem 1rem; }
+      .review-textarea   { padding: 0.85rem 1rem; }
+    }
     .auth-email-btns { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
     .auth-email-btn {
       flex: 1;
