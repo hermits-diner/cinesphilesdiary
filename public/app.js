@@ -8,6 +8,231 @@ let API_HEADERS = {
   'Content-Type': 'application/json'
 };
 
+// ─── SUPABASE AUTH & SYNC MODULE ─────────────────────────────────────────────
+const _SUPABASE_URL = 'https://qkbkvauvretlqxionkvv.supabase.co';
+const _SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrYmt2YXV2cmV0bHF4aW9ua3Z2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTA5NDEsImV4cCI6MjA5NjA4Njk0MX0.28rQOYl3mXmBVq7G3G7UKK5ozMPR9scFcc_ip8hsUek';
+
+let _supabaseClient = null;
+let supabaseUser = null; // Currently authenticated user (null = guest)
+
+function getSupabase() {
+  if (!_supabaseClient && window.supabase) {
+    _supabaseClient = window.supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON_KEY);
+  }
+  return _supabaseClient;
+}
+
+function initSupabaseAuth() {
+  const sb = getSupabase();
+  if (!sb) { console.warn('[Supabase] SDK not loaded'); return; }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    const wasLoggedIn = !!supabaseUser;
+    supabaseUser = session?.user || null;
+    updateAuthUI();
+
+    if (event === 'SIGNED_IN' && !wasLoggedIn) {
+      const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email?.split('@')[0] || '시네필';
+      showToast('로그인 성공', `${name}님, 시네필 다이어리에 오신 것을 환영합니다!`, 'success');
+      await loadUserDataFromSupabase();
+    }
+    if (event === 'SIGNED_OUT') {
+      showToast('로그아웃', '다이어리에서 안전하게 로그아웃 되었습니다.', 'info');
+    }
+  });
+
+  // Restore existing session on page load
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user) {
+      supabaseUser = session.user;
+      updateAuthUI();
+    }
+  });
+}
+
+function updateAuthUI() {
+  const btn = document.getElementById('authFloatingBtn');
+  const iconEl = document.getElementById('authFloatingBtnIcon');
+  const textEl = document.getElementById('authFloatingBtnText');
+  if (!btn) return;
+
+  if (supabaseUser) {
+    const name = supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || '시네필';
+    const avatar = supabaseUser.user_metadata?.avatar_url;
+    iconEl.innerHTML = avatar
+      ? `<img src="${escapeHtml(avatar)}" class="auth-avatar-img" alt="${escapeHtml(name)}">`
+      : `<i class="fa-solid fa-circle-user"></i>`;
+    textEl.textContent = name.length > 12 ? name.slice(0, 11) + '…' : name;
+    btn.onclick = showUserMenu;
+  } else {
+    iconEl.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i>`;
+    textEl.textContent = '로그인';
+    btn.onclick = openAuthModal;
+  }
+}
+
+function openAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+}
+
+async function signInWithGoogle() {
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+  if (error) showToast('로그인 실패', error.message, 'error');
+}
+
+async function signInWithEmail() {
+  const sb = getSupabase();
+  if (!sb) return;
+  const email = document.getElementById('authEmailInput')?.value?.trim();
+  const password = document.getElementById('authPasswordInput')?.value;
+  if (!email || !password) { showToast('입력 오류', '이메일과 비밀번호를 입력해 주세요.', 'error'); return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { showToast('로그인 실패', error.message, 'error'); }
+  else { closeAuthModal(); }
+}
+
+async function signUpWithEmail() {
+  const sb = getSupabase();
+  if (!sb) return;
+  const email = document.getElementById('authEmailInput')?.value?.trim();
+  const password = document.getElementById('authPasswordInput')?.value;
+  if (!email || !password) { showToast('입력 오류', '이메일과 비밀번호를 입력해 주세요.', 'error'); return; }
+  if (password.length < 6) { showToast('비밀번호 오류', '비밀번호는 최소 6자 이상이어야 합니다.', 'error'); return; }
+  const { error } = await sb.auth.signUp({ email, password });
+  if (error) { showToast('회원가입 실패', error.message, 'error'); }
+  else { showToast('이메일 인증 필요', '가입 확인 이메일을 발송했습니다. 받은 편지함을 확인해 주세요.', 'success'); closeAuthModal(); }
+}
+
+function showUserMenu() {
+  const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email || '사용자';
+  if (confirm(`${name}으로 로그인 중\n\n로그아웃 하시겠습니까?`)) {
+    getSupabase()?.auth.signOut();
+  }
+}
+
+// Load all cloud data into localStorage then re-render UI
+async function loadUserDataFromSupabase() {
+  const sb = getSupabase();
+  if (!sb || !supabaseUser) return;
+  const uid = supabaseUser.id;
+
+  try {
+    const [logsRes, diaryRes, ticketRes, bucketRes] = await Promise.all([
+      sb.from('cinema_logs').select('*').eq('user_id', uid),
+      sb.from('diary_entries').select('*').eq('user_id', uid).order('created_at', { ascending: false }),
+      sb.from('tickets').select('*').eq('user_id', uid).order('created_at', { ascending: false }),
+      sb.from('buckets').select('*').eq('user_id', uid).order('created_at', { ascending: true })
+    ]);
+
+    if (logsRes.data?.length) {
+      logsRes.data.forEach(log => {
+        localStorage.setItem(`CINEDIARY_LOG_${log.movie_cd}`, JSON.stringify({
+          movieCd: log.movie_cd, movieNm: log.movie_nm,
+          rating: parseFloat(log.rating) || 0,
+          comment: log.comment || '', savedAt: log.saved_at || new Date().toISOString()
+        }));
+      });
+    }
+    if (diaryRes.data?.length) {
+      localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaryRes.data.map(d => ({
+        id: d.local_id || d.id, title: d.title, watchDate: d.watch_date,
+        context: d.context || '집에서 이불 덮고 혼자', emotion: d.emotion || '🍿',
+        content: d.content, savedAt: d.saved_at || d.created_at
+      }))));
+    }
+    if (ticketRes.data?.length) {
+      localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(ticketRes.data.map(t => ({
+        id: t.local_id || t.id, movieNm: t.movie_nm, watchDate: t.watch_date,
+        theater: t.theater || 'CGV', seat: t.seat || '일반석',
+        companions: t.companions || '혼자서', snacks: t.snacks || '선택 안 함',
+        review: t.review || '', serial: t.serial || '', poster: t.poster || null
+      }))));
+    }
+    if (bucketRes.data?.length) {
+      localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(bucketRes.data.map(b => ({
+        id: b.local_id || b.id, title: b.title, items: b.items || []
+      }))));
+    }
+
+    if (typeof loadSavedDiaries === 'function') loadSavedDiaries();
+    if (typeof loadSavedTickets === 'function') loadSavedTickets();
+    if (typeof loadSavedBuckets === 'function') loadSavedBuckets();
+    if (typeof updateDiaryHub === 'function') updateDiaryHub();
+    console.log('[Supabase] User data loaded');
+  } catch (err) {
+    console.error('[Supabase] Load failed:', err);
+  }
+}
+
+// Fire-and-forget sync helpers — never block UI
+const supabaseSync = {
+  async upsertCinemaLog(log) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    await sb.from('cinema_logs').upsert({
+      user_id: supabaseUser.id, movie_cd: log.movieCd, movie_nm: log.movieNm,
+      rating: log.rating, comment: log.comment, saved_at: log.savedAt
+    }, { onConflict: 'user_id,movie_cd' });
+  },
+  async deleteCinemaLog(movieCd) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    await sb.from('cinema_logs').delete().eq('user_id', supabaseUser.id).eq('movie_cd', movieCd);
+  },
+  async upsertDiaryEntry(entry) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    await sb.from('diary_entries').upsert({
+      user_id: supabaseUser.id, local_id: entry.id, title: entry.title,
+      watch_date: entry.watchDate || null, context: entry.context,
+      emotion: entry.emotion, content: entry.content, saved_at: entry.savedAt
+    }, { onConflict: 'user_id,local_id' });
+  },
+  async deleteDiaryEntry(localId) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    await sb.from('diary_entries').delete().eq('user_id', supabaseUser.id).eq('local_id', localId);
+  },
+  async syncAllTickets(tickets) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    const uid = supabaseUser.id;
+    await sb.from('tickets').delete().eq('user_id', uid);
+    if (tickets.length) {
+      await sb.from('tickets').insert(tickets.map(t => ({
+        user_id: uid, local_id: t.id, movie_nm: t.movieNm,
+        watch_date: t.watchDate || null, theater: t.theater, seat: t.seat,
+        companions: t.companions, snacks: t.snacks, review: t.review,
+        serial: t.serial, poster: t.poster || null
+      })));
+    }
+  },
+  async syncAllBuckets(boards) {
+    const sb = getSupabase(); if (!sb || !supabaseUser) return;
+    const uid = supabaseUser.id;
+    await sb.from('buckets').delete().eq('user_id', uid);
+    if (boards.length) {
+      await sb.from('buckets').insert(boards.map(b => ({
+        user_id: uid, local_id: b.id, title: b.title, items: b.items || []
+      })));
+    }
+  }
+};
+
+// Expose auth functions for HTML event handlers
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.signInWithGoogle = signInWithGoogle;
+window.signInWithEmail = signInWithEmail;
+window.signUpWithEmail = signUpWithEmail;
+// ─────────────────────────────────────────────────────────────────────────────
+
 // XSS Prevention: escape any string before inserting into innerHTML
 function escapeHtml(str) {
   if (!str) return '';
@@ -233,6 +458,9 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 window.addEventListener('DOMContentLoaded', async () => {
   console.log('[CineDiary] DOMContentLoaded fired — starting initialization...');
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  // Initialize Supabase auth listener
+  initSupabaseAuth();
 
   // Fetch auth token from server securely
   try {
@@ -948,41 +1176,16 @@ async function coachDiaryReview() {
     return;
   }
 
-  // 1. Check Rate Limit (1 day 3 times free limit)
-  const todayStr = new Date().toISOString().split('T')[0];
-  let limitData = { date: todayStr, count: 0 };
-  try {
-    const rawLimit = localStorage.getItem('CINEDIARY_COACH_LIMIT');
-    if (rawLimit) {
-      const parsed = JSON.parse(rawLimit);
-      if (parsed.date === todayStr) {
-        limitData = parsed;
-      }
-    }
-  } catch (err) {
-    console.error('Failed to read coach limit:', err);
-  }
-
   const coachBtn = document.getElementById('coachDiaryBtn');
 
-  if (limitData.count >= 3) {
-    showToast('비평 코칭 한도 초과 🎟️', '오늘의 시네필 무료 코칭 한도(3회)를 다 소진하셨습니다. 가상 충전 광고를 관람하시겠습니까?', 'error');
-    if (confirm('30초 분량의 비평 보상형 동영상 광고(가상 시뮬레이션)를 시청하고 코칭 티켓 +1개를 충전하시겠습니까?')) {
-      showToast('광고 시청 중...', '가상 보상형 광고 30초가 송출 중입니다. 잠시만 시네필 광고를 감상해 주세요🍿', 'success');
-      
-      if (coachBtn) coachBtn.disabled = true;
-      await new Promise(r => setTimeout(r, 2000)); // speed up for testing
-      
-      limitData.count = 2; // rollback count to allow one more fetch
-      localStorage.setItem('CINEDIARY_COACH_LIMIT', JSON.stringify(limitData));
-      
-      if (coachBtn) coachBtn.disabled = false;
-      showToast('코칭 티켓 충전 성공! 🎫', '비평 트레이너 충전 완료! 코칭 받기 버튼을 다시 눌러 비평을 시작하세요.', 'success');
-    }
+  // 1. Require login
+  if (!supabaseUser) {
+    showToast('로그인 필요', 'AI 코칭은 로그인 후 이용하실 수 있습니다.', 'info');
+    openAuthModal();
     return;
   }
 
-  // 2. Check Local Cache (prevent redundant same-text review queries)
+  // 2. Check local cache (prevent redundant same-text queries)
   const cacheKey = `diary_${movieNm}_${diaryContent}`;
   let coachCaches = {};
   try {
@@ -995,20 +1198,31 @@ async function coachDiaryReview() {
   const resultPanel = document.getElementById('diaryAiCoachResultPanel');
 
   if (coachCaches[cacheKey]) {
-    console.log('[CineDiary] AI diary coach response cache hit! Instant rendering.');
-    showToast('로컬 분석 캐시 히트', '이미 첨삭 받은 일기이므로 즉각적인 로컬 로드를 수행합니다.', 'success');
-    
+    console.log('[CineDiary] AI diary coach cache hit!');
+    showToast('캐시 히트', '이미 첨삭 받은 일기입니다. 즉시 결과를 불러옵니다.', 'success');
     if (loader) loader.style.display = 'block';
     if (resultPanel) resultPanel.style.display = 'none';
-    
-    await new Promise(r => setTimeout(r, 450)); // elegant delay for rendering visual transition
-    
+    await new Promise(r => setTimeout(r, 450));
     if (loader) loader.style.display = 'none';
     renderDiaryCoachResult(coachCaches[cacheKey], diaryContent);
     return;
   }
 
-  // 3. Trigger network query
+  // 3. Get user JWT for server-side auth + usage tracking
+  let userToken = null;
+  try {
+    const { data: { session } } = await getSupabase().auth.getSession();
+    userToken = session?.access_token;
+  } catch (e) {
+    console.error('Failed to get session:', e);
+  }
+  if (!userToken) {
+    showToast('세션 만료', '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.', 'error');
+    openAuthModal();
+    return;
+  }
+
+  // 4. Trigger network query
   if (loader) loader.style.display = 'block';
   if (resultPanel) resultPanel.style.display = 'none';
   if (coachBtn) coachBtn.disabled = true;
@@ -1016,31 +1230,28 @@ async function coachDiaryReview() {
   try {
     const response = await fetch(`${BACKEND_BASE}/api/coach-review`, {
       method: 'POST',
-      headers: API_HEADERS,
-      body: JSON.stringify({
-        movieNm,
-        diaryTitle,
-        diaryContent,
-        diaryContext,
-        emotion
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
+      body: JSON.stringify({ movieNm, diaryTitle, diaryContent, diaryContext, emotion })
     });
 
     const result = await response.json();
+
+    if (response.status === 429 && result.error === 'DAILY_LIMIT_REACHED') {
+      showToast('코칭 한도 초과', '오늘의 무료 코칭 한도(3회)를 모두 사용하셨습니다. 내일 다시 이용해 주세요.', 'error');
+      if (loader) loader.style.display = 'none';
+      return;
+    }
+
     if (!response.ok || !result.success) throw new Error(result.error || 'AI 비평 분석에 실패했습니다.');
 
-    // Save cache
+    // Cache result locally
     coachCaches[cacheKey] = result;
     localStorage.setItem('CINEDIARY_COACH_CACHES', JSON.stringify(coachCaches));
 
-    // Update limit usage count (if not simulated fallback ad ticket)
-    limitData.count += 1;
-    localStorage.setItem('CINEDIARY_COACH_LIMIT', JSON.stringify(limitData));
-
-    // Render result
     if (loader) loader.style.display = 'none';
     renderDiaryCoachResult(result, diaryContent);
-    showToast('AI 비평 첨삭 성공 🎓', `평론 코칭이 끝났습니다! 오늘의 코칭 가능 잔여 횟수: ${3 - limitData.count}회`, 'success');
+    const remaining = result.remaining ?? '?';
+    showToast('AI 비평 첨삭 성공 🎓', `평론 코칭이 완료되었습니다! 오늘 남은 코칭 횟수: ${remaining}회`, 'success');
 
   } catch (err) {
     console.error('Coach diary review failed:', err);
@@ -2137,8 +2348,8 @@ function saveCinemaLog() {
   try {
     localStorage.setItem(cacheKey, JSON.stringify(logData));
     showToast('저장 완료', `영화 《${activeMovieInfo.movieNm}》 관람 기록이 저장되었습니다.`, 'success');
-    
     if (deleteReviewBtn) deleteReviewBtn.style.display = 'inline-flex';
+    if (supabaseUser) supabaseSync.upsertCinemaLog(logData).catch(err => console.error('[Supabase sync]', err));
   } catch (e) {
     console.error('Save failed:', e);
     showToast('저장 실패', '로컬 저장 공간이 부족하거나 쓸 수 없습니다.', 'error');
@@ -2155,7 +2366,8 @@ function deleteCinemaLog() {
   try {
     localStorage.removeItem(cacheKey);
     showToast('삭제 완료', `영화 《${movieNm}》 관람 기록이 삭제되었습니다.`, 'success');
-    
+    if (supabaseUser) supabaseSync.deleteCinemaLog(activeMovieInfo.movieCd).catch(err => console.error('[Supabase sync]', err));
+
     // Reset UI
     activeRating = 0;
     highlightStars(0);
@@ -2453,7 +2665,8 @@ async function saveTicketStub() {
   try {
     localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 발급 성공', `영화 《${movieNm}》의 디지털 티켓이 보관함에 저장되었습니다.`, 'success');
-    
+    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(err => console.error('[Supabase sync]', err));
+
     // Reset Form
     if (ticketMovieNmEl) ticketMovieNmEl.value = '';
     if (ticketSeatEl) ticketSeatEl.value = '';
@@ -2622,6 +2835,7 @@ function deleteTicketStub(e, id) {
   try {
     localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 삭제 완료', '디지털 티켓이 보관함에서 제거되었습니다.', 'success');
+    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(err => console.error('[Supabase sync]', err));
     loadSavedTickets();
     updateDiaryHub();
   } catch (err) {
@@ -2679,7 +2893,8 @@ function saveDiaryEntry() {
   try {
     localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 저장 완료', '오늘의 영화 감상이 다이어리에 소중히 보관되었습니다.', 'success');
-    
+    if (supabaseUser) supabaseSync.upsertDiaryEntry(newDiary).catch(err => console.error('[Supabase sync]', err));
+
     // Reset Form
     if (diaryTitleEl) diaryTitleEl.value = '';
     if (diaryContentEl) diaryContentEl.value = '';
@@ -2778,6 +2993,7 @@ function deleteDiaryEntry(e, id) {
   try {
     localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 삭제 완료', '일기 기록이 보관함에서 삭제되었습니다.', 'success');
+    if (supabaseUser) supabaseSync.deleteDiaryEntry(id).catch(err => console.error('[Supabase sync]', err));
     loadSavedDiaries();
     updateDiaryHub();
   } catch (err) {
@@ -2815,7 +3031,7 @@ function createBucketBoard() {
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     showToast('보드 생성 완료', `새로운 영화 챌린지 《${title}》 보드가 다이어리에 배치되었습니다.`, 'success');
-    
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
     if (bucketListTitleEl) bucketListTitleEl.value = '';
     loadSavedBuckets();
     updateDiaryHub();
@@ -2933,6 +3149,7 @@ function deleteBucketBoard(e, id) {
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     showToast('보드 삭제 완료', '영화 챌린지 보드가 다이어리에서 철거되었습니다.', 'success');
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
     loadSavedBuckets();
   } catch (err) {
     console.error(err);
@@ -2974,6 +3191,7 @@ function addMovieToBucket(boardId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
     inputEl.value = '';
     loadSavedBuckets();
   } catch (e) {
@@ -3003,8 +3221,8 @@ function toggleBucketItem(boardId, itemId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
     loadSavedBuckets();
-    
     if (item.checked) {
       showToast('정복 완료 🍿', `영화 《${item.text}》 미션을 완료하였습니다! 축하합니다!`, 'success');
     }
@@ -3032,6 +3250,7 @@ function deleteBucketItem(e, boardId, itemId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
     loadSavedBuckets();
   } catch (err) {
     console.error(err);

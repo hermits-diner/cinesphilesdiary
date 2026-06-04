@@ -5,15 +5,25 @@ const axios = require('axios');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.set('trust proxy', 1); // Trust Render's reverse proxy for correct rate-limiting and health checks
 const PORT = process.env.PORT || 5000;
 const APP_AUTH_TOKEN = process.env.APP_AUTH_TOKEN || 'DEFAULT_CINEDIARY_AUTH_TOKEN';
-const KOBIS_API_KEY = process.env.KOBIS_API_KEY || '5a852c691ced334dd9ffadc9ac8637c5';
+const KOBIS_API_KEY = process.env.KOBIS_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY || '26b3b2607b512f3af37009d3c6210a9c';
+// Supabase Admin client (service_role — server-side only, never exposed to client)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let supabaseAdmin = null;
+if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+}
 
 const GENRE_MAP = {
   28: '액션', 12: '모험', 16: '애니메이션', 35: '코미디', 80: '범죄',
@@ -24,7 +34,7 @@ const GENRE_MAP = {
 };
 
 function isGeminiConfigured() {
-  return !!(GEMINI_API_KEY && GEMINI_API_KEY.startsWith('AIzaSy'));
+  return !!(GEMINI_API_KEY && GEMINI_API_KEY.length > 10);
 }
 
 // In-Memory Caching System
@@ -142,6 +152,30 @@ const checkAuth = (req, res, next) => {
   }
 
   next();
+};
+
+// Supabase JWT auth middleware — verifies user session for protected user-specific endpoints
+const checkSupabaseAuth = async (req, res, next) => {
+  if (!supabaseAdmin) {
+    return res.status(503).json({ error: 'AUTH_UNAVAILABLE', message: 'Supabase가 설정되지 않았습니다.' });
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'UNAUTHORIZED', message: '로그인이 필요합니다.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !user) {
+      return res.status(401).json({ error: 'UNAUTHORIZED', message: '유효하지 않은 로그인 토큰입니다. 다시 로그인해 주세요.' });
+    }
+    req.supabaseUser = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'UNAUTHORIZED', message: '인증 확인 중 오류가 발생했습니다.' });
+  }
 };
 
 // 0. GET /api/init — Provide auth token to client securely (server-side env only)
@@ -952,7 +986,7 @@ app.get('/api/global-trending', checkAuth, async (req, res) => {
 });
 
 // 5. POST /api/coach-review — AI Movie Diary Critique & Coaching system (Persona: Review Expert & Writing Educator)
-app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
+app.post('/api/coach-review', checkSupabaseAuth, reviewLimiter, async (req, res) => {
   const { movieNm, diaryTitle, diaryContent, diaryContext, emotion } = req.body;
 
   if (!movieNm || !diaryContent) {
@@ -969,6 +1003,30 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
   const safeContent = sanitizeInput(diaryContent);
   const safeContext = sanitizeInput(diaryContext || '일상 속에서');
   const safeEmotion = sanitizeInput(emotion || '🍿');
+
+  // Check & reserve daily coaching quota (3회/일 per user, server-enforced)
+  const userId = req.supabaseUser.id;
+  const today = new Date().toISOString().split('T')[0];
+  let coachUsageCount = 0;
+  try {
+    const { data: usageRow } = await supabaseAdmin
+      .from('coach_usage')
+      .select('count')
+      .eq('user_id', userId)
+      .eq('usage_date', today)
+      .single();
+    coachUsageCount = usageRow?.count || 0;
+    if (coachUsageCount >= 3) {
+      return res.status(429).json({
+        error: 'DAILY_LIMIT_REACHED',
+        message: '오늘의 무료 코칭 한도(3회)를 모두 사용하셨습니다.',
+        remaining: 0
+      });
+    }
+  } catch (usageErr) {
+    // Non-blocking: if usage check fails, allow the request (graceful degradation)
+    console.error('Coach usage check error:', usageErr.message);
+  }
 
   // Auto-fetch TMDB Assets for rich RAG context
   let genres = '영화';
@@ -1012,6 +1070,15 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
     // Simulate delay for realism (1200ms for heavy AI analysis computation)
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
+    // Increment usage count
+    const newCount = coachUsageCount + 1;
+    try {
+      await supabaseAdmin.from('coach_usage').upsert(
+        { user_id: userId, usage_date: today, count: newCount },
+        { onConflict: 'user_id,usage_date' }
+      );
+    } catch (e) { console.error('Failed to increment coach usage:', e.message); }
+
     return res.json({
       success: true,
       scores: {
@@ -1023,7 +1090,8 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
       },
       feedback: mockFeedbacks[idx],
       corrected: mockCorrectedReviews[idx],
-      simulated: true
+      simulated: true,
+      remaining: Math.max(0, 3 - newCount)
     });
   }
 
@@ -1113,6 +1181,15 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
       throw new Error('Gemini API response is missing required coach schema fields');
     }
 
+    // Increment usage count on successful Gemini response
+    const newCount = coachUsageCount + 1;
+    try {
+      await supabaseAdmin.from('coach_usage').upsert(
+        { user_id: userId, usage_date: today, count: newCount },
+        { onConflict: 'user_id,usage_date' }
+      );
+    } catch (e) { console.error('Failed to increment coach usage:', e.message); }
+
     return res.json({
       success: true,
       scores: {
@@ -1124,7 +1201,8 @@ app.post('/api/coach-review', checkAuth, reviewLimiter, async (req, res) => {
       },
       feedback: jsonResult.feedback.trim(),
       corrected: jsonResult.corrected.trim(),
-      simulated: false
+      simulated: false,
+      remaining: Math.max(0, 3 - newCount)
     });
 
   } catch (error) {
