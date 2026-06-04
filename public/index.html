@@ -2987,8 +2987,8 @@
     /* Floating Home Button styling */
     .floating-home-btn {
       position: fixed;
-      bottom: 2.2rem;
-      right: 2.2rem;
+      top: 2.2rem;
+      left: 2.2rem;
       width: 3.2rem;
       height: 3.2rem;
       border-radius: 50%;
@@ -3011,13 +3011,23 @@
       background: rgba(41, 33, 49, 0.9);
       border-color: rgba(229, 169, 169, 0.55);
       color: #fff;
-      transform: scale(1.12) translateY(-2px);
+      transform: scale(1.12) translateY(2px); /* animate downwards slightly since button is at top */
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 169, 169, 0.35);
     }
 
     .floating-home-btn:active {
       transform: scale(0.95) translateY(0);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .floating-home-btn {
+        top: 1.2rem;
+        left: 1.2rem;
+        width: 2.6rem;
+        height: 2.6rem;
+        font-size: 1rem;
+      }
     }
 
     /* ── Diary Hub Section ── */
