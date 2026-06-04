@@ -1366,14 +1366,33 @@ async function coachDiaryReview() {
   if (resultPanel) resultPanel.style.display = 'none';
   if (coachBtn) coachBtn.disabled = true;
 
+  // 15초 타임아웃 — Vercel cold start / Gemini 지연 대응
+  const abortCtrl = new AbortController();
+  const timeoutId = setTimeout(() => abortCtrl.abort(), 15000);
+
   try {
     const response = await fetch(`${BACKEND_BASE}/api/coach-review`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
-      body: JSON.stringify({ movieNm, diaryTitle, diaryContent, diaryContext, emotion })
+      body: JSON.stringify({ movieNm, diaryTitle, diaryContent, diaryContext, emotion }),
+      signal: abortCtrl.signal
     });
+    clearTimeout(timeoutId);
 
-    const result = await response.json();
+    // 서버가 HTML(404/500)을 반환할 때 json() 파싱 오류 방지
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      throw new Error(`서버 응답을 처리할 수 없습니다. (HTTP ${response.status}) — 백엔드 URL을 확인해 주세요.`);
+    }
+
+    if (response.status === 401) {
+      showToast('인증 만료', '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.', 'error');
+      openAuthModal();
+      if (loader) loader.style.display = 'none';
+      return;
+    }
 
     if (response.status === 429 && result.error === 'DAILY_LIMIT_REACHED') {
       showToast('코칭 한도 초과', '오늘의 무료 코칭 한도(3회)를 모두 사용하셨습니다. 내일 다시 이용해 주세요.', 'error');
@@ -1393,8 +1412,12 @@ async function coachDiaryReview() {
     showToast('AI 비평 첨삭 성공 🎓', `평론 코칭이 완료되었습니다! 오늘 남은 코칭 횟수: ${remaining}회`, 'success');
 
   } catch (err) {
+    clearTimeout(timeoutId);
     console.error('Coach diary review failed:', err);
-    showToast('코칭 실패', err.message, 'error');
+    const msg = err.name === 'AbortError'
+      ? 'AI 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.'
+      : err.message;
+    showToast('코칭 실패', msg, 'error');
     if (loader) loader.style.display = 'none';
   } finally {
     if (coachBtn) coachBtn.disabled = false;
@@ -1406,9 +1429,19 @@ function renderDiaryCoachResult(data, originalContentText) {
   const resultPanel = document.getElementById('diaryAiCoachResultPanel');
   if (!resultPanel) return;
 
-  const scores = data.scores || { expression: 75, structure: 75, analysis: 75, vocabulary: 75, coachability: 75 };
-  const feedback = data.feedback || '영화적 정서가 물씬 배어 나오는 훌륭한 영화 일기입니다.';
-  const corrected = data.corrected || '평론가 스타일로 교정된 화려한 시네필 비평 에세이입니다.';
+  // 개별 필드 parseInt 보정 — Gemini가 문자열이나 누락 필드를 반환해도 안전하게 처리
+  const s = data.scores || {};
+  const scores = {
+    expression:   parseInt(s.expression,   10) || 75,
+    structure:    parseInt(s.structure,    10) || 75,
+    analysis:     parseInt(s.analysis,     10) || 75,
+    vocabulary:   parseInt(s.vocabulary,   10) || 75,
+    coachability: parseInt(s.coachability, 10) || 75,
+  };
+  const feedback = (typeof data.feedback === 'string' && data.feedback.trim())
+    ? data.feedback : '영화적 정서가 물씬 배어 나오는 훌륭한 영화 일기입니다.';
+  const corrected = (typeof data.corrected === 'string' && data.corrected.trim())
+    ? data.corrected : '평론가 스타일로 교정된 화려한 시네필 비평 에세이입니다.';
 
   resultPanel.innerHTML = `
     <div class="ai-coach-results-card" style="margin-top: 1.5rem;">
