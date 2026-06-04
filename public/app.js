@@ -41,12 +41,21 @@ function initSupabaseAuth() {
     }
   });
 
-  // Restore existing session on page load
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session?.user) {
-      supabaseUser = session.user;
+  // 페이지 로드 시 세션 복원 — 서버에서 유효성 재확인
+  sb.auth.getSession().then(async ({ data: { session }, error }) => {
+    if (error || !session?.user) {
+      // 세션 없음 또는 오류 → localStorage 잔여 키 정리
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') || key === 'supabase.auth.token') {
+          localStorage.removeItem(key);
+        }
+      });
+      supabaseUser = null;
       updateAuthUI();
+      return;
     }
+    supabaseUser = session.user;
+    updateAuthUI();
   });
 }
 
@@ -160,12 +169,25 @@ function showUserMenu() {
 async function doSignOut() {
   const dropdown = document.getElementById('authDropdown');
   if (dropdown) dropdown.classList.remove('open');
-  const sb = getSupabase();
-  if (sb) {
-    await sb.auth.signOut();
-    supabaseUser = null;
-    updateAuthUI();
+
+  try {
+    const sb = getSupabase();
+    if (sb) await sb.auth.signOut({ scope: 'global' });
+  } catch (e) {
+    console.warn('[Auth] signOut error (ignored):', e);
   }
+
+  // Supabase가 localStorage에 남긴 세션 키 전체 제거
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('sb-') || key === 'supabase.auth.token') {
+      localStorage.removeItem(key);
+    }
+  });
+
+  // 클라이언트 인스턴스 초기화 → 다음 로그인 시 새로 생성
+  _supabaseClient = null;
+  supabaseUser = null;
+  updateAuthUI();
 }
 window.doSignOut = doSignOut;
 
