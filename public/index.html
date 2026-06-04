@@ -3083,7 +3083,56 @@
       margin-bottom: -0.4rem;
     }
 
-    @media (max-width: 768px) {
+    /* Desktop screen-matching constraint to align perfectly with SVG background screen (880x328) */
+    @media (min-width: 901px) {
+      .screen-stage.diary-hub-section {
+        width: 880px !important;
+        height: 328px !important;
+        padding: 1.25rem 2.5rem !important;
+        gap: 0.65rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-radius: 2px !important; /* matches rx="2" of the SVG screen */
+      }
+      .screen-stage.diary-hub-section .brand {
+        margin-bottom: -0.5rem;
+      }
+      .screen-stage.diary-hub-section .brand-cinephile {
+        font-size: 2.3rem !important;
+      }
+      .screen-stage.diary-hub-section .brand-diary {
+        font-size: 3rem !important;
+      }
+      .screen-stage.diary-hub-section .brand-subtitle {
+        font-size: 0.85rem !important;
+        margin-top: -0.25rem !important;
+      }
+      .screen-stage.diary-hub-section .diary-hub-grid {
+        height: 114px !important;
+        margin-bottom: 0 !important;
+        width: 100% !important;
+      }
+      .screen-stage.diary-hub-section .diary-hub-card {
+        height: 114px !important;
+        padding: 0.75rem 1rem !important;
+        box-sizing: border-box !important;
+      }
+      .screen-stage.diary-hub-section .diary-hub-card-poster-wrapper {
+        width: 60px !important;
+        height: 90px !important;
+      }
+      .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-title {
+        font-size: 0.95rem !important;
+      }
+      .screen-stage.diary-hub-section .diary-hub-card--ticket .diary-hub-card-excerpt {
+        font-size: 0.75rem !important;
+        -webkit-line-clamp: 2 !important;
+      }
+    }
+
+    @media (max-width: 900px) {
       .screen-stage.diary-hub-section {
         width: 96vw;
         padding: 1.8rem 1rem;
