@@ -69,6 +69,20 @@ function updateAuthUI() {
     textEl.textContent = '로그인';
     btn.onclick = openAuthModal;
   }
+
+  // AI 코칭 버튼 로그인 상태 반영
+  const coachBtn = document.getElementById('coachDiaryBtn');
+  if (coachBtn) {
+    if (supabaseUser) {
+      coachBtn.innerHTML = '<i class="fa-solid fa-graduation-cap"></i> AI 비평 & 글쓰기 코칭';
+      coachBtn.style.opacity = '1';
+      coachBtn.title = 'AI 영화 평론가 & 작문 교육자에게 일기 코칭 및 첨삭 받기';
+    } else {
+      coachBtn.innerHTML = '<i class="fa-solid fa-lock"></i> AI 코칭 (로그인 필요)';
+      coachBtn.style.opacity = '0.5';
+      coachBtn.title = '로그인 후 이용 가능합니다';
+    }
+  }
 }
 
 function openAuthModal() {
@@ -258,6 +272,18 @@ const supabaseSync = {
     }
   }
 };
+
+// Debounced sync failure toast — shows once even if multiple syncs fail simultaneously
+let _syncFailTimer = null;
+function onSyncError(label) {
+  return (err) => {
+    console.error('[Supabase sync]', label, err);
+    clearTimeout(_syncFailTimer);
+    _syncFailTimer = setTimeout(() => {
+      showToast('동기화 실패', '클라우드 저장에 실패했습니다. 데이터는 이 기기에 보관됩니다.', 'error');
+    }, 300);
+  };
+}
 
 // Expose auth functions for HTML event handlers
 window.openAuthModal = openAuthModal;
@@ -2347,7 +2373,7 @@ function loadCinemaLog(movieCd) {
       highlightStars(activeRating);
       ratingScoreText.textContent = `${activeRating.toFixed(1)} / 5.0`;
       userReviewInput.value = log.comment || '';
-      charCounter.textContent = `${userReviewInput.value.length} / 150`;
+      charCounter.textContent = `${userReviewInput.value.length} / 1000`;
       
       if (deleteReviewBtn) deleteReviewBtn.style.display = 'inline-flex';
     } catch (e) {
@@ -2383,7 +2409,7 @@ function saveCinemaLog() {
     localStorage.setItem(cacheKey, JSON.stringify(logData));
     showToast('저장 완료', `영화 《${activeMovieInfo.movieNm}》 관람 기록이 저장되었습니다.`, 'success');
     if (deleteReviewBtn) deleteReviewBtn.style.display = 'inline-flex';
-    if (supabaseUser) supabaseSync.upsertCinemaLog(logData).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.upsertCinemaLog(logData).catch(onSyncError('sync'));
   } catch (e) {
     console.error('Save failed:', e);
     showToast('저장 실패', '로컬 저장 공간이 부족하거나 쓸 수 없습니다.', 'error');
@@ -2400,7 +2426,7 @@ function deleteCinemaLog() {
   try {
     localStorage.removeItem(cacheKey);
     showToast('삭제 완료', `영화 《${movieNm}》 관람 기록이 삭제되었습니다.`, 'success');
-    if (supabaseUser) supabaseSync.deleteCinemaLog(activeMovieInfo.movieCd).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.deleteCinemaLog(activeMovieInfo.movieCd).catch(onSyncError('sync'));
 
     // Reset UI
     activeRating = 0;
@@ -2453,6 +2479,7 @@ function showToast(title, desc, type = 'info') {
 // ==========================================
 
 let activeDiaryEmotion = '🍿';
+let _editingDiaryId = null; // 편집 중인 다이어리 id (null = 새 작성)
 
 // Open the My CineDiary Modal
 function openCineDiary() {
@@ -2486,6 +2513,13 @@ function openCineDiary() {
     try { loadSavedTickets(); } catch (e) { console.error('Failed to load saved tickets:', e); }
     try { loadSavedDiaries(); } catch (e) { console.error('Failed to load saved diaries:', e); }
     try { loadSavedBuckets(); } catch (e) { console.error('Failed to load saved buckets:', e); }
+
+    // 다이어리 검색 입력 이벤트
+    const diarySearchInput = document.getElementById('diarySearchInput');
+    if (diarySearchInput && !diarySearchInput._searchBound) {
+      diarySearchInput.addEventListener('input', () => loadSavedDiaries());
+      diarySearchInput._searchBound = true;
+    }
     
   } catch (err) {
     console.error('[CineDiary] openCineDiary 처리 중 에러 발생:', err);
@@ -2699,7 +2733,7 @@ async function saveTicketStub() {
   try {
     localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 발급 성공', `영화 《${movieNm}》의 디지털 티켓이 보관함에 저장되었습니다.`, 'success');
-    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(onSyncError('sync'));
 
     // Reset Form
     if (ticketMovieNmEl) ticketMovieNmEl.value = '';
@@ -2869,7 +2903,7 @@ function deleteTicketStub(e, id) {
   try {
     localStorage.setItem('CINEDIARY_TICKETS', JSON.stringify(tickets));
     showToast('티켓 삭제 완료', '디지털 티켓이 보관함에서 제거되었습니다.', 'success');
-    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllTickets(tickets).catch(onSyncError('sync'));
     loadSavedTickets();
     updateDiaryHub();
   } catch (err) {
@@ -2903,8 +2937,9 @@ function saveDiaryEntry() {
     return;
   }
   
+  const diaryId = _editingDiaryId || Date.now().toString();
   const newDiary = {
-    id: Date.now().toString(),
+    id: diaryId,
     title,
     watchDate: diaryDate,
     context,
@@ -2912,22 +2947,33 @@ function saveDiaryEntry() {
     content,
     savedAt: new Date().toISOString()
   };
-  
+
   let diaries = [];
   try {
     diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]');
   } catch (e) {
     console.error(e);
   }
-  
+
   if (!Array.isArray(diaries)) diaries = [];
-  
-  diaries.unshift(newDiary);
-  
+
+  if (_editingDiaryId) {
+    // 편집 모드: 기존 항목 교체
+    const idx = diaries.findIndex(d => d && d.id === _editingDiaryId);
+    if (idx !== -1) diaries[idx] = newDiary;
+    else diaries.unshift(newDiary);
+    _editingDiaryId = null;
+    // 저장 버튼 텍스트 원복
+    const saveBtn = document.getElementById('saveDiaryBtn');
+    if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> 다이어리 저장하기';
+  } else {
+    diaries.unshift(newDiary);
+  }
+
   try {
     localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 저장 완료', '오늘의 영화 감상이 다이어리에 소중히 보관되었습니다.', 'success');
-    if (supabaseUser) supabaseSync.upsertDiaryEntry(newDiary).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.upsertDiaryEntry(newDiary).catch(onSyncError('sync'));
 
     // Reset Form
     if (diaryTitleEl) diaryTitleEl.value = '';
@@ -2968,21 +3014,30 @@ function loadSavedDiaries() {
   }
   
   if (!Array.isArray(diaries)) diaries = [];
-  
+
   if (countSpan) countSpan.textContent = diaries.length;
-  
-  if (diaries.length === 0) {
+
+  // 검색 필터 적용
+  const searchQuery = (document.getElementById('diarySearchInput')?.value || '').trim().toLowerCase();
+  const filtered = searchQuery
+    ? diaries.filter(d => d && (
+        (d.title || '').toLowerCase().includes(searchQuery) ||
+        (d.content || '').toLowerCase().includes(searchQuery)
+      ))
+    : diaries;
+
+  if (filtered.length === 0) {
     feedList.innerHTML = `
       <div style="text-align: center; padding: 4rem 1rem; color: var(--color-text-muted); width: 100%;">
         <i class="fa-solid fa-pen-fancy" style="font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 0.75rem; display: block;"></i>
-        아직 기록된 일기가 없습니다. 영화 일상의 소중한 한 컷을 적어보세요!
+        ${searchQuery ? `"${escapeHtml(searchQuery)}"에 해당하는 일기가 없습니다.` : '아직 기록된 일기가 없습니다. 영화 일상의 소중한 한 컷을 적어보세요!'}
       </div>
     `;
     return;
   }
-  
+
   feedList.innerHTML = '';
-  diaries.forEach(diary => {
+  filtered.forEach(diary => {
     if (!diary) return;
     let formattedDate = diary.watchDate || '';
     if (formattedDate && formattedDate.includes('-')) {
@@ -2992,9 +3047,14 @@ function loadSavedDiaries() {
     const card = document.createElement('div');
     card.className = 'diary-feed-card';
     card.innerHTML = `
-      <button class="diary-delete-btn" onclick="deleteDiaryEntry(event, '${diary.id}')" title="일기 삭제">
-        <i class="fa-solid fa-trash"></i>
-      </button>
+      <div style="position:absolute;top:0.6rem;right:0.6rem;display:flex;gap:0.35rem;">
+        <button class="diary-delete-btn" style="position:static;" onclick="editDiaryEntry('${diary.id}')" title="일기 편집">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="diary-delete-btn" style="position:static;" onclick="deleteDiaryEntry(event, '${diary.id}')" title="일기 삭제">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
       <div class="diary-card-header">
         <div class="diary-card-title-wrap">
           <span class="diary-card-emoji">${escapeHtml(diary.emotion || '🍿')}</span>
@@ -3009,9 +3069,46 @@ function loadSavedDiaries() {
   });
 }
 
+function editDiaryEntry(id) {
+  let diaries = [];
+  try { diaries = JSON.parse(localStorage.getItem('CINEDIARY_DIARIES') || '[]'); } catch (e) { console.error(e); }
+  const diary = diaries.find(d => d && d.id === id);
+  if (!diary) return;
+
+  // 작성 폼에 기존 데이터 채우기
+  const diaryTitleEl = document.getElementById('diaryTitle');
+  const diaryDateEl = document.getElementById('diaryDate');
+  const diaryContextEl = document.getElementById('diaryContext');
+  const diaryContentEl = document.getElementById('diaryContent');
+
+  if (diaryTitleEl) diaryTitleEl.value = diary.title || '';
+  if (diaryDateEl) diaryDateEl.value = diary.watchDate || '';
+  if (diaryContextEl) diaryContextEl.value = diary.context || '집에서 이불 덮고 혼자';
+  if (diaryContentEl) diaryContentEl.value = diary.content || '';
+  activeDiaryEmotion = diary.emotion || '🍿';
+
+  // 이모지 버튼 활성화 상태 동기화
+  document.querySelectorAll('#diaryEmotionRow .emotion-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-emoji') === activeDiaryEmotion);
+  });
+
+  // 저장 버튼을 "수정하기"로 변경
+  const saveBtn = document.getElementById('saveDiaryBtn');
+  if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> 수정 완료';
+
+  _editingDiaryId = id;
+
+  // 작성 폼 탭으로 스크롤 이동
+  const diaryTab = document.querySelector('.space-tab-btn[data-tab="tabDiary"]');
+  if (diaryTab) diaryTab.click();
+  setTimeout(() => {
+    if (diaryTitleEl) diaryTitleEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+}
+
 function deleteDiaryEntry(e, id) {
   if (e) e.stopPropagation();
-  
+
   if (!confirm('이 일기를 삭제하시겠습니까?')) return;
   
   let diaries = [];
@@ -3027,7 +3124,7 @@ function deleteDiaryEntry(e, id) {
   try {
     localStorage.setItem('CINEDIARY_DIARIES', JSON.stringify(diaries));
     showToast('일기 삭제 완료', '일기 기록이 보관함에서 삭제되었습니다.', 'success');
-    if (supabaseUser) supabaseSync.deleteDiaryEntry(id).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.deleteDiaryEntry(id).catch(onSyncError('sync'));
     loadSavedDiaries();
     updateDiaryHub();
   } catch (err) {
@@ -3065,7 +3162,7 @@ function createBucketBoard() {
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     showToast('보드 생성 완료', `새로운 영화 챌린지 《${title}》 보드가 다이어리에 배치되었습니다.`, 'success');
-    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(onSyncError('sync'));
     if (bucketListTitleEl) bucketListTitleEl.value = '';
     loadSavedBuckets();
     updateDiaryHub();
@@ -3183,7 +3280,7 @@ function deleteBucketBoard(e, id) {
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
     showToast('보드 삭제 완료', '영화 챌린지 보드가 다이어리에서 철거되었습니다.', 'success');
-    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(onSyncError('sync'));
     loadSavedBuckets();
   } catch (err) {
     console.error(err);
@@ -3225,7 +3322,7 @@ function addMovieToBucket(boardId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
-    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(onSyncError('sync'));
     inputEl.value = '';
     loadSavedBuckets();
   } catch (e) {
@@ -3255,7 +3352,7 @@ function toggleBucketItem(boardId, itemId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
-    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(onSyncError('sync'));
     loadSavedBuckets();
     if (item.checked) {
       showToast('정복 완료 🍿', `영화 《${item.text}》 미션을 완료하였습니다! 축하합니다!`, 'success');
@@ -3284,7 +3381,7 @@ function deleteBucketItem(e, boardId, itemId) {
   
   try {
     localStorage.setItem('CINEDIARY_BUCKETS', JSON.stringify(boards));
-    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(err => console.error('[Supabase sync]', err));
+    if (supabaseUser) supabaseSync.syncAllBuckets(boards).catch(onSyncError('sync'));
     loadSavedBuckets();
   } catch (err) {
     console.error(err);
@@ -3293,10 +3390,30 @@ function deleteBucketItem(e, boardId, itemId) {
 
 // Expose functions globally for inline HTML event handlers
 window.openCineDiary = openCineDiary;
+
+// 미저장 내용 확인 후 모달 닫기
+window.closeCineDiary = function() {
+  const diaryContent = document.getElementById('diaryContent');
+  const diaryTitle = document.getElementById('diaryTitle');
+  const hasUnsaved = (diaryContent?.value?.trim() || diaryTitle?.value?.trim());
+
+  if (hasUnsaved && !confirm('작성 중인 내용이 있습니다. 저장하지 않고 닫으시겠습니까?')) return;
+
+  // 편집 모드 초기화
+  if (_editingDiaryId) {
+    _editingDiaryId = null;
+    const saveBtn = document.getElementById('saveDiaryBtn');
+    if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> 다이어리 저장하기';
+  }
+
+  const modal = document.getElementById('cineDiaryModal');
+  if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+};
 window.updateLiveTicketPreview = updateLiveTicketPreview;
 window.saveTicketStub = saveTicketStub;
 window.deleteTicketStub = deleteTicketStub;
 window.saveDiaryEntry = saveDiaryEntry;
+window.editDiaryEntry = editDiaryEntry;
 window.deleteDiaryEntry = deleteDiaryEntry;
 window.createBucketBoard = createBucketBoard;
 window.loadSavedBuckets = loadSavedBuckets;
