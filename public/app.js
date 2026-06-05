@@ -1546,23 +1546,9 @@ function renderDiaryCoachResult(data, originalContentText) {
 }
 
 // Centralized Ticket Booking Link Generator (Supports Affiliate Wrappers easily!)
-function getBookingLinks(movieNm) {
-  if (!movieNm) return null;
-  const q = encodeURIComponent(movieNm.trim());
-  return {
-    cgv:  `https://www.cgv.co.kr/search/movie.aspx?query=${q}`,
-    mega: `https://www.megabox.co.kr/movie?searchYn=Y&searchText=${q}`
-  };
-}
-
-function renderBookingBtnsHtml(movieNm) {
-  const links = getBookingLinks(movieNm);
-  if (!links) return '';
-  return `
-    <div class="booking-btns-row">
-      <a href="${links.cgv}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="CGV 예매">CGV</a>
-      <a href="${links.mega}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="메가박스 예매">메가박스</a>
-    </div>`;
+function getBookingUrl(movieNm) {
+  if (!movieNm) return '#';
+  return `https://search.naver.com/search.naver?query=${encodeURIComponent(movieNm.trim() + ' 예매')}`;
 }
 
 // Helper: Calculate yesterday's date string (YYYY-MM-DD) dynamically
@@ -1816,7 +1802,11 @@ function renderBoxOfficeList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        ${renderBookingBtnsHtml(movie.movieNm)}
+        <div class="unified-booking-container">
+          <a href="${getBookingUrl(movie.movieNm)}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
+          </a>
+        </div>
       </div>
     `;
     
@@ -1908,7 +1898,11 @@ function renderWeeklyBoxOfficeList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        ${renderBookingBtnsHtml(movie.movieNm)}
+        <div class="unified-booking-container">
+          <a href="${getBookingUrl(movie.movieNm)}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
+          </a>
+        </div>
       </div>
     `;
     
@@ -2074,7 +2068,11 @@ function renderGlobalTrendingList(moviesList) {
           </div>
         </div>
         ${rankChangeHtml}
-        ${renderBookingBtnsHtml(movie.movieNm)}
+        <div class="unified-booking-container">
+          <a href="${getBookingUrl(movie.movieNm)}" target="_blank" class="unified-booking-btn unified-booking-btn--ghost" onclick="event.stopPropagation();" title="실시간 영화 예매 및 시간표 보기">
+            <i class="fa-solid fa-ticket"></i> 실시간 빠른 예매
+          </a>
+        </div>
       </div>
     `;
     
@@ -2217,13 +2215,8 @@ async function openMovieDetails(movieCd, movieNm) {
   loadCinemaLog(movieCd);
   
   // Pre-populate cinema booking links immediately
-  const bookingLinks = getBookingLinks(movieNm);
-  if (bookingLinks) {
-    const cgvBtn  = document.getElementById('modalBookingCgv');
-    const megaBtn = document.getElementById('modalBookingMega');
-    if (cgvBtn)  cgvBtn.href  = bookingLinks.cgv;
-    if (megaBtn) megaBtn.href = bookingLinks.mega;
-  }
+  const modalUnifiedBookingBtn = document.getElementById('modalUnifiedBookingBtn');
+  if (modalUnifiedBookingBtn) modalUnifiedBookingBtn.href = getBookingUrl(movieNm);
   
   // Reset modal visuals
   const backdrop = document.getElementById('modalBackdrop');
