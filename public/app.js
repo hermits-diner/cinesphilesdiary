@@ -1550,9 +1550,8 @@ function getBookingLinks(movieNm) {
   if (!movieNm) return null;
   const q = encodeURIComponent(movieNm.trim());
   return {
-    cgv:   `https://www.cgv.co.kr/search/movie.aspx?query=${q}`,
-    lotte: `https://www.lottecinema.co.kr/NLCHS/Movie/List?flag=1`,
-    mega:  `https://www.megabox.co.kr/movie?searchYn=Y&searchText=${q}`
+    cgv:  `https://www.cgv.co.kr/search/movie.aspx?query=${q}`,
+    mega: `https://www.megabox.co.kr/movie?searchYn=Y&searchText=${q}`
   };
 }
 
@@ -1562,8 +1561,7 @@ function renderBookingBtnsHtml(movieNm) {
   return `
     <div class="booking-btns-row">
       <a href="${links.cgv}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="CGV 예매">CGV</a>
-      <a href="${links.lotte}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="롯데시네마 예매">롯데</a>
-      <a href="${links.mega}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="메가박스 예매">메가</a>
+      <a href="${links.mega}" target="_blank" class="booking-btn-site" onclick="event.stopPropagation();" title="메가박스 예매">메가박스</a>
     </div>`;
 }
 
@@ -2221,12 +2219,10 @@ async function openMovieDetails(movieCd, movieNm) {
   // Pre-populate cinema booking links immediately
   const bookingLinks = getBookingLinks(movieNm);
   if (bookingLinks) {
-    const cgvBtn   = document.getElementById('modalBookingCgv');
-    const lotteBtn = document.getElementById('modalBookingLotte');
-    const megaBtn  = document.getElementById('modalBookingMega');
-    if (cgvBtn)   cgvBtn.href   = bookingLinks.cgv;
-    if (lotteBtn) lotteBtn.href = bookingLinks.lotte;
-    if (megaBtn)  megaBtn.href  = bookingLinks.mega;
+    const cgvBtn  = document.getElementById('modalBookingCgv');
+    const megaBtn = document.getElementById('modalBookingMega');
+    if (cgvBtn)  cgvBtn.href  = bookingLinks.cgv;
+    if (megaBtn) megaBtn.href = bookingLinks.mega;
   }
   
   // Reset modal visuals
