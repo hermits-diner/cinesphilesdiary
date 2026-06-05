@@ -1550,8 +1550,8 @@ function getBookingLinks(movieNm) {
   if (!movieNm) return null;
   const q = encodeURIComponent(movieNm.trim());
   return {
-    cgv:   `https://www.cgv.co.kr/movies/?searchStr=${q}`,
-    lotte: `https://www.lottecinema.co.kr/LCMW/Contents/Movie/Movie-List.aspx?searchText=${q}`,
+    cgv:   `https://www.cgv.co.kr/search/movie.aspx?query=${q}`,
+    lotte: `https://www.lottecinema.co.kr/NLCHS/Movie/List?flag=1`,
     mega:  `https://www.megabox.co.kr/movie?searchYn=Y&searchText=${q}`
   };
 }
